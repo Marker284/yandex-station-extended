@@ -65,7 +65,7 @@ LOG=/data/opt/etc/dropbear/dropbear.log
 case "$1" in
   start)
     if [ -x "$DB" ] && [ -f "$HK" ]; then
-      pidof dropbear >/dev/null 2>&1 || "$DB" -r "$HK" -p 2222 -E 2>>"$LOG"
+      pidof dropbear >/dev/null 2>&1 || "$DB" -r "$HK" -p 2222 -B 2>>"$LOG"
     fi
     ;;
   stop)
