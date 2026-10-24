@@ -54,3 +54,17 @@
 
 - В `quasar.cfg` есть сторож Wi-Fi (`wifiReseter`) и проверка связи `generate_204`.
 - Есть запасные адреса DNS (`DnsFallbackMap`) — см. [Сеть](network.md).
+
+## glagol: когда порт 1961 молчит { #glagol-1961 }
+
+- **`:1961` поднимается только после успешного `/glagol/device_list`** из облака. Список
+  устройств кэшируется лишь в памяти процесса. Поэтому при холодной загрузке с доступным
+  бэкендом порт открывается, а после краха/рестарта `maind` **без связи с облаком** — нет
+  (`account_devices.cpp: Fail to update account device list: Timeouted`), хотя mDNS его уже
+  рекламирует, а внутренний `127.0.0.1:9899` работает.
+- Когда связь возвращается, в логе видно `glagol_ws_server.cpp: Restarting WS server due to new
+  auth data. Settings.port = 1961` — порт несколько раз мигает и затем встаёт стабильно. Строки
+  `asio async_shutdown error: ... SSL_shutdown` — безобидный шум отвалившихся коннектов.
+- **Битый `conversationToken` роняет `maind --platformd`** целиком (его поднимет
+  `quasar_launcher2`). Корректный клиент шлёт валидный JWT и проблемы не создаёт — но при
+  фаззинге `:1961` держите это в уме. Детали протокола — [Сеть → glagol](network.md#glagol).
