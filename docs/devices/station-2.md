@@ -78,6 +78,53 @@ NAND — **Micron 512 МБ SLC**, page 4096, OOB 128, erase 256 КБ. Разде
 - `gpio-keys` — физические кнопки.
 - `midi_touch` — сенсорная панель.
 
+## USB-host (OTG) { #usb-host }
+
+Порт Type-C по умолчанию отдан gadget-контроллеру: `dwc_otg` (`ff400000.dwc2_a`) держит
+USB2-порт 1, а `xhci-hcd.0.auto` стартует без порта и умирает при загрузке:
+
+```
+xhci-hcd xhci-hcd.0.auto: xHCI host not responding to stop endpoint command.
+xhci-hcd xhci-hcd.0.auto: Assuming host is dying, halting host.
+xhci-hcd xhci-hcd.0.auto: HC died; cleaning up
+```
+
+Переключение — те же регистры, что у [Лайта](station-lite.md) (PHY `ffe09000`, раскладка
+как в Amlogic `phy-aml-new-usb3.c`, `set_mode()`):
+
+| Адрес | Регистр | До | После | Смысл |
+|---|---|---|---|---|
+| `0xffe09084` | `usb_r1` | `0x01000000` | `0x01000000` | у Лайта здесь `0x01002000`; на Станции 2 USB2-порт 1 уже не запрещён |
+| `0xffe09080` | `usb_r0` | `0x8000006A` | `0x0000006A` | `u2d_act = 0`: порт → xHCI |
+| `0xffe09090` | `usb_r4` | `0x00000002` | `0x00000000` | `p21_SLEEPM0 = 0` |
+| `0xffe09020` | `u2p_r0` | `0x10252000` | `0x00252060` | подтяжки 15 кОм на D+/D- (роль хоста) |
+
+Порядок: `unbind` `ff400000.dwc2_a` → `unbind` `xhci-hcd.0.auto` → четыре `devmem` →
+`bind` `xhci-hcd.0.auto`. `dwc3` не отвязывать — будет oops в `dwc3_remove`.
+
+Проверено на живом устройстве (`YNDX-00051`, прошивка от 21.10.2026):
+
+* хаб Genesys `05e3:0610` плюс вложенный WCH `1a86:8091` — определяются на 480 Мбит/с;
+* флешка 8,18 ГБ (`/dev/sdb`, FAT32, монтируется) и SD-карта 7,4 ГБ в картридере
+  `05e3:0751` (`/dev/sda`) — читаются;
+* USB-Ethernet Realtek RTL8153 (`0bda:8153`) — после `r8152` появляется `eth0`;
+* модули из [`contrib/modules`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/modules)
+  (`sd_mod`, `usb-storage`, `uas`, `mii`, `usbnet`, `r8152`) загружаются без единой ошибки ядра;
+  `snd-usb-audio` на этой модели **не проверялся**.
+
+Нюансы, которых нет в рецепте для Лайта:
+
+* **картридер не сообщает о вставке карты.** `/dev/sda` остаётся нулевого размера, пока
+  устройство не переподключить: `echo 1-1.2.1 > /sys/bus/usb/drivers/usb/unbind`, пауза,
+  `echo 1-1.2.1 > /sys/bus/usb/drivers/usb/bind`. Пересчёт `scsi_host/*/scan` помогает только
+  на старте; на раннем старте каталога ещё нет и glob подставляется буквально;
+* `contrib/otg/install.sh` на этой модели **откажется работать**: в нём жёсткая проверка
+  `yandex,station-micro`. Ставить нужно руками либо ослабить проверку;
+* после переключения USB-gadget (ADB, режим прошивки) недоступен до перезагрузки.
+
+Пошаговая инструкция, скрипты и защита от бутлупа — в рецепте
+[USB Host (OTG)](../recipes/usb-host.md).
+
 ## Что ещё проверить
 
 - Протокол **Gowin LED** (`gowin_led_device`) — как выводится на дисплей-«шторку».

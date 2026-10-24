@@ -13,6 +13,14 @@
     Хаб Fresco Logic с питанием + SSD Patriot Burst Elite 240G (мост RTL9201), Ethernet RTL8153,
     USB-звук C&T, — всё определяется на 480 Мбит/с, переживает перезагрузку, чтение SSD ~32 МБ/с.
 
+!!! success "Проверено также на Станции 2 (`yandex,station-midi`)"
+    SoC тот же — **Amlogic AXG**, ядро 4.9.68, USB2-PHY `ffe09000` с теми же регистрами
+    (`usb_r0 0x8000006A`, `u2p_r0 0x10252000`), симптом при загрузке тот же
+    (`xHCI host not responding … HC died`). Модули из `contrib/modules` грузятся как есть.
+    Отличия: проверка модели в `install.sh` рассчитана на `yandex,station-micro`, а картридер
+    на Станции 2 не сообщает о вставке карты — нужно `unbind`/`bind` USB-устройства.
+    Регистры, шина и замеры — в [`devices/station-2.md`](../devices/station-2.md#usb-host).
+
 !!! danger "Модули из первой версии этого гайда были битыми"
     Ранее здесь лежали модули с подписью `4.9.y`, собранные под **чужие** заголовки ядра.
     Они роняли колонку: `r8152`/`usbnet` — kernel oops в `register_netdevice` при появлении
