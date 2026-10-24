@@ -41,9 +41,19 @@ S54default-bluez-agent  S60touch_buttons_settings  S70unbound  S98pstore-clear  
 | `--telemetry` | телеметрия |
 | `--fluent-bitd` | логи |
 | `--updatesd` | обновления (OTA); убирается при [отключении обновлений](../start/ssh.md#kill-ota) |
+| `--updater_gateway` | шлюз обновлятора через unix-сокет `/tmp/updater.sock` |
 
 Симлинки на `maind` в том же каталоге: `led_util`, `tcp_alsa_writer`,
 `keymaster_proxy_app`, `quasar_client`.
+
+Кроме ролей, в `main` зашит диспетчер диагностических команд — их больше, чем оборачивает
+[`q`](#хелпер-q): помимо перечисленных есть ещё `--nettest`, `--build-timestamp` и
+`--device-localization`.
+
+!!! warning "`--getprop` синтезирует значения"
+    Обработчик `--getprop` отдаёт Android-style свойства с **захардкоженным**
+    `ro.product.cpu.abi=arm64-v8a`. Это не отражает реальную архитектуру: сам `maind` — **ARM32**
+    (ELF32, armhf), userspace тоже 32-битный. Не ориентируйтесь на этот вывод при сборке бинарников.
 
 ## Звук
 
