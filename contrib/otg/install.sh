@@ -1,5 +1,6 @@
 #!/bin/sh
-# Установка USB Host (OTG) на Станцию Лайт (Yandex Station Micro, Amlogic AXG, ядро 4.9.68).
+# Установка USB Host (OTG) на Станцию Лайт (Yandex Station Micro) и Станцию 2
+# (Yandex Station Midi) — Amlogic AXG, ядро 4.9.68, PHY ffe09000.
 #
 # Запуск на колонке из каталога, куда скопированы contrib/otg, contrib/modules и contrib/bin/fuse2fs
 # (например: scp -r contrib/otg contrib/modules root@<ip>:/data/otg-src/ &&
@@ -21,8 +22,16 @@ set -e
 SRC=$(cd "$(dirname "$0")/.." && pwd)
 D=/data/otg
 
-grep -q "yandex,station-micro" /proc/device-tree/compatible 2>/dev/null \
-	|| { echo "Это не Станция Лайт (yandex,station-micro) — регистры PHY другие, выходим."; exit 1; }
+# Платформа и регистры PHY у Лайта (yandex,station-micro) и Станции 2
+# (yandex,station-midi) совпадают: см. docs/devices/station-2.md.
+if grep -q "yandex,station-midi" /proc/device-tree/compatible 2>/dev/null; then
+	MODEL="Станция 2 (yandex,station-midi)"
+elif grep -q "yandex,station-micro" /proc/device-tree/compatible 2>/dev/null; then
+	MODEL="Станция Лайт (yandex,station-micro)"
+else
+	echo "Это не Станция Лайт (yandex,station-micro) и не Станция 2 (yandex,station-midi) — регистры PHY другие, выходим."
+	exit 1
+fi
 [ "$(uname -r)" = "4.9.68" ] || { echo "Ядро $(uname -r), модули собраны под 4.9.68 — выходим."; exit 1; }
 command -v devmem >/dev/null || { echo "Нет devmem в busybox — выходим."; exit 1; }
 
@@ -52,5 +61,5 @@ ln -sf $D/audio-route.sh /usr/bin/usb-audio
 sync
 mount -o remount,ro / || true
 
-echo "Готово. Для exFAT/NTFS: yse install exfat-fuse ntfs-3g"
+echo "Готово ($MODEL). Для exFAT/NTFS: yse install exfat-fuse ntfs-3g"
 echo "Перезагрузите колонку; лог первого запуска — $D/last.log"

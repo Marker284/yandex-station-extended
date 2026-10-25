@@ -156,8 +156,8 @@ xhci-hcd xhci-hcd.0.auto: HC died; cleaning up
   устройство не переподключить: `echo 1-1.2.1 > /sys/bus/usb/drivers/usb/unbind`, пауза,
   `echo 1-1.2.1 > /sys/bus/usb/drivers/usb/bind`. Пересчёт `scsi_host/*/scan` помогает только
   на старте; на раннем старте каталога ещё нет и glob подставляется буквально;
-- `contrib/otg/install.sh` на этой модели **откажется работать**: в нём жёсткая проверка
-  `yandex,station-micro`. Ставить нужно руками либо ослабить проверку;
+- `contrib/otg/install.sh` принимает обе модели: `yandex,station-micro` и `yandex,station-midi`
+  (проверка `contrib/otg/install.sh` до этого PR отказывалась на Станции 2);
 - после переключения USB-gadget (ADB, режим прошивки) недоступен до перезагрузки.
 
 Пошаговая инструкция, скрипты и защита от бутлупа — в рецепте
