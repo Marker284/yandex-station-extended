@@ -114,7 +114,7 @@ with open("/dev/fb0", "wb", buffering=0) as fb:
 
 - Рассеиватель сглаживает соседние светодиоды: крупные символы и силуэты читаются лучше мелких деталей.
 - Прошивка перерисовывает панель во время работы Алисы и может затереть ваш кадр.
-- Штатные анимации — файлы `.led` в `/system/vendor/quasar/ledpatterns/oknix/`.
+- Штатные анимации — файлы `.led` в `/system/vendor/quasar/ledpatterns/oknix/` для центральных светодиодов логотипа(84-87) и `/system/vendor/quasar/ledpatterns/panel/` для остальной панели.
 
 ## USB-host (OTG) { #usb-host }
 
