@@ -40,7 +40,9 @@ build-профиль `yandexstation_2_tv/127`. Железо и ОС совпад
 | RTC | **PCF8563** (I2C `2-0x51`) |
 | Радио | **Intel** `iwlwifi`/`iwlmvm` по PCIe (`fc700000`, MSI IRQ 64) + BT `btusb`/`btintel` |
 
-!!! note "Модель GPU из дампа не следует { #gpu-model }"
+<a id="gpu-model"></a>
+
+!!! note "Модель GPU из дампа не следует"
     Узел `/bifrost`, драйвер `mali_kbase` и таблица DVFS показывают только то, что это
     Mali архитектуры Bifrost. У **S905X2** (g12a) по документации Amlogic распаян
     **Mali-G31 MP2** — G52 стоит в S922X (g12b). В первой редакции этой страницы было
