@@ -6,7 +6,7 @@ A=/data/opt/airplay
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/btbus/socket HOME=$A
 start() {
   [ -x $A/bin/shairport-sync ] && [ -S /tmp/btbus/socket ] || return 0
-  pidof shairport-sync >/dev/null 2>&1 && return 0
+  [ -f /tmp/airplay-supervisor.pid ] && kill -0 "$(cat /tmp/airplay-supervisor.pid)" 2>/dev/null && return 0
   # /opt/var лежит на /data и переживает ребут: протухший pid не даст avahi стартовать
   rm -f /opt/var/run/avahi-daemon/pid
   i=0
@@ -16,10 +16,19 @@ start() {
   start-stop-daemon -S -b -x $A/bin/nqptp
   # softvol-регулятор «AirPlay» появляется при первом открытии устройства
   aplay -q -D airplay -t raw -f S16_LE -r 48000 -c 2 -d 1 /dev/zero
-  # сборка без libdaemon: -d/-j не работают, в фон отправляет start-stop-daemon
-  start-stop-daemon -S -b -x $A/bin/shairport-sync -- --log-to-syslog -c $A/shairport-sync.conf
+  # сборка без libdaemon (-d/-j не работают); при загрузке shairport может выйти, если поднялся
+  # раньше, чем всё вокруг готово, — перезапускать
+  (
+    while :; do
+      $A/bin/shairport-sync -c $A/shairport-sync.conf >> /tmp/shairport.log 2>&1
+      sleep 3
+    done
+  ) < /dev/null > /dev/null 2>&1 &
+  echo $! > /tmp/airplay-supervisor.pid
 }
 stop() {
+  [ -f /tmp/airplay-supervisor.pid ] && kill "$(cat /tmp/airplay-supervisor.pid)" 2>/dev/null
+  rm -f /tmp/airplay-supervisor.pid
   killall shairport-sync nqptp 2>/dev/null
   /opt/sbin/avahi-daemon -k 2>/dev/null
 }

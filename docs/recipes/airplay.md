@@ -75,41 +75,56 @@ AirPlay как подключённый Bluetooth-телефон «AirPlay» и 
 
 ### Установка
 
-1. Поставьте [bt-proxy](bt-proxy.md#install) и avahi: `yse install avahi-dbus-daemon`.
-2. Соберите shairport-sync и nqptp в Docker —
-   [`contrib/airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile).
-   Кросс-сборка под armhf в Debian buster: glibc 2.28 не новее системной (2.30), поэтому
-   бинарники работают на штатной libc и штатной `libasound` колонки; ffmpeg (только AAC/ALAC)
-   и libplist — статически, ещё 9 библиотек — в `lib/` рядом (2,4 МБ вместе с бинарниками):
+Нужны root по SSH и [`yse`](../start/packages.md). С компьютера, одной командой:
 
-    ```sh
-    cd contrib/airplay-lite2
-    docker build -t lite2-ap2 .
-    docker run --rm lite2-ap2 tar -C /out -cf - bin lib | \
-      ssh -p 2222 root@<IP колонки> 'mkdir -p /data/opt/airplay && tar -C /data/opt/airplay -xf -'
-    ```
+```sh
+curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/main/contrib/airplay-lite2/install.sh | sh -s -- <IP колонки> --reboot
+```
 
-3. Конфиги из [`contrib/airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2):
-   `shairport-sync.conf` и `asoundrc` (как `.asoundrc`) — в `/data/opt/airplay/`. В
-   `shairport-sync.conf` задайте `airplay_device_id` — MAC `wlan0`
-   (`cat /sys/class/net/wlan0/address`) без двоеточий.
-4. `/opt/etc/avahi/avahi-daemon.conf` — имя хоста, которое объявляет `maind`
-   ([почему](../internals/gotchas.md#avahi)), на Лайт 2 оно вида `YandexLite-gen2-XXXXXXXX`:
+[`install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh)
+ставит avahi из Entware, [bt-proxy](bt-proxy.md), готовую сборку shairport-sync + nqptp
+([`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz)),
+конфиги и автозапуск, отключает D-Bus-активацию `org.bluez`. `airplay_device_id` (MAC `wlan0`) и
+имя хоста для avahi (`YandexLite-gen2-<deviceid>`) вычисляет на колонке; имя можно задать
+явно: `AP_HOSTNAME=… sh install.sh …`. Откат — `sh install.sh <IP> --uninstall --reboot`.
 
-    ```ini
-    [server]
-    host-name=YandexLite-gen2-XXXXXXXX
-    allow-interfaces=wlan0
-    use-ipv6=no
+??? note "Собрать и поставить вручную"
+    1. Соберите shairport-sync и nqptp в Docker —
+       [`contrib/airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile).
+       Кросс-сборка под armhf в Debian buster: glibc 2.28 не новее системной (2.30), поэтому
+       бинарники работают на штатной libc и штатной `libasound`; ffmpeg (только AAC/ALAC) и
+       libplist — статически, ещё 9 библиотек — в `lib/` рядом (2,4 МБ вместе с бинарниками).
+       Готовый архив собран им же:
 
-    [publish]
-    publish-addresses=no
-    publish-hinfo=no
-    publish-workstation=no
-    ```
+        ```sh
+        cd contrib/airplay-lite2
+        docker build -t lite2-ap2 .
+        docker run --rm lite2-ap2 tar -C /out -cf - bin lib | \
+          ssh -p 2222 root@<IP колонки> 'mkdir -p /data/opt/airplay && tar -C /data/opt/airplay -xf -'
+        ```
 
-5. Автозапуск — [`contrib/airplay-lite2/S99zairplay-lite2`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/S99zairplay-lite2)
-   в `/etc/init.d/` (rootfs: `mount -o remount,rw /` … `mount -o remount,ro /`).
+    2. [bt-proxy](bt-proxy.md#install) и `yse install avahi-dbus-daemon`.
+    3. `shairport-sync.conf` и `asoundrc` (как `.asoundrc`) из
+       [`contrib/airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)
+       — в `/data/opt/airplay/`; в `shairport-sync.conf` — `airplay_device_id`, MAC `wlan0` без
+       двоеточий.
+    4. `/opt/etc/avahi/avahi-daemon.conf` — имя хоста, которое объявляет `maind`
+       ([почему](../internals/gotchas.md#avahi)):
+
+        ```ini
+        [server]
+        host-name=YandexLite-gen2-XXXXXXXX
+        allow-interfaces=wlan0
+        use-ipv6=no
+
+        [publish]
+        publish-addresses=no
+        publish-hinfo=no
+        publish-workstation=no
+        ```
+
+    5. Автозапуск — [`S99zairplay-lite2`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/S99zairplay-lite2)
+       в `/etc/init.d/` (rootfs: `mount -o remount,rw /` … `mount -o remount,ro /`).
 
 Проверка с мака: `dns-sd -B _airplay._tcp` показывает колонку, `cat /tmp/bt-proxy.log` на
 колонке — `плеер org.mpris.MediaPlayer2.ShairportSync (AirPlay)`.
@@ -126,8 +141,9 @@ AirPlay как подключённый Bluetooth-телефон «AirPlay» и 
   `airplay_device_id`.
 - **MPRIS всегда `Stopped`.** Статус и трек MPRIS берёт из потока метаданных:
   `metadata = { enabled = "yes"; }` обязателен, иначе Алиса не узнает, что AirPlay играет.
-- **`-d` и `-j` молча выходят.** Сборка без libdaemon не демонизируется — в фон отправляет
-  `start-stop-daemon -b`.
+- **`-d` и `-j` молча выходят.** Сборка без libdaemon не демонизируется. При загрузке shairport
+  иногда выходит, поднявшись раньше окружения, поэтому `S99zairplay-lite2` держит его в цикле
+  перезапуска, вывод — в `/tmp/shairport.log`.
 - **shairport из Entware на Лайт 2 не подходит для общего звука.** Он 64-битный со своей
   alsa-lib 1.2.11: читает `/opt/etc/asound.conf`, а не штатный `/etc/asound.conf`, и не делит
   dmix с системной 1.2.1.2 (`unable to create IPC shm instance`). Подложить ему системную

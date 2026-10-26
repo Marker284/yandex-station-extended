@@ -58,7 +58,8 @@ PropertiesChanged MediaPlayer1 Status: playing  ->  «Bluetooth player is playin
 
 ## Установка { #install }
 
-Нужны root по SSH и `/data/opt` (`yse bootstrap` его создаёт).
+Нужны root по SSH и `/data/opt` (`yse bootstrap` его создаёт). Для AirPlay на Лайт 2 всё это
+делает [установщик](airplay.md#lite2) — шаги ниже нужны, если ставите bt-proxy для другого плеера.
 
 1. Скопируйте на колонку [`contrib/bin/bt-proxy`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/bt-proxy)
    (статический ARMv7 musl, 1,2 МБ) и [`contrib/bt-proxy/bus.conf`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bt-proxy/bus.conf)

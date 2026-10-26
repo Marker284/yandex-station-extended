@@ -60,6 +60,7 @@
 | **`mini2-ssh.tar.gz`** | 7.6 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/mini2-ssh.tar.gz) | Готовый самораспаковывающийся архив SSH для Станции Мини 2. |
 | **`librespot-micro-installer.zip`**| 2.3 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/librespot-micro-installer.zip) | Установщик клиента Spotify Connect для Станции Лайт. |
 | **`Station1_ROOT.zip`** | 2.8 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/Station1_ROOT.zip) | Архив инструментов рутирования для первой Станции (Allwinner). |
+| **`airplay-lite2-armhf.tar.gz`** | 1.4 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz) | shairport-sync 5.6.2 (AirPlay 2, MPRIS, soxr) и nqptp 1.2.9 для Станции Лайт 2: armhf, штатная glibc колонки, 9 библиотек рядом. Собран [`airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile), SHA256 `1521dbbd29c86ff265c40ca158f8795d71332bb7062d4d7eead8cf9cdb9cd1a9`. Ставится [`airplay-lite2/install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh). |
 
 ---
 
@@ -88,7 +89,7 @@
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
 * **[`bt-proxy/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bt-proxy)** — исходники (Rust) и автозапуск `bt-proxy`: любой MPRIS-плеер виден Алисе как Bluetooth-телефон. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/bt-proxy/).
-* **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
+* **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — установщик `install.sh` (одна команда с компьютера, откат `--uninstall`), Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
 * **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** — запуск клиента Spotify Connect (`librespot`).
 * **[`music.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/music.go)** / **[`qstream.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/qstream.go)** — стриминг звука через сокет `tcp_alsa_writer`.
 * **[`mic-tap.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/mic-tap.sh)** — захват микрофонного потока с PDM-матрицы.
