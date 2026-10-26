@@ -5,7 +5,7 @@
 Lua-скрипты и бинарники и даёт им доступ к железу: подсветке, громкости, датчикам, кнопкам,
 часам и IPC Алисы. На компьютере — CLI `yam`, который ходит в API демона по сети.
 
-[BetterYAM](https://github.com/Yandex-Station-Universal-Repo/BetterYAM/tree/betteryam) —
+[BetterYAM](https://github.com/Yandex-Station-Universal-Repo/BetterYAM/) —
 форк YAM с отдельным демоном под каждую модель. Первая и пока единственная — Станция Мини
 (1-го поколения). Подробнее — [ниже](#betteryam).
 
