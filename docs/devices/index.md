@@ -37,6 +37,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция 2 | `yandex,station-midi` ⚠️ | Amlogic AXG | ✅ разобрана | [Станция 2](station-2.md) |
 | Станция Стрит | `Yandex Station Mango DVT` | Amlogic A1 (A35, 32-бит) | ✅ разобрана | [Стрит](station-street.md) |
 | Станция Макс | `yandexstation_2` ⚠️ | Amlogic + Android 9 | ✅ разобрана | [Макс](station-max.md) |
+| Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | ✅ разобрана | [Макс с Zigbee](station-max-zigbee.md) |
 | Станция (1-го поколения) | `tulip-d1` | Allwinner R18 (sun50iw1) | ✅ разобрана | [Станция gen1](station-gen1.md) |
 | Умный хаб Яндекса (не колонка) | `yandex,saturn` | Amlogic AXG | ✅ разобран | [Умный хаб](yandex-hub.md) |
 | Станция Мини 3 | `yandex,station-mini3` (bergamot) | Amlogic AXG | ✅ разобрана | [Мини 3](station-mini3.md) |
@@ -51,7 +52,10 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 - `yandex,station-midi` (DT) = розничная **Станция 2** (Buildroot/AXG) — **не** «Миди»;
 - розничная **Станция Миди** = кодовое имя **Cucumber** (`yandex,cucumber`, A5);
 - `yandexstation_2` (Android `ro.product.device`) = розничная **Станция Макс** — **не**
-  «Станция 2».
+  «Станция 2»;
+- под `yandexstation_2` скрыты **два SKU**: `YNDX-0008` (Макс) и `YNDX-00052`
+  (Макс со встроенным Zigbee). Fingerprint у них одинаковый, по ПО не различаются —
+  смотрите SKU на днище.
 
 !!! note
     Прочерки — это приглашение дополнить. Минимальный набор для новой модели:

@@ -145,6 +145,7 @@ nav:
       - Станция 2: devices/station-2.md
       - Станция Стрит (Mango): devices/station-street.md
       - Станция Макс: devices/station-max.md
+      - Станция Макс с Zigbee: devices/station-max-zigbee.md
       - Станция (1 поколения): devices/station-gen1.md
       - Умный хаб (Saturn): devices/yandex-hub.md
       - JBL Link Music: devices/jbl-link-music.md
