@@ -10,7 +10,7 @@
 | [Fastfetch](fastfetch.md) | информер с логотипом Алисы | все `aarch64` |
 | [Подсветка](led.md) | управление кольцом, формат анимаций `.led` | Лайт, Мини 2, Мини 3 |
 | [YAM и BetterYAM](yam.md) | плагины `.yap` с веб-панелью и Lua API к подсветке, кнопкам, датчикам, голосовым командам | `aarch64`; BetterYAM — Мини |
-| [Своя LLM вместо Алисы](llm.md) | свой сервер вместо облака Алисы ([quasard](llm.md#quasard)); гибрид — пока идея | прошивки ~1.56 и 3.x |
+| [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)) или свой бэкенд ([quasard](llm.md#quasard)) | Quasar Bridge — Станция 2, Quasar 3.21; quasard — ~1.56 и 3.x |
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |
 
 Готовые скрипты — в каталоге
