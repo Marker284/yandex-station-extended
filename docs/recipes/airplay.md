@@ -103,23 +103,29 @@
     ```text
     general = { name = "Yandex Lite 2"; interface = "wlan0"; airplay_device_id = 0xXXXXXXXXXXXXL; };
     alsa = { output_device = "default"; };
+    sessioncontrol = { run_this_before_play_begins = "/opt/etc/airplay-take-audio.sh";
+                       wait_for_completion = "yes"; };
     ```
 
 4. `/opt/etc/asound.conf` — вывод через dmix на 48 кГц (копия штатного `dmix_spk`
-   из `/etc/asound.conf`; оригинал Entware сохраните рядом):
+   из `/etc/asound.conf`, но со своим `ipc_key`; оригинал Entware сохраните рядом):
 
     ```text
     pcm.!default { type plug; slave.pcm "dmix_spk"; }
     pcm.dmix_spk {
       type dmix
-      ipc_key 1024
+      ipc_key 2048
       ipc_key_add_uid false
       ipc_perm 0666
       slave { pcm "hw:0,0"; channels 2; rate 48000; buffer_size 7680; period_size 960; }
     }
     ```
 
-5. Автозапуск — [`contrib/S99zairplay-entware`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/S99zairplay-entware)
+5. Арбитраж звука — [`contrib/airplay-take-audio.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-take-audio.sh)
+   в `/opt/etc/` (`chmod 755`). Хук из шага 3 перед началом воспроизведения завершает
+   `maind --mediad`, если тот держит карту; супервизор поднимает его заново через ~5 с.
+
+6. Автозапуск — [`contrib/S99zairplay-entware`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/S99zairplay-entware)
    (установка и откат — в шапке скрипта):
 
     ```sh
@@ -133,6 +139,12 @@
 
 ### Грабли { #lite2-gotchas }
 
+- **AirPlay подключается, а звука нет.** `maind --mediad` иногда держит `pcmC0D0p` постоянно:
+  `/proc/asound/card0/pcm0p/sub0/status` — `state: PREPARED` без воспроизведения, минутами,
+  `owner_pid` — mediad. Сразу после загрузки карта свободна, что заставляет mediad её
+  занять — не выяснено. Если mediad завершить, `quasar_launcher2` (`launch.json`: `delay 5`)
+  поднимает новый, и тот карту не берёт; shairport повторяет открытие ALSA и захватывает её.
+  Это и делает хук из шага 5.
 - **Звук икает дважды в секунду.** В логе (`shairport-sync -v --statistics`) раз в ~0,5 с
   `Large negative (i.e. early) sync error of -2300 frames (-0.052 seconds)`. Карта `hw:0`
   фактически играет только 48 кГц и молча принимает 44100: поток идёт на ~9% быстрее,
@@ -153,9 +165,14 @@
 - **Пока играет AirPlay, звуки колонки не выводятся.** Смешать с Алисой через общий dmix не
   получается: alsa-lib Entware (1.2.11) и системная (1.2.1.2) не делят сегмент shared memory,
   системный `aplay` в это время падает с `unable to create IPC shm instance`. Подсунуть
-  shairport системную alsa-lib нельзя — ей нужна `GLIBC_2.29`, у Entware 2.27. После
-  остановки AirPlay карта освобождается, и звук колонки возвращается. Как ведёт себя сама
-  Алиса, если ответить ей во время AirPlay, не проверялось.
+  shairport системную alsa-lib нельзя — ей нужна `GLIBC_2.29`, у Entware 2.27. Поэтому у
+  dmix из шага 4 свой `ipc_key`: с общим `1024` версии мешают друг другу через shared memory,
+  а со своим остаётся честный `EBUSY` на карте. После остановки AirPlay карта
+  освобождается, и звук колонки возвращается. Как ведёт себя сама Алиса, если ответить ей
+  во время AirPlay, не проверялось.
+- Хук из шага 5 обрывает то, что играла Алиса: AirPlay всегда забирает звук себе.
+  Механизм проверен вручную (mediad завершён — карта свободна — shairport её занял),
+  хук в сборе — не проверялся.
 - Имя хоста в `avahi-daemon.conf` привязано к имени, которое объявляет `maind`: если оно
   сменится, AirPlay пропадёт из сети, сама колонка не пострадает.
 

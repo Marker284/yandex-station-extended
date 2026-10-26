@@ -87,6 +87,7 @@
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
 * **[`S99zairplay-entware`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/S99zairplay-entware)** — автозапуск AirPlay 2 из Entware (dbus, avahi, nqptp, shairport-sync) без пакета `/data/shairport`. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
+* **[`airplay-take-audio.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-take-audio.sh)** — хук `shairport-sync` для Лайт 2: перед воспроизведением забирает звуковую карту у `maind --mediad`. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
 * **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** — запуск клиента Spotify Connect (`librespot`).
 * **[`music.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/music.go)** / **[`qstream.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/qstream.go)** — стриминг звука через сокет `tcp_alsa_writer`.
 * **[`mic-tap.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/mic-tap.sh)** — захват микрофонного потока с PDM-матрицы.
