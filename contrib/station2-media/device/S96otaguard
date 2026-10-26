@@ -1,0 +1,66 @@
+#!/bin/sh
+# Сторож обновлений Станции 2. Живёт на корневой ФС, а не в /data, поэтому переживает
+# сброс колонки. Раз в 2 минуты проверяет все звенья OTA и возвращает блокировку:
+#   updatesd (качает)  -> device_ota_update.sh -> apply_packed_ota (кладёт .swu,
+#   fw_setenv boot_to_recovery 1, reboot) -> recovery прошивает.
+# Эталоны заглушек и пустой ключ — в /etc/otaguard (кладёт install-station2.sh).
+# Разрешить штатное обновление: touch /data/local/allow_ota, затем перезагрузка.
+Q=/system/vendor/quasar
+G=/etc/otaguard
+ALLOW=/data/local/allow_ota
+INTERVAL=120
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+log() {
+  echo "$(date): $*" >> /tmp/otaguard.log
+  [ -d /data/local/tmp ] && echo "$(date): $*" >> /data/local/tmp/otaguard.log
+}
+
+RW=0
+rw() { [ "$RW" = 1 ] || { mount -o remount,rw / 2>/dev/null; RW=1; }; }
+
+# эталон -> цель, если цель отличается
+restore() {
+  cmp -s "$1" "$2" && return 0
+  rw
+  cp "$1" "$2" && chmod "$3" "$2"
+  log "восстановил $2"
+}
+
+check() {
+  [ -f "$ALLOW" ] && return 0
+  RW=0
+  restore "$G/launch.json" "$Q/launch.json" 644
+  restore "$G/device_ota_update.sh" "$Q/device_ota_update.sh" 755
+  restore "$G/apply_packed_ota" /usr/bin/apply_packed_ota 755
+  restore "$G/ota_script.pub" "$Q/ota_script.pub" 644
+  if [ "$RW" = 1 ]; then sync; mount -o remount,ro / 2>/dev/null; fi
+
+  for p in $(pidof maind); do
+    case "$(tr '\0' ' ' 2>/dev/null < /proc/$p/cmdline)" in
+      *--updatesd*) kill -9 "$p" 2>/dev/null; log "убил maind --updatesd ($p)" ;;
+    esac
+  done
+  if [ -n "$(ls /bkupgrade/ota/ 2>/dev/null)" ] || ls /bkupgrade/update_* >/dev/null 2>&1; then
+    rm -rf /bkupgrade/ota/* /bkupgrade/update_*
+    log "удалил скачанный образ OTA"
+  fi
+  # флаг пишем только при необходимости: env лежит на NAND
+  if [ "$(fw_printenv -n boot_to_recovery 2>/dev/null)" = 1 ]; then
+    fw_setenv boot_to_recovery 0 && log "сбросил boot_to_recovery"
+  fi
+}
+
+case "$1" in
+  start)
+    pid=$(cat /tmp/otaguard.pid 2>/dev/null)
+    [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && exit 0
+    (
+      while :; do check; sleep "$INTERVAL"; done
+    ) </dev/null >/dev/null 2>&1 &
+    echo $! > /tmp/otaguard.pid
+    ;;
+  check) check ;;
+  stop) ;;
+esac
+exit 0

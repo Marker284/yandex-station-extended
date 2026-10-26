@@ -124,3 +124,93 @@ Content-Type: application/x-apple-binary-plist
   падает с `Exec format error`.
 - **mDNS рядом с `maind`** — раздел [«Свой mDNS (avahi) рядом с maind»](../internals/gotchas.md#avahi).
   На Станции 2 хватило того, что avahi получает ровно то имя хоста, которое публикует `maind`.
+
+---
+
+## Станция 2: AirPlay 2 одним набором { #station-2-bundle }
+
+!!! info "Проверено на Станции 2 (`yandexmidi`, прошивка `0.369.1.50.*` от 21.10.2026)"
+    `shairport-sync 5.6.2` (AirPlay 2) и `nqptp 1.2.9`, собраны из исходников. Схема та же, что
+    [выше](#station-2): своя шина D-Bus, avahi с именем хоста колонки, распорядитель звука.
+
+Скрипты — [`contrib/station2-media`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station2-media).
+Что в них сделано иначе:
+
+- **Один каталог `/data/local/opt/ap2`.** Всё собрано под musl, а `patchelf` прописывает
+  бинарникам интерпретатор `/data/local/opt/ap2/lib/ld-musl-aarch64.so.1` и `RUNPATH`
+  `$ORIGIN/../lib`: они запускаются напрямую, без обёртки с загрузчиком и без
+  `LD_LIBRARY_PATH`, который ломал бы 32-битные программы Яндекса.
+- **Одна громкость с Алисой.** Звук AirPlay идёт через `softvol` на регуляторе Алисы
+  `Master Playback Volume`, а `shairport-sync` двигает этот же регулятор
+  (`mixer_control_name = "Master"`): сенсорная панель, голос и ползунок iPhone меняют одну
+  громкость.
+- **Установка за короткое окно ADB.** По ADB уходит только SSH (меньше 1 МБ), остальное — по SSH.
+  На Станции 2 загрузка 15 МБ по ADB шла 100 с и обрывалась вместе с окном.
+- **Сторож обновлений** `/etc/init.d/S96otaguard` на корневой ФС: переживает сброс колонки,
+  подробности — ниже.
+
+### Сборка
+
+Docker на Linux или macOS (Apple Silicon — `colima start --arch aarch64 --vm-type vz`):
+
+```sh
+cd contrib/station2-media/build
+docker run --rm --platform linux/arm64 -v "$PWD:/work" -v "$PWD/out:/out" \
+  alpine:3.24 sh /work/ap2-build.sh
+```
+
+Внутри: минимальный статический ffmpeg (только `aac` и `alac`), `nqptp`, `shairport-sync` с
+`--with-airplay-2`, avahi, dbus, dropbear и alsa-utils из пакетов Alpine, замыкание библиотек
+и `patchelf`. Результат — `build/out/ap2/{bin,lib}`, около 14 МБ. Версии `shairport-sync` и
+`nqptp` должны совпадать по интерфейсу памяти (`smi11` у обоих).
+
+### Установка
+
+Нужен root ADB ([шаг 1](../start/root.md)). Установщик запускают сразу, как только открылся
+порт `5555`:
+
+```sh
+cd contrib/station2-media
+./install.sh <IP колонки>              # SSH по ADB, затем всё остальное по SSH
+./install.sh <IP колонки> --ssh-only   # повторно, когда SSH уже есть
+```
+
+Что делает:
+
+- ключ `~/.ssh/yandex_station2` и dropbear на `2222`, вход только по ключу;
+- [`yandex-noupdate.sh`](../start/ssh.md#kill-ota) и сторож обновлений, оригиналы файлов —
+  рядом со скриптом, в `backup/ota`;
+- набор в `/data/local/opt/ap2`, автозапуск `/etc/init.d/S97ap2`;
+- имя хоста для avahi берёт из mDNS колонки (`hostname` у неё другой).
+
+На колонке: `/data/local/opt/ap2/ap2.sh start|stop|restart|status`.
+
+### Громкость
+
+- Регулятор `Master Playback Volume` (моно, 0–255) Алиса двигает через `set_volume.sh` →
+  `amixer set Master N%`. Системный `softvol` создаёт его **без шкалы в дБ**, поэтому
+  `ap2.sh start` один раз открывает свой `softvol` на этом регуляторе с пустым выходом
+  (`pcm.ap2prime`): шкала появляется и держится до перезагрузки.
+- Шкала выхода — 36 дБ. На системных 51 дБ четверть ползунка — почти тишина, а вся слышимая
+  громкость сжата в верхнюю половину.
+- `shairport-sync` идёт с `chrt -r 30`: без реального времени звук делит процессор с демонами
+  Яндекса.
+
+### Обновления
+
+`yandex-noupdate.sh` подменяет ключ, заглушает `device_ota_update.sh` и убирает `updatesd`. На
+Станции 2 есть ещё одно звено: `device_ota_update.sh` вызывает `/usr/bin/apply_packed_ota`,
+который кладёт образ в `/bkupgrade/ota/yandex_io_ota.swu`, ставит
+`fw_setenv boot_to_recovery 1` и перезагружает колонку в recovery. `S96otaguard` раз в 2 минуты
+возвращает заглушки (эталоны — в `/etc/otaguard`), гасит `updatesd`, удаляет скачанные образы
+и сбрасывает `boot_to_recovery`. Разрешить штатное обновление: `touch /data/local/allow_ota`.
+
+### Ограничения
+
+- Пока играет AirPlay, медиа-демон Алисы остановлен: её плеер и голос молчат, после сессии
+  возвращаются через пару секунд.
+- После каждой сессии приёмник перезапускается, чтобы отпустить ALSA, — на несколько секунд
+  колонка пропадает из списка AirPlay.
+- В «Доме» колонка добавляется как AirPlay-динамик, но плеера и кнопок на её плитке нет:
+  «Дом» при открытии плитки к колонке не обращается, а протокол MediaRemote, на котором
+  работает этот плеер, в `shairport-sync` не реализован.
