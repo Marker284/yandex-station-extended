@@ -1,0 +1,31 @@
+#!/bin/sh
+# AirPlay 2 на Станции Лайт 2: avahi (Entware) -> nqptp -> shairport-sync (своя сборка с MPRIS)
+# на приватной шине bt-proxy (S55zbtproxy). Алиса управляет AirPlay как Bluetooth-телефоном.
+# Проверено на Станции Лайт 2 (plum), прошивка 0.369.1.50. Откат: удалить этот файл.
+A=/data/opt/airplay
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/btbus/socket HOME=$A
+start() {
+  [ -x $A/bin/shairport-sync ] && [ -S /tmp/btbus/socket ] || return 0
+  pidof shairport-sync >/dev/null 2>&1 && return 0
+  # /opt/var лежит на /data и переживает ребут: протухший pid не даст avahi стартовать
+  rm -f /opt/var/run/avahi-daemon/pid
+  i=0
+  while [ $i -lt 120 ] && ! ip -4 addr show wlan0 2>/dev/null | grep -q inet; do sleep 1; i=$((i+1)); done
+  # приватная шина пускает только root
+  /opt/sbin/avahi-daemon -D --no-drop-root
+  start-stop-daemon -S -b -x $A/bin/nqptp
+  # softvol-регулятор «AirPlay» появляется при первом открытии устройства
+  aplay -q -D airplay -t raw -f S16_LE -r 48000 -c 2 -d 1 /dev/zero
+  # сборка без libdaemon: -d/-j не работают, в фон отправляет start-stop-daemon
+  start-stop-daemon -S -b -x $A/bin/shairport-sync -- --log-to-syslog -c $A/shairport-sync.conf
+}
+stop() {
+  killall shairport-sync nqptp 2>/dev/null
+  /opt/sbin/avahi-daemon -k 2>/dev/null
+}
+case "$1" in
+  start) start & ;;
+  stop) stop ;;
+  restart) stop; sleep 2; start ;;
+esac
+exit 0

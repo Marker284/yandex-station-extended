@@ -67,5 +67,6 @@
 
 ## AirPlay { #airplay }
 
-AirPlay 2 из Entware работает: пакеты через `yse`, свой mDNS рядом с `maind`, вывод через
-dmix на 48 кГц — [рецепт](../recipes/airplay.md#lite2).
+AirPlay 2 работает вместе с Алисой: через [bt-proxy](../recipes/bt-proxy.md) она видит AirPlay
+как Bluetooth-телефон и сама разводит его со своей музыкой, «дальше / пауза» и громкостью —
+[рецепт](../recipes/airplay.md#lite2).

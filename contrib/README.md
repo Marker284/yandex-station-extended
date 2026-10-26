@@ -18,6 +18,7 @@
 | **`nano`** | 325 КБ | [Скачать nano](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/nano) | Удобный консольный текстовый редактор. |
 | **`zsh`** | 3.6 МБ | [Скачать zsh](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/zsh-5.9.2-aarch64-musl) | Мощная командная оболочка Zsh (версия 5.9.2). |
 | **`yse`** | 20 КБ | [Скачать yse](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/yse) | Пакетный менеджер: Entware + `.yap`-пакеты с GitHub. Установщик с ПК — [`install-yse.sh`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/install-yse.sh), [инструкция](https://hackalice.me/start/packages/). |
+| **`bt-proxy`** | 1.2 МБ | [Скачать bt-proxy](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/bt-proxy) | MPRIS-плееры как Bluetooth-источник Алисы; `armv7-linux-musleabihf`, сборка — [`bt-proxy/build.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bt-proxy/build.sh). [Рецепт](https://hackalice.me/recipes/bt-proxy/). |
 
 ---
 
@@ -86,8 +87,8 @@
   [Рецепт](https://hackalice.me/recipes/sounds/#native-tts), проверка пакетов и ошибок:
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
-* **[`S99zairplay-entware`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/S99zairplay-entware)** — автозапуск AirPlay 2 из Entware (dbus, avahi, nqptp, shairport-sync) без пакета `/data/shairport`. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
-* **[`airplay-take-audio.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-take-audio.sh)** — хук `shairport-sync` для Лайт 2: перед воспроизведением забирает звуковую карту у `maind --mediad`. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
+* **[`bt-proxy/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bt-proxy)** — исходники (Rust) и автозапуск `bt-proxy`: любой MPRIS-плеер виден Алисе как Bluetooth-телефон. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/bt-proxy/).
+* **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
 * **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** — запуск клиента Spotify Connect (`librespot`).
 * **[`music.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/music.go)** / **[`qstream.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/qstream.go)** — стриминг звука через сокет `tcp_alsa_writer`.
 * **[`mic-tap.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/mic-tap.sh)** — захват микрофонного потока с PDM-матрицы.
