@@ -119,6 +119,7 @@ nav:
           - Мини 3 — retail CA и маркеры: start/retail-ca-mini3.md
           - С Android (AliceBridge): start/root-android.md
           - JBL Link Music — ADB по USB: start/root-jbl-link-music.md
+          - Станция Макс — получение root: start/root-s905x2.md
       - 2. SSH и обновления: start/ssh.md
       - 3. Пакеты yse: start/packages.md
       - 4. Если что-то сломалось: start/recovery.md
