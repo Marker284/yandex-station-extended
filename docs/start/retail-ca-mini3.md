@@ -3,8 +3,9 @@
 Способ для **[Станции Мини 3 (bergamot)](../devices/station-mini3.md)** после обновления
 21 октября 2026 года, когда [DNS-метод](root.md) перестал работать. Колонка загружается в
 factory mode, в retail-разделе правится только CA-бандл, а в `/data` кладутся маркеры сетевого
-ADB и конфиг Wi-Fi. После normal-загрузки ADB с root поднимается сам — без приложения и без
-роутера с подменой DNS.
+ADB и конфиг Wi-Fi. После normal-загрузки ADB с root поднимается сам, пока DNS указывает на
+стенд; постоянный вход — SSH из [шага 2](ssh.md): после возврата DNS настоящий Яндекс выключает
+ADB (см. [шаг 7](#adb-after-dns)).
 
 Основа — [гайд для Лайт 2](retail-ca.md): порядок тот же, ниже — с поправками под Мини 3.
 
@@ -18,7 +19,7 @@ ADB и конфиг Wi-Fi. После normal-загрузки ADB с root под
 | system | mtd3, UBI-том `rootfs` | то же: mtd3, UBI-том `rootfs` |
 | UBI в factory | нужен `ubiattach -m 3` | **не нужен**: в cmdline есть `ubi.mtd=system`, ubi0 уже поднят |
 | CA | `/system/vendor/quasar/certs/ca-certificates.crt` | тот же файл, а `/system/vendor/quasar/ca-certificates.crt` — **симлинк** на него |
-| factory-сборка | — | `0.6.1.4.…factory-6` от 11.11.2024, в ней ещё есть корень AAA |
+| factory-сборка | — | `0.6.1.4.…factory-6` от 11.11.2024 или `0.4.1.39.…factory-4` от 21.10.2024; в обеих ещё есть корень AAA |
 | normal-загрузка | `upgrade_step=1`, `boot_to_recovery=0` | то же; в factory `upgrade_step=2` |
 | OTA | `S01swupdate` + `swupdate` | в `.50` нет ни `S01swupdate`, ни `swupdate`: применяет `device_ota_update.sh` → `apply_packed_ota`, подпись проверяется по `ota_script.pub` |
 | Wi-Fi | — | данные сети только в `/data/wpa_supplicant.conf`; без файла после перезагрузки колонка никуда не подключается |
@@ -34,6 +35,8 @@ ubifs на mtd3, смонтирован `ro`, но dm-verity нет: `mount -o r
   (`remoteActivation`, `network`), а на `check_updates` — `{"hasUpdate":false}`. Его сертификат
   должен строиться до корня `AAA Certificate Services` (утёкшая цепочка eMudhra:
   лист ← `EM OV TLS CA - G3C` ← AAA). Так устроен, например, [eQuasar](retail-ca.md#1-equasar);
+  остальные запросы (в первую очередь `/register`) стенд должен проксировать в настоящий
+  Яндекс — для eQuasar нужна [строка `resolver`](#equasar-resolver);
 - DNS: подмена на роутере или хотспот с компьютера (общий доступ к интернету в Windows отдаёт
   колонке DNS = IP компьютера);
 - корень AAA:
@@ -49,18 +52,20 @@ cat /proc/cmdline                          # rootfstype=ramfs, без root=
 cat /system/vendor/quasar/version_full
 ```
 
-Ожидается `0.6.1.4.…factory-6`. Если видно `0.369.1.50…` — factory-образ обновлён вместе с
-retail, войти этим способом нельзя, дальше не идите.
+Ожидается factory-сборка: `0.6.1.4.…factory-6` или `0.4.1.39.2634333263.20241021.factory-4`
+(обе проверены). Если видно `0.369.1.50…` — factory-образ обновлён вместе с retail, войти этим
+способом нельзя, дальше не идите.
 
 ## 1. Стенд и вход в factory mode
 
-1. Поднимите стенд и DNS (роутер или хотспот компьютера).
+1. Поднимите стенд ([с `resolver`](#equasar-resolver)) и DNS (роутер или хотспот компьютера;
+   [пример для Keenetic](#dns-keenetic)).
 2. Обесточьте колонку, зажмите кнопку отключения микрофона, подайте питание и держите
    10–15 с, пока подсветка не замигает.
 3. В приложении «Дом с Алисой» добавьте колонку и дайте ей Wi-Fi с нужным DNS. Приложение
    может сообщить, что настроить не удалось, — это нормально.
-4. Убедитесь, что в логе стенда есть запросы `/get_sync_info` и `/check_updates`, и
-   подключитесь по ADB:
+4. Убедитесь, что в логе стенда есть `POST /register` с кодом 200, а за ним `/get_sync_info`
+   и `/check_updates`, и подключитесь по ADB:
 
 ```sh
 adb connect <IP_колонки>:5555
@@ -72,6 +77,50 @@ adb shell id
 !!! warning "Сброс стирает /data"
     Вместе с ним исчезают старые маркеры и `/data/quasar/data/user_config.dat`. Всё нужное
     создаётся заново на шагах 4–5.
+
+!!! tip "macOS: `No route to host` при открытом порте"
+    Если `nc -z <IP_колонки> 5555` проходит, а `adb connect` пишет `No route to host`, adb
+    блокирует защита «Локальная сеть» — см. [установку ADB](../internals/toolchain.md#adb-install).
+
+### eQuasar: resolver для `/register` { #equasar-resolver }
+
+Factory-прошивка сначала регистрируется: `POST /register` с кодом активации из приложения.
+eQuasar перехватывает только `get_sync_info` и `check_updates`, остальное проксирует через
+`proxy_pass https://$host…`, а для имени из переменной nginx нужен `resolver`. Без него
+`/register` получает 502 (в `error.log` — `no resolver defined to resolve quasar.yandex.net`),
+приложение пишет об ошибке (например, что не удалось подключить колонку по Bluetooth), колонка
+уходит из Wi-Fi и до `get_sync_info` не доходит.
+
+Добавьте строку в блок `server { listen 443 ssl; … }` файла
+`copymetoroot/etc/nginx/sites-enabled/quasar` и пересоберите стенд
+(`docker compose up -d --build`):
+
+```nginx
+resolver 77.88.8.8 8.8.8.8 ipv6=off valid=300s;
+```
+
+Резолвер — публичный, не DNS роутера: тот отдаёт для `quasar.yandex.net` адрес стенда, и
+запрос зациклится. С ним регистрация проходит, и Алиса говорит, что настройка завершена и
+осталось обновить прошивку. Обновления не будет: на `check_updates` отвечает стенд.
+
+### DNS на Keenetic { #dns-keenetic }
+
+В CLI роутера (веб-CLI `http://<IP_роутера>/a`; из Entware-shell — `ndmc -c "…"`):
+
+```text
+ip host quasar.yandex.net <IP_стенда>
+ip host quasar.yandex.ru <IP_стенда>
+ip host scbh.yandex.net <IP_стенда>
+ip host strm.yandex.ru 127.0.0.1
+ip host rpc.alice.yandex.net 127.0.0.1
+ip host uniproxy.alice.yandex.net 127.0.0.1
+ip host alice.yandex.net 127.0.0.1
+ip host alice-ats.yandex.net 127.0.0.1
+ip host alice-ats-test.yandex.net 127.0.0.1
+```
+
+Откат — после [шага 2](ssh.md), теми же строками с `no` и без адреса:
+`no ip host quasar.yandex.net` и т. д.
 
 ## 2. Разметка и монтирование retail
 
@@ -142,15 +191,23 @@ grep -c 'BEGIN CERTIFICATE' $D/ca-certificates.crt
 sha256sum $D/ca-certificates.crt
 ```
 
-Ожидается 123 сертификата и хеш (для сборки `0.369.1.50…`; на другой сборке исходный бандл
-другой, и хеш будет отличаться):
+Ожидается 123 сертификата, а файл длиннее исходного ровно на 1517 байт — размер
+`aaa-certificate-services.pem`. Хеш зависит от сборки: исходный бандл у каждой свой.
 
-```text
-737b5c4acabcadca46842a90cb7ede2acc31bb8ba4664167864d1697d73e8bf4
+| Сборка | Исходный бандл (SHA-256) | После склейки (SHA-256) |
+|---|---|---|
+| `0.369.1.50.4794652521.20261021.117` | `5c6138b74904e2b4cddb097d5890912157bff9ecae1f1f21e9f260946ad90b1e` | `966eb46c99b9952a016f2af43828b807d1fa7baec6c4e2fc91edb61414e0fcd3` |
+| `0.369.1.50…` (номер не записан) | — | `737b5c4acabcadca46842a90cb7ede2acc31bb8ba4664167864d1697d73e8bf4` |
+
+Если вашей сборки нет в таблице, проверьте на компьютере, что новый файл — ровно старый плюс
+корень AAA (Linux / macOS, в каталоге со склейкой):
+
+```sh
+cat ca.cur aaa-certificate-services.pem | cmp - retail-ca.pem && echo OK
 ```
 
-Если хеш другой — не перезагружайте колонку: восстановите `.orig` (см.
-[ниже](#restore)) или повторите склейку.
+Если сертификатов не 123, размер вырос не на 1517 байт или `cmp` нашёл разницу — не
+перезагружайте колонку: восстановите `.orig` (см. [ниже](#restore)) или повторите склейку.
 
 !!! note "Не проверяйте грепом по имени"
     В PEM имя субъекта закодировано в base64, поэтому `grep 'AAA Certificate Services'` даёт
@@ -218,7 +275,18 @@ cat /data/quasar/quasar_adb.log
 ## 5. Wi-Fi в /data
 
 Без этого после перезагрузки колонка никуда не подключится: данные сети приложение записывает
-только по завершённой настройке, а на стенде она не завершается.
+только по завершённой настройке.
+
+Если `/register` прошёл (стенд с [`resolver`](#equasar-resolver)), файл уже есть — с вашей сетью,
+но с `update_config=1`. Проверьте его и поменяйте только этот параметр:
+
+```sh
+grep -E 'update_config|ssid|key_mgmt' /bkupgrade/data/wpa_supplicant.conf
+sed -i 's/^update_config=1$/update_config=0/' /bkupgrade/data/wpa_supplicant.conf
+chmod 600 /bkupgrade/data/wpa_supplicant.conf
+```
+
+Если файла нет — создайте его целиком:
 
 ```sh
 cat > /bkupgrade/data/wpa_supplicant.conf <<'EOF'
@@ -270,10 +338,30 @@ adb shell cat /data/quasar/quasar_adb.log
 
 ADB поднимается сам: маркеры → `activate_adb.sh check` → `yandex-debugctl adb-net`.
 
+### ADB после возврата DNS { #adb-after-dns }
+
+ADB держится, пока на `get_sync_info` отвечает стенд. Когда DNS возвращён, настоящий Яндекс
+присылает конфиг без `adbd`, и прошивка вызывает `activate_adb.sh … deactivate`: маркеры
+удаляются, adbd останавливается. В `/data/quasar/quasar_adb.log`:
+
+```text
+Reset network flag for adb
+Deactivate adb by quasmodrom config
+```
+
+Поэтому DNS возвращайте только после [шага 2](ssh.md): SSH из `/etc/init.d/S99zdropbear` от
+маркеров не зависит. ADB при необходимости включается из SSH; после перезагрузки синхронизация
+с Яндексом снова его выключит:
+
+```sh
+sh /system/vendor/quasar/activate_adb.sh --quasmodrom --network activate
+sh /system/vendor/quasar/activate_adb.sh --quasmodrom --network deactivate   # выключить
+```
+
 ## 8. Закрепление: обновления и SSH
 
-Дальше — обычный **[шаг 2: SSH и отключение обновлений](ssh.md)**, сразу, пока есть ADB.
-Dropbear из `contrib/bin` (armhf) на Мини 3 подходит.
+Дальше — обычный **[шаг 2: SSH и отключение обновлений](ssh.md)**, сразу, пока есть ADB и DNS
+ещё указывает на стенд. Dropbear из `contrib/bin` (armhf) на Мини 3 подходит.
 
 !!! tip "Если файлы копировались через Windows"
     Busybox спотыкается о переводы строк CRLF (`set: illegal option`). Перед запуском
@@ -354,10 +442,12 @@ umount /mnt/retail
 
 ## Что в итоге
 
-- ADB с root на каждой загрузке `.50`: маркеры в `/data/quasar/` плюс `adbd` в
-  `/data/quasar/data/user_config.dat` (появляется после ответа стенда на `get_sync_info`).
-- SSH на порту 2222 стартует сам из `/etc/init.d/S99zdropbear`.
+- SSH на порту 2222 стартует сам из `/etc/init.d/S99zdropbear` — это постоянный вход.
+- ADB с root на каждой загрузке `.50`, пока DNS указывает на стенд: маркеры в `/data/quasar/`
+  плюс `adbd` в `/data/quasar/data/user_config.dat`. После возврата DNS Яндекс выключает ADB
+  ([шаг 7](#adb-after-dns)).
 - Обновления закрыты: подменённый `ota_script.pub`, заглушённый `device_ota_update.sh`, убранный
   `updatesd`.
-- Если OTA всё же прошьётся: `/data` уцелеет, ADB вернётся, а `restore-system.sh` вернёт CA и
-  SSH одной командой.
+- Если OTA всё же прошьётся, `S99zdropbear` и пропатченный CA пропадут вместе с `system`, а
+  `/data` уцелеет. Если маркеры ещё на месте (DNS на стенде), ADB поднимется сам, и
+  `restore-system.sh` вернёт CA и SSH одной командой; если нет — заново с шага 1.
