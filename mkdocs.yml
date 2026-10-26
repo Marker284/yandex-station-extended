@@ -127,6 +127,7 @@ nav:
       - USB Host (OTG): recipes/usb-host.md
       - AirPlay: recipes/airplay.md
       - Свои звуки: recipes/sounds.md
+      - Обработанный микрофон: recipes/microphone.md
       - Fastfetch: recipes/fastfetch.md
       - Подсветка: recipes/led.md
       - YAM и BetterYAM: recipes/yam.md

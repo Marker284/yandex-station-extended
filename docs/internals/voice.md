@@ -52,6 +52,10 @@
 Выход — канал **`vqe_0`**: его слушают спотеры (`spotterChannelName`) и его же отправляют в
 облако (`speechkitLogChannels`).
 
+Для Лайт 2 / Plum проверен [захват обработанного `vqe_0`](../recipes/microphone.md)
+через экспортированный интерфейс VQE. Конфигурация Plum отличается от приведённого выше
+профиля `yandexmini`: два микрофонных канала и один опорный, выход — моно 16 кГц.
+
 ## 3. Локальные нейросети
 
 Движок `nnet`, признаки `cmn:lda`, модели в `spotter_models/` (обновляются с CDN Яндекса в
@@ -113,7 +117,8 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   *(одновременный захват не проверялся)*.
 - **Произнести свой текст** проще всего локально — через API glagol на порту 1961, как это
   делает интеграция YandexStation для Home Assistant (см. [Сеть → glagol](network.md#glagol));
-  из облака это делает `AliceResponse.TtsSpeak`.
+  для Plum также проверен [вызов `START_VOCALIZE` через SSH](../recipes/sounds.md#native-tts).
+  Оба варианта используют облачный синтез; из облака ответ приходит как `AliceResponse.TtsSpeak`.
 - **Подмена адреса**: пиннинга сертификатов нет (см. [Подводные камни](gotchas.md)),
   `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS.
 - **Рабочий пример** — [quasard](../recipes/llm.md#quasard): свой uniproxy (JSON и protobuf

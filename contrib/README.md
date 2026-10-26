@@ -77,6 +77,13 @@
 * **[`decrypt_ota.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/decrypt_ota.py)** — распаковка и расшифровка OTA-пакетов прошивки.
 
 ### Звук, медиа и стриминг:
+
+* **[`alice-say.py`](alice-say.py)** — самостоятельный клиент озвучки текста через
+  штатный `AliceCapability.START_VOCALIZE` по root-SSH. На ПК нужны Python 3.11+
+  и OpenSSH, на колонке — `socat`. Протокол проверен на Лайт 2 / Plum;
+  используется облачный TTS Яндекса. Ничего не устанавливает и не меняет в прошивке.
+  [Рецепт](https://hackalice.me/recipes/sounds/#native-tts), проверка пакетов и ошибок:
+  `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
 * **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** — запуск клиента Spotify Connect (`librespot`).
 * **[`music.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/music.go)** / **[`qstream.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/qstream.go)** — стриминг звука через сокет `tcp_alsa_writer`.
