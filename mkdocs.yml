@@ -134,6 +134,7 @@ nav:
       - Колонка без Яндекса: recipes/standalone.md
   - Устройства:
       - devices/index.md
+      - Станция 3: devices/station-3.md
       - Станция Лайт (Micro): devices/station-lite.md
       - Станция Лайт 2 (Plum): devices/station-lite2.md
       - Станция Мини 3 (Bergamot): devices/station-mini3.md

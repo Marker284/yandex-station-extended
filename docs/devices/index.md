@@ -42,6 +42,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция Мини 3 | `yandex,station-mini3` (bergamot) | Amlogic AXG | ✅ разобрана | [Мини 3](station-mini3.md) |
 | Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | ✅ разобрана | [Мини 3 Про](station-mini3-pro.md) |
 | JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | ✅ разобрана | [JBL Link Music](jbl-link-music.md) |
+| Станция 3 | ? (`platform=orion`) | ? | 🌐 только сеть, без root | [Станция 3](station-3.md) |
 | Станция Дуо Макс | ? | ? | ⏳ нужны данные | — |
 | Станция Про | ? | ? | ⏳ нужны данные | — |
 
