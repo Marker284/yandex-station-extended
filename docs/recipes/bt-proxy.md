@@ -104,6 +104,56 @@ PropertiesChanged MediaPlayer1 Status: playing  ->  «Bluetooth player is playin
 Сборка из исходников — [`contrib/bt-proxy/build.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bt-proxy/build.sh)
 (Rust, `cargo-zigbuild`).
 
+## Как подключить свой плеер { #player }
+
+Плееру не нужно знать ни про `bt-proxy`, ни про Алису — достаточно четырёх условий.
+
+1. **MPRIS** (`org.mpris.MediaPlayer2.<имя>`, интерфейс `org.mpris.MediaPlayer2.Player`):
+
+    | Что | Зачем |
+    |---|---|
+    | `PlaybackStatus`: `Playing` / `Paused` / `Stopped` | кто играет: фокус Алисы и пауза остальных |
+    | `Metadata`: `xesam:title`, `xesam:artist`, `xesam:album`, `mpris:length` | название трека |
+    | `Volume` 0–1 (если есть) | общая громкость: `MediaTransport1.Volume` 0–127 |
+    | `Play`, `Pause`, `Next`, `Previous`, `Stop` | «продолжи», «пауза», «дальше», «назад» |
+    | сигнал `PropertiesChanged` при каждом изменении | `bt-proxy` не опрашивает плеер |
+
+    Устройство появляется у Алисы при первом `Playing`, после `Stopped` живёт ещё минуту и
+    сразу исчезает, когда плеер уходит с шины.
+
+2. **Приватная шина.** Плеер запускается от root с
+   `DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/btbus/socket` и регистрирует MPRIS на «системной»
+   шине. Плееры, умеющие только сессионную шину, переключите в системный режим.
+3. **Звук через штатную alsa-lib колонки.** Чтобы ответы Алисы звучали поверх музыки, плеер
+   пишет в `default` системной `libasound`: на Лайт 2 это armhf под glibc не новее 2.30.
+   Entware (aarch64, своя alsa-lib) и готовые сборки под свежие дистрибутивы этого не дают — и
+   не делят dmix с Алисой. Собрать под колонку можно так же, как shairport:
+   [`contrib/airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile)
+   (Debian buster, кросс-сборка под armhf). Свой регулятор громкости — softvol в `.asoundrc`,
+   как [`asoundrc`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/asoundrc) у AirPlay.
+4. **Автозапуск после `S55zbtproxy`** — свой init-скрипт по образцу
+   [`S99zairplay-lite2`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/S99zairplay-lite2)
+   и имя для Алисы в `ALIASES` в `S55zbtproxy`.
+
+Проверка: в `/tmp/bt-proxy.log` строка `плеер org.mpris.MediaPlayer2.<имя> (<имя у Алисы>)`,
+после воспроизведения в `/data/quasar/daemons_logs/maind.log` — `Bt source connected` и
+`Bluetooth player is playing`. Без плеера цепочку можно проверить `BT_PROXY_FAKE=<имя>`.
+
+??? example "Набросок: Spotify Connect через spotifyd (не проверялось)"
+    В spotifyd MPRIS встроен. Готовые релизы armv7 собраны под более новую glibc, поэтому
+    собирать его нужно под колонку (Rust, alsa и dbus из buster). Конфиг:
+
+    ```toml
+    [global]
+    device_name = "Yandex Lite 2"
+    backend = "alsa"
+    device = "spotify"      # softvol в .asoundrc, по образцу airplay
+    use_mpris = true
+    dbus_type = "system"    # с DBUS_SYSTEM_BUS_ADDRESS приватной шины
+    ```
+
+    `ALIASES` в `S55zbtproxy` уже содержит `spotifyd=Spotify`.
+
 ## Другие модели { #models }
 
 Нужен тот же Bluetooth-стек: `maind` ходит в BlueZ по D-Bus. Проверка на колонке:
