@@ -1,0 +1,46 @@
+#!/bin/sh
+# Автозапуск AirPlay 2 из Entware: dbus -> avahi -> nqptp -> shairport-sync.
+# Пакеты: yse install shairport-sync-openssl nqptp avahi-dbus-daemon (рецепт — recipes/airplay.md#lite2).
+# Конфиги: /opt/etc/avahi/avahi-daemon.conf, /opt/etc/shairport-sync.conf, /opt/etc/asound.conf.
+#
+# Проверено на Станции Лайт 2 (plum), прошивка 0.369.1.50: старт по ребуту, анонс в сети,
+# воспроизведение с iPad. На других моделях не проверялось.
+#
+# Почему не штатные /opt/etc/init.d/S20dbus и S50shairport-sync:
+#   - S20dbus проверяет pidof dbus-daemon, видит системный dbus колонки и свой не запускает —
+#     avahi остаётся без шины;
+#   - S50shairport-sync передаёт -d hw:0,0 мимо /opt/etc/asound.conf (dmix 48 кГц) — звук икает.
+#
+# Установка (rootfs только для чтения):
+#   mount -o remount,rw / && cp S99zairplay-entware /etc/init.d/ \
+#     && chmod 755 /etc/init.d/S99zairplay-entware; mount -o remount,ro /
+# Откат: /etc/init.d/S99zairplay-entware stop, затем удалить файл тем же remount.
+O=/opt
+R=$O/var/run
+start() {
+  [ -x "$O/bin/shairport-sync" ] || return 0
+  pidof shairport-sync >/dev/null 2>&1 && return 0
+  # /opt/var лежит на /data и переживает ребут: убрать протухшие pid и сокеты
+  rm -f $R/dbus/dbus.pid $R/dbus/system_bus_socket $R/avahi-daemon/pid
+  # wlan0 поднимается после quasar
+  i=0
+  while [ $i -lt 120 ] && ! ip -4 addr show wlan0 2>/dev/null | grep -q inet; do
+    sleep 1; i=$((i+1))
+  done
+  # свой dbus Entware, отдельно от системного (сокет в /opt/var/run/dbus)
+  $O/bin/dbus-daemon --system --fork
+  $O/sbin/avahi-daemon -D
+  start-stop-daemon --start --background --exec $O/bin/nqptp
+  $O/bin/shairport-sync --log-to-syslog -c $O/etc/shairport-sync.conf -o alsa -j
+}
+stop() {
+  killall shairport-sync nqptp 2>/dev/null
+  $O/sbin/avahi-daemon -k 2>/dev/null
+  [ -s $R/dbus/dbus.pid ] && kill "$(cat $R/dbus/dbus.pid)" 2>/dev/null
+}
+case "$1" in
+  start)   start & ;;
+  stop)    stop ;;
+  restart) stop; sleep 2; start ;;
+esac
+exit 0

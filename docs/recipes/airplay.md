@@ -15,7 +15,8 @@
 
 !!! note "Откуда взять пакет `/data/shairport`"
     Инструкции по установке самого пакета в вики пока нет. Если знаете источник —
-    [дополните страницу](../contributing.md).
+    [дополните страницу](../contributing.md). Другой путь — AirPlay 2 из Entware без
+    `/data/shairport`, см. [Станция Лайт 2](#lite2).
 
 ## Установка фикса
 
@@ -56,6 +57,107 @@
 2. **Пауза запускает Яндекс.Музыку.** `/dev/input/event1` читают и `airplayd`, и
    `maind --platformd`. Скрипт ставит хуки `shairport-sync`: на старте воспроизведения
    quasar (Алиса) останавливается, на паузе/остановке — запускается снова.
+
+---
+
+## Станция Лайт 2: AirPlay 2 из Entware { #lite2 }
+
+!!! info "Проверено на Станции Лайт 2 (plum), прошивка 0.369.1.50"
+    `shairport-sync-openssl 4.3.6` (AirPlay 2, Avahi, soxr) + `nqptp 1.2.4` + `avahi 0.8`
+    из Entware (`aarch64-3.10`). Воспроизведение с iPad, автозапуск — по ребуту.
+    На других моделях не проверялось.
+
+Пакет `/data/shairport` не нужен: всё ставится из Entware через [`yse`](../start/packages.md)
+в `/data/opt`, rootfs меняется только ради автозапуска. Места в `/data` уходит ~33 МБ
+(вместе с `libffmpeg-full`).
+
+### Установка
+
+1. Поставьте пакеты (нужен `yse bootstrap`):
+
+    ```sh
+    yse install shairport-sync-openssl nqptp avahi-dbus-daemon
+    ```
+
+2. Узнайте имя хоста, которое объявляет `maind` (например, с мака:
+   `dns-sd -G v4 <имя>.local` или `avahi-resolve -a <IP колонки>` — см.
+   [Свой mDNS рядом с maind](../internals/gotchas.md#avahi)). На Лайт 2 оно вида
+   `YandexLite-gen2-XXXXXXXX`. В `/opt/etc/avahi/avahi-daemon.conf`:
+
+    ```ini
+    [server]
+    host-name=YandexLite-gen2-XXXXXXXX
+    allow-interfaces=wlan0
+    use-ipv4=yes
+    use-ipv6=no
+
+    [publish]
+    publish-addresses=no
+    publish-hinfo=no
+    publish-workstation=no
+    ```
+
+3. `/opt/etc/shairport-sync.conf` — `airplay_device_id` задайте явно, это MAC `wlan0`
+   (`cat /sys/class/net/wlan0/address`) без двоеточий:
+
+    ```text
+    general = { name = "Yandex Lite 2"; interface = "wlan0"; airplay_device_id = 0xXXXXXXXXXXXXL; };
+    alsa = { output_device = "default"; };
+    ```
+
+4. `/opt/etc/asound.conf` — вывод через dmix на 48 кГц (копия штатного `dmix_spk`
+   из `/etc/asound.conf`; оригинал Entware сохраните рядом):
+
+    ```text
+    pcm.!default { type plug; slave.pcm "dmix_spk"; }
+    pcm.dmix_spk {
+      type dmix
+      ipc_key 1024
+      ipc_key_add_uid false
+      ipc_perm 0666
+      slave { pcm "hw:0,0"; channels 2; rate 48000; buffer_size 7680; period_size 960; }
+    }
+    ```
+
+5. Автозапуск — [`contrib/S99zairplay-entware`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/S99zairplay-entware)
+   (установка и откат — в шапке скрипта):
+
+    ```sh
+    mount -o remount,rw / && cp S99zairplay-entware /etc/init.d/ \
+      && chmod 755 /etc/init.d/S99zairplay-entware; mount -o remount,ro /
+    /etc/init.d/S99zairplay-entware start
+    ```
+
+Проверка с мака: `dns-sd -B _airplay._tcp` показывает колонку, а `dns-sd -B _yandexio._tcp` —
+по-прежнему штатный сервис `maind`.
+
+### Грабли { #lite2-gotchas }
+
+- **Звук икает дважды в секунду.** В логе (`shairport-sync -v --statistics`) раз в ~0,5 с
+  `Large negative (i.e. early) sync error of -2300 frames (-0.052 seconds)`. Карта `hw:0`
+  фактически играет только 48 кГц и молча принимает 44100: поток идёт на ~9% быстрее,
+  расхождение набегает до порога resync (0,05 с), и shairport перескакивает.
+  `audio_backend_latency_offset_in_seconds` не помогает — это дрейф, а не задержка.
+  Лечится dmix на 48 кГц из шага 4, после него `sync error` в логе нет.
+- **`output_device = "default"` без шага 4 — тот же `hw:0`.** shairport из Entware работает
+  со своей alsa-lib (1.2.11), она читает `/opt/etc/asound.conf`, а не системный
+  `/etc/asound.conf`; в Entware `default` — это `plug` прямо на `hw`.
+- **`deviceid=00:00:00:00:00:00` в анонсе.** `interface = "wlan0"` MAC не даёт — нужен явный
+  `airplay_device_id`.
+- **Штатные `/opt/etc/init.d` из Entware не годятся.** `S20dbus` проверяет `pidof dbus-daemon`,
+  видит системный dbus колонки и свой не запускает; `S50shairport-sync` передаёт `-d hw:0,0`
+  мимо dmix из шага 4.
+
+### Ограничения
+
+- **Пока играет AirPlay, звуки колонки не выводятся.** Смешать с Алисой через общий dmix не
+  получается: alsa-lib Entware (1.2.11) и системная (1.2.1.2) не делят сегмент shared memory,
+  системный `aplay` в это время падает с `unable to create IPC shm instance`. Подсунуть
+  shairport системную alsa-lib нельзя — ей нужна `GLIBC_2.29`, у Entware 2.27. После
+  остановки AirPlay карта освобождается, и звук колонки возвращается. Как ведёт себя сама
+  Алиса, если ответить ей во время AirPlay, не проверялось.
+- Имя хоста в `avahi-daemon.conf` привязано к имени, которое объявляет `maind`: если оно
+  сменится, AirPlay пропадёт из сети, сама колонка не пострадает.
 
 ---
 
