@@ -87,7 +87,7 @@
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
 * **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** — запуск клиента Spotify Connect (`librespot`).
-* **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`)
+* **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`) и Spotify
   одним каталогом с общей с Алисой громкостью, установка за окно ADB, сторож обновлений.
   [Рецепт](https://hackalice.me/recipes/airplay/#station-2-bundle).
 * **[`music.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/music.go)** / **[`qstream.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/qstream.go)** — стриминг звука через сокет `tcp_alsa_writer`.
