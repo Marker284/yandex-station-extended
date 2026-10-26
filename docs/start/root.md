@@ -76,6 +76,15 @@
     ```
 
     **OpenWrt**
+
+    **Способ 1. Перенаправление всех DNS-запросов (DNAT)**
+
+    !!! warning "Влияние DNAT на остальные устройства"
+        Это правило перехватывает DNS-запросы всей LAN и может нарушить работу Podkop
+        и других настроек DNS. Для таких сетей используйте способ 2 ниже.
+        Выберите один способ: перед переходом со способа 1 на способ 2 удалите
+        правило `Quasar-Unlock` в LuCI и примените изменения.
+
     Завернуть DNS-запросы из LAN на сервер разблокировки:
     ```sh
     uci add firewall redirect
@@ -87,6 +96,58 @@
     uci set firewall.@redirect[-1].dest_port='53'
     uci set firewall.@redirect[-1].target='DNAT'
     uci commit firewall && /etc/init.d/firewall reload
+    ```
+
+    <a id="rollback-openwrt-dnat"></a>
+
+    **Откат способа 1 после шага 2:** удалите перенаправление `Quasar-Unlock`
+    по имени и примените изменения. Повторный поиск после каждого удаления учитывает
+    изменение индексов UCI, если правило было добавлено несколько раз.
+    Цикл удаления проверен через `sh -n`; на роутере отдельно не выполнялся:
+
+    ```sh
+    while :; do
+        section="$(
+            uci show firewall |
+                sed -n "s/^\(firewall\.[^.]*\)\.name='Quasar-Unlock'$/\1/p" |
+                head -n 1
+        )"
+        [ -n "$section" ] || break
+        uci delete "$section" || break
+    done
+    uci commit firewall && /etc/init.d/firewall reload
+    ```
+
+    **Способ 2. Пересылка DNS только для доменов активации**
+
+    Добавьте в dnsmasq пересылку запросов для трёх доменов. Остальные домены продолжат
+    обслуживаться через текущие DNS-серверы роутера, в том числе через Podkop.
+    Команды выполняются по SSH на роутере:
+
+    ```sh
+    uci add_list dhcp.@dnsmasq[0].server='/quasar.yandex.net/179.254.167.126'
+    uci add_list dhcp.@dnsmasq[0].server='/quasar.yandex.ru/179.254.167.126'
+    uci add_list dhcp.@dnsmasq[0].server='/scbh.yandex.net/179.254.167.126'
+    uci commit dhcp && /etc/init.d/dnsmasq reload
+    ```
+
+    Правила действуют для указанных доменов и их поддоменов у всех клиентов этого
+    экземпляра dnsmasq, а не только у колонки. Обращения клиентов напрямую к другим
+    DNS-серверам этот способ не перехватывает.
+
+    Проверено на OpenWrt 24.10.5 с Podkop: Мини 2, прошивка
+    `0.369.1.46.4793643989.20261020.299`, и Миди, прошивка
+    `0.369.1.46.4778262955.20261013.160`.
+
+    <a id="rollback-openwrt-domains"></a>
+
+    **Откат способа 2 после шага 2:** удалите только добавленные записи:
+
+    ```sh
+    uci -q del_list dhcp.@dnsmasq[0].server='/quasar.yandex.net/179.254.167.126'
+    uci -q del_list dhcp.@dnsmasq[0].server='/quasar.yandex.ru/179.254.167.126'
+    uci -q del_list dhcp.@dnsmasq[0].server='/scbh.yandex.net/179.254.167.126'
+    uci commit dhcp && /etc/init.d/dnsmasq reload
     ```
 
     **Раздача с Android**
@@ -118,6 +179,11 @@
     ### 7. Верните обычный DNS { #restore-dns }
 
     После шага 2 уберите `179.254.167.126` из настроек роутера. Доступ сохранится.
+
+    Для OpenWrt выполните откат выбранного способа:
+
+    - [Способ 1 — удалить перенаправление DNS (DNAT)](#rollback-openwrt-dnat).
+    - [Способ 2 — удалить пересылку DNS для доменов активации](#rollback-openwrt-domains).
 
 === "Вариант 2. Свой стенд на ПК"
 
