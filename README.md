@@ -51,7 +51,8 @@
 
 | Модель | Root | Подробнее |
 |---|:---:|---|
-| Лайт, Мини, Мини 2, Миди, Станция 2, Стрит, Умный хаб | ✅ | [DNS-метод](https://hackalice.me/start/root/) |
+| **Мини 1 (2019)** | ✅ | [Root и ADB по USB — инструкция](docs/start/root-mini1-usb.md) |
+| Лайт, Мини 2, Миди, Станция 2, Стрит, Умный хаб | ✅ | [DNS-метод](https://hackalice.me/start/root/) |
 | Мини 3 | ✅ | [retail CA и маркеры](https://hackalice.me/start/retail-ca-mini3/) |
 | Лайт 2 | ✅ | [retail CA из factory](https://hackalice.me/start/retail-ca/) |
 | Станция 1-го поколения | ✅ | [AliceBridge](https://hackalice.me/start/root-android/#station-1) |

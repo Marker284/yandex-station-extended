@@ -1,4 +1,4 @@
-# Мини 1: ADB root по USB через Station Mini Root { #mini1-usb-root }
+# Мини 1 (2019): root и ADB по USB через Station Mini Root { #mini1-usb-root }
 
 Способ для **[Станции Мини первого поколения](../devices/station-mini.md), YNDX-0004,
 Amlogic A113X**. Программа сохраняет исходный `system`, собирает из него образ с USB-ADB,

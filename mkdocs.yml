@@ -118,7 +118,7 @@ nav:
           - Лайт 2 — retail CA из factory: start/retail-ca.md
           - Мини 3 — retail CA и маркеры: start/retail-ca-mini3.md
           - С Android (AliceBridge): start/root-android.md
-          - Мини 1 — USB/TPL (Station Mini Root): start/root-mini1-usb.md
+          - Мини 1 (2019) — root и ADB по USB: start/root-mini1-usb.md
           - JBL Link Music — ADB по USB: start/root-jbl-link-music.md
       - 2. SSH и обновления: start/ssh.md
       - 3. Пакеты yse: start/packages.md
