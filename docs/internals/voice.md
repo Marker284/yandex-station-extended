@@ -1,9 +1,8 @@
 # Голосовой тракт Алисы
 
-Как колонка слышит, распознаёт и отвечает. Снято с Amlogic-Станции (quasar 3.21): по
+Снято с Amlogic-Станции (quasar 3.21): по
 `quasar.cfg` (`audiod`, `aliced`, `audiosender`, `bio_capability`), моделям в `spotter_models/`
-и `bio_lingware/`, путям исходников в `strings maind` и логам `maind.log`. Помечено *(вывод)*
-то, что не подтверждено напрямую.
+и `bio_lingware/`, путям исходников в `strings maind` и логам `maind.log`. Не подтверждено напрямую.
 
 !!! abstract "Главное"
     На устройстве распознаётся **только ключевое слово и ~25 коротких команд**. Полное
@@ -83,10 +82,11 @@
 
 ## 5. Облако
 
-ASR: `shortRecognizerModel: quasar-general`, промежуточные гипотезы (`enable_partials`).
-`music_recognizer` — распознавание играющей музыки. Диалог и навыки — VINS/Megamind;
-`experiments`/`supportedFeatures` сообщают серверу, что умеет устройство (так он и отличает
-«болталку» от команд умного дома — маршрутизация на стороне облака).
+ASR — используется модель quasar-general для распознавания речи и поддерживаются промежуточные гипотезы (enable_partials).
+
+`music_recognizer` — отвечает за распознавание музыки, которая сейчас играет на устройстве.
+
+Диалоги и навыки обрабатываются через VINS/Megamind. Параметры `experiments/supportedFeatures` передают серверу информацию о возможностях устройства. На основе этих данных облако определяет, как маршрутизировать запрос - как ответ в диалоге или в управление устройствами умного дома.
 
 ## 6. Ответ
 
@@ -115,9 +115,7 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   делает интеграция YandexStation для Home Assistant (см. [Сеть → glagol](network.md#glagol));
   из облака это делает `AliceResponse.TtsSpeak`.
 - **Подмена адреса**: пиннинга сертификатов нет (см. [Подводные камни](gotchas.md)),
-  `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS.
-- **Рабочий пример** — [quasard](../recipes/llm.md#quasard): свой uniproxy (JSON и protobuf
-  `AAPI`), ASR, LLM и TTS вместо облака.
+  `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS. Рабочий пример — [quasard](../recipes/llm.md#quasard): свой uniproxy (JSON и protobuf `AAPI`), ASR, LLM и TTS вместо облака.
 
 !!! warning "Приватность"
     Колонка постоянно держит соединение с облаком, а для «beta»-групп может отправлять случайные
