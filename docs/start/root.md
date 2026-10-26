@@ -434,6 +434,13 @@
     - На роутере включена DNS-фильтрация (Яндекс.DNS, AdGuard и т.п.) — отключите её.
     - Колонка могла запомнить старый адрес — передёрните питание.
     - Проверьте с ПК в той же сети: `nslookup quasar.yandex.net` должен вернуть `179.254.167.126`.
+    - Колонка могла обновится на актуальную версию (после 21.10.26).
+        - Если успели настроить подключение по SSH, узнать версию: `cat /system/vendor/quasar/version_full`. Если там `0.369.1.50...` вернуть adb можно так: 
+        ```bash
+        touch /data/quasar/activate_adb_quasmodrom /data/quasar/activate_network_ad
+        sh /system/vendor/quasar//activate_adb.sh check
+        cat /data/quasar/quasar_adb.log
+        ```
 
 ??? failure "`adb connect` пишет `unable to connect`"
     Компьютер и колонка должны быть в одной сети, не в гостевой (с изоляцией клиентов).
