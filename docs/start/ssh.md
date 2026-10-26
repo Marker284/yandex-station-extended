@@ -8,7 +8,27 @@
 Все команды — с компьютера, из клона репозитория
 ([Marker284/yandex-station-extended](https://github.com/Marker284/yandex-station-extended)).
 
-## 1. Отключите обновления { #kill-ota }
+
+## 1. Включаем перманентный ADB доступ { #permADB }
+
+```sh
+mkdir -p /data/quasar
+touch /data/quasar/activate_adb_quasmodrom
+touch /data/quasar/activate_network_adb
+chattr +i /data/quasar/activate_adb_quasmodrom
+chattr +i /data/quasar/activate_network_adb
+```
+
+Проверка после перезагрузки:
+
+```adb devices
+```
+
+??? info "Что делает скрипт"
+    Создает файлы которые читает система при загрузке станции, если находит - включает ADB.
+
+
+## 2. Отключите обновления { #kill-ota }
 
 ```sh
 adb push contrib/yandex-noupdate.sh /data/opt/yandex-noupdate.sh
@@ -39,7 +59,7 @@ ota key     : подменён
     3. Из `launch.json` убирается демон `maind --updatesd` (с проверкой результата: если правка
        не удалась, файл остаётся исходным, а защита держится на пунктах 1–2).
 
-## 2. Поставьте SSH (Dropbear) { #dropbear }
+## 3. Поставьте SSH (Dropbear) { #dropbear }
 
 Статический `dropbear` (32-битный ARM, armhf) лежит в репозитории, в [`contrib/bin/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bin).
 
@@ -116,19 +136,10 @@ ssh -p 2222 root@192.168.1.120
     Войти может любой в вашей локальной сети. Не открывайте порты 2222 и 5555 наружу и не
     держите колонку в недоверенной сети.
 
-## 3. Верните DNS
+## 4. Верните DNS
 
-Теперь можно убрать `179.254.167.126` с роутера ([шаг 7](root.md#restore-dns)).
+Теперь можно убрать настройки DNS (`179.254.167.126`) с роутера ([шаг 7](root.md#restore-dns)).
 
 Дальше: **[шаг 3 — пакеты `yse`](packages.md)**.
 
 ---
-
-## Как это устроено
-
-- Корневая ФС `/` — ubifs, смонтирована только для чтения, но dm-verity на ней не включён:
-  после `mount -o remount,rw /` правки сохраняются и переживают перезагрузку.
-- `/data` — ссылка на `/bkupgrade/data` (отдельный раздел, ~87 МБ). Свой софт кладите в `/data/opt`.
-- Скрипты `/etc/init.d/S??*` выполняет `rcS` по алфавиту при загрузке — так работают
-  `S99zdropbear` и другие автозапуски из этой вики.
-- Сброс к заводским настройкам кнопками очищает `/data` — после него шаги 1–2 придётся повторить.
