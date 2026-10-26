@@ -14,7 +14,7 @@
 ## BusyBox
 
 - нет `timeout`;
-- `awk` без математики (`exp`, `log` → «Math support is not compiled in»);
+- `awk` без математическихх функций (`exp`, `log` → «Math support is not compiled in»);
 - `tar` без `-z` (используйте `gunzip -c | tar -x`);
 - `test -w` говорит «можно писать» даже на read-only разделе — проверяйте режим монтирования
   в `/proc/mounts`;
