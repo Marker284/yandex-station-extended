@@ -132,6 +132,7 @@ nav:
       - YAM и BetterYAM: recipes/yam.md
       - Своя LLM вместо Алисы: recipes/llm.md
       - Колонка без Яндекса: recipes/standalone.md
+      - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
   - Устройства:
       - devices/index.md
       - Станция Лайт (Micro): devices/station-lite.md

@@ -12,6 +12,7 @@
 | [YAM и BetterYAM](yam.md) | плагины `.yap` с веб-панелью и Lua API к подсветке, кнопкам, датчикам, голосовым командам | `aarch64`; BetterYAM — Мини |
 | [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)) или свой бэкенд ([quasard](llm.md#quasard)) | Quasar Bridge — Станция 2, Quasar 3.21; quasard — ~1.56 и 3.x |
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |
+| [Отключение обновлений](station1-disable-updates.md) | остановка цикла обязательного OTA, из-за которого Алиса отвечает с ошибками | проверено на Станции 1, прошивка 2.369.5.46 |
 
 Готовые скрипты — в каталоге
 [`contrib/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib)
