@@ -70,7 +70,8 @@ alarm_capability.cpp: Cannot convert directive to proto: {"timer":…}
 | `alarm_snooze_directive` | `{alarm_id, duration_sec}` |
 | `set_do_not_disturb_directive` | `{force_do_not_disturb_state: "ForceEnable" \| "ForceDisable"}` |
 
-Остановить звенящий будильник — директива `alarm_stop` (без payload).
+Остановить звенящий будильник — легаси-директива `alarm_stop` (Struct в `Payload`, без
+полей).
 
 Будильник целиком:
 
@@ -116,8 +117,6 @@ Enum передаётся **именем** (`"ForceEnable"`, `"MONDAY"`) — т�
 
 ## Источник { #source }
 
-Проект [syrinx](https://github.com/garenal1v3/syrinx) — свой бэкенд для колонки (GPL-3.0).
-Подробности, примеры и код сериализации — в
-[docs/device-skills.md](https://github.com/garenal1v3/syrinx/blob/main/docs/device-skills.md).
+Снято в проекте syrinx — своём бэкенде для колонки (GPL-3.0, репозиторий в публикации).
 Про подмену облачного адреса — [«Своя LLM вместо Алисы»](../recipes/llm.md) и
 [«Колонка без Яндекса»](../recipes/standalone.md).
