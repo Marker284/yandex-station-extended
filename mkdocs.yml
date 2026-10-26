@@ -152,6 +152,7 @@ nav:
       - Архитектура прошивки: internals/architecture.md
       - Сеть и порты: internals/network.md
       - Голосовой тракт Алисы: internals/voice.md
+      - Директивы и capabilities: internals/directives.md
       - Подводные камни: internals/gotchas.md
       - Сборка софта: internals/toolchain.md
   - Как дополнять вики: contributing.md
