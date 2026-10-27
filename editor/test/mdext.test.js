@@ -32,6 +32,27 @@ describe('markdown вики', () => {
     expect(out).toContain('конец');
   });
 
+  it('md_in_html: содержимое <div markdown> разбирается как Markdown', () => {
+    const out = md.render(
+      ['<div class="tg-banner" markdown>', '<div class="t" markdown>', '**Чат** в [tg](https://t.me/x).', '</div>', '</div>'].join('\n'),
+    );
+    expect(out).toContain('<strong>Чат</strong>');
+    expect(out).toContain('<a href="https://t.me/x">tg</a>');
+    expect(out).not.toContain('markdown>'); // служебный атрибут убран
+    expect(out).toContain('<div class="tg-banner">');
+    expect(out).toContain('</div>');
+  });
+
+  it('md_in_html: без атрибута markdown содержимое остаётся сырым', () => {
+    const out = md.render(['<div class="x">', '**не разметка**', '</div>'].join('\n'));
+    expect(out).toContain('**не разметка**');
+  });
+
+  it('md_in_html: закрывающий тег не на своей строке — блок остаётся сырым', () => {
+    const out = md.render(['<div class="x" markdown>', '**жирный** текст</div>'].join('\n'));
+    expect(out).toContain('**жирный**');
+  });
+
   it('attr_list, клавиши, иконки', () => {
     expect(md.render('## Шаг { #root }')).toMatch(/<h2 id="root" data-line="0"[^>]*>Шаг<\/h2>/);
     expect(md.render('[Скачать](x.zip){ .md-button .md-button--primary }')).toContain('<a href="x.zip" class="md-button md-button--primary">Скачать</a>');

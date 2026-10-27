@@ -10,6 +10,35 @@
     return document.querySelector('.yse-suggest[data-yse-path]');
   }
 
+  // ---- кнопка «Создать статью» в шапке сайта
+  function editorUrl() {
+    var m = document.querySelector('meta[name="yse-editor-url"]');
+    return m && m.content ? new URL(m.content, location.href).href : '';
+  }
+
+  function addHeaderButton() {
+    var header = document.querySelector('.md-header__inner');
+    if (!header) return;
+    var url = editorUrl();
+    if (!url) return;
+    var link = header.querySelector('.yse-new');
+    if (!link) {
+      link = document.createElement('a');
+      link.className = 'md-header__button yse-new';
+      link.title = 'Написать новую статью вики';
+      link.setAttribute('data-yse-edit', '');
+      link.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>' +
+        '<span class="yse-new__label">Создать статью</span>';
+      var source = header.querySelector('.md-header__source');
+      if (source) header.insertBefore(link, source);
+      else header.appendChild(link);
+    }
+    link.href = url + '?new=1';
+  }
+
+  addHeaderButton();
+
   // ---- ссылки на редактор открываем полной загрузкой (instant-навигация его не запустит)
   document.addEventListener(
     'click',
@@ -29,6 +58,7 @@
   // показывали бы вечный спиннер вместо подсказки «что-то долго».
   if (window.document$ && window.document$.subscribe) {
     window.document$.subscribe(function () {
+      addHeaderButton(); // instant-навигация меняет содержимое, шапка остаётся
       var el = document.getElementById('yse-editor');
       var booted = !el || el.hasAttribute('data-booted') || window.__yseEditorBooted;
       try {
@@ -72,6 +102,20 @@
     if (bubble) bubble.hidden = true;
   }
 
+  function run(what) {
+    var c = card();
+    if (!c) return;
+    if (what === 'edit') {
+      location.href =
+        c.getAttribute('data-yse-edit-url') +
+        '?path=' + encodeURIComponent(c.getAttribute('data-yse-path')) +
+        '&quote=' + encodeURIComponent(quote.slice(0, 300));
+    } else {
+      window.open(reportUrl(quote), '_blank', 'noopener');
+    }
+    hide();
+  }
+
   function ensureBubble() {
     if (bubble) return bubble;
     bubble = document.createElement('div');
@@ -84,22 +128,24 @@
       '<a href="#" data-yse-bubble="report">' +
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>' +
       'Ошибка</a>';
-    bubble.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    // Действие — на mousedown, а не на click: при нажатии браузер успевает снять
+    // выделение, плашка прячется, и до click дело не доходит — кнопка «срабатывала
+    // через раз». Цитата к этому моменту уже сохранена в quote.
+    bubble.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      var a = e.target.closest('[data-yse-bubble]');
+      if (a) {
+        e.stopPropagation();
+        run(a.getAttribute('data-yse-bubble'));
+      }
+    });
+
+    // мышь отработала выше; это — для клавиатуры (Enter на выбранной ссылке)
     bubble.addEventListener('click', function (e) {
       var a = e.target.closest('[data-yse-bubble]');
       if (!a) return;
       e.preventDefault();
-      var c = card();
-      if (!c) return;
-      if (a.getAttribute('data-yse-bubble') === 'edit') {
-        location.href =
-          c.getAttribute('data-yse-edit-url') +
-          '?path=' + encodeURIComponent(c.getAttribute('data-yse-path')) +
-          '&quote=' + encodeURIComponent(quote.slice(0, 300));
-      } else {
-        window.open(reportUrl(quote), '_blank', 'noopener');
-      }
-      hide();
+      if (e.detail === 0) run(a.getAttribute('data-yse-bubble'));
     });
     document.body.appendChild(bubble);
     return bubble;

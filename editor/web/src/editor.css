@@ -1058,6 +1058,7 @@ body:has(.yse-app) .md-footer {
     background: none;
   }
 
+  /* иконка :material-…: — пока SVG не подгрузился, на её месте серый квадратик */
   .yse-preview .yse-icon-shortcode {
     display: inline-block;
     width: 1.1em;
@@ -1065,6 +1066,18 @@ body:has(.yse-app) .md-footer {
     vertical-align: -0.15em;
     border-radius: 3px;
     background: var(--md-default-fg-color--lighter);
+  }
+
+  .yse-preview .yse-icon-shortcode.yse-icon-ready {
+    background: none;
+    border-radius: 0;
+  }
+
+  .yse-preview .yse-icon-shortcode svg {
+    width: 1.1em;
+    height: 1.1em;
+    fill: currentcolor;
+    vertical-align: top;
   }
 
   /* строки в CodeMirror */
