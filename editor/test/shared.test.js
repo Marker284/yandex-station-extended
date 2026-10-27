@@ -111,8 +111,9 @@ describe('paths', () => {
     const lines = out.split('\n');
     const i = lines.indexOf('      - "Моя: страница": recipes/moya.md');
     expect(i).toBeGreaterThan(0);
-    expect(lines[i - 1]).toContain('station1-disable-updates.md');
-    expect(lines[i + 1]).toBe('  - Устройства:');
+    // структурно, без привязки к тому, какая страница сейчас последняя в разделе
+    expect(lines[i - 1]).toMatch(/^ {6}- .+: recipes\/[a-z0-9._/-]+\.md$/);
+    expect(lines[i + 1]).toMatch(/^ {2}- .+:$/);
     expect(out.split('\n').length).toBe(mkdocs.split('\n').length + 1);
     // повтор не дублирует
     expect(addToNav(out, 'Рецепты', 'Моя: страница', 'docs/recipes/moya.md')).toBe(out);
@@ -123,7 +124,8 @@ describe('paths', () => {
     const out = addToNav(mkdocs, 'Начало работы', 'Новый шаг', 'docs/start/new.md');
     const lines = out.split('\n');
     const i = lines.indexOf('      - Новый шаг: start/new.md');
-    expect(lines[i - 1]).toContain('start/recovery.md');
-    expect(lines[i + 1]).toBe('  - Рецепты:');
+    expect(i).toBeGreaterThan(0);
+    expect(lines[i - 1]).toMatch(/^ {6}- .+: start\/[a-z0-9._/-]+\.md$/);
+    expect(lines[i + 1]).toMatch(/^ {2}- .+:$/);
   });
 });
