@@ -47,7 +47,7 @@
 
 ## Карта флеша (MTD)
 
-```
+```text
 mtd0 "bootloader" 4 MB    mtd1 "tpl" 6 MB     mtd2 "boot" 20 MB
 mtd3 "system" 176 MB -> ubi0:rootfs (ubifs, RO)
 mtd4 "nv" 1 MB -> /tee (vfat, RO)

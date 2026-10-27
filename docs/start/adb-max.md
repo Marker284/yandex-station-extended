@@ -4,7 +4,7 @@ Root shell на Яндекс Станции Макс (`yandexstation_2`, YNDX-00
 прошивки и без записи на блочные устройства. Единственное, что нужно на
 старте, — сетевой ADB.
 
-```
+```text
 uid=0(root) gid=0(root) groups=0(root) context=u:r:kernel:s0
 ```
 
@@ -52,7 +52,7 @@ adb shell getprop ro.build.fingerprint
 
 Ожидается:
 
-```
+```text
 Yandex/yandexstation_2/yandexstation_2:9/PPR1.180610.011/20220415:user/release-keys
 ```
 
@@ -162,7 +162,7 @@ adb shell cat /data/local/tmp/r4.log
 Признак успеха — `id` из процесса, который payload запустил уже после
 эскалации:
 
-```
+```text
 uid=0(root) gid=0(root) groups=0(root) context=u:r:kernel:s0
 ```
 

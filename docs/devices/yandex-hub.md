@@ -45,7 +45,7 @@ Amlogic AXG + Buildroot + quasar, поэтому приёмы доступа/п�
 
 ## Карта флеша (MTD)
 
-```
+```text
 mtd0 "bootloader" 2 MB   mtd1 "tpl" 2 MB    mtd2 "boot" 10 MB
 mtd3 "system" 80 MB -> ubi0:rootfs (ubifs, RO)
 mtd4 "nv" 1 MB     mtd5 "bkupgrade" ~105 MB -> ubi1 (RW) = /bkupgrade

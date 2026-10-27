@@ -32,7 +32,7 @@
 
 ### Kernel cmdline
 
-```
+```text
 androidboot.serialno=... androidboot.deviceid=... androidboot.localization=RU.RU
 androidboot.rpmb_state=0 androidboot.rh_unlock=0
 ubi.mtd=system root=ubi0:rootfs rootfstype=ubifs ubi.mtd=bkupgrade
@@ -45,7 +45,7 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 
 ## Карта флеша (MTD / UBI)
 
-```
+```text
 mtd0  "bootloader"  2 MB     U-Boot / BL2+BL3x
 mtd1  "tpl"         2 MB
 mtd2  "boot"       10 MB     uImage + dtb
@@ -107,7 +107,7 @@ recovery, rsv, system, tee` (`instaboot` — snapshot/hibernation, `misc` — re
 
 ### Формат `.led` (декодирован) { #led-format }
 
-```
+```text
 gammacorrection          # заголовок: применять гамма-коррекцию
 loop                     # зациклить анимацию
 RRGGBB  RRGGBB  RRGGBB   1000   # цвет ring1 ring2 ring3  +  длительность кадра (мс)

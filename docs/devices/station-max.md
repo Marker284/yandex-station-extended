@@ -57,7 +57,7 @@ build-профиль `yandexstation_2_tv/127`). Это флагман-медиа
 ## Разметка (Android, eMMC)
 
 Разделы `/dev/block/`:
-```
+```text
 boot bootloader cache cri_data data dtbo env logo md0 metadata misc
 odm param platform product recovery reserved rsv sysrecovery system
 tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
