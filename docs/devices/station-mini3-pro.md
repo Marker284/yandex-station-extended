@@ -3,7 +3,8 @@
 Розничное имя — **Яндекс Станция Мини 3 Про**; кодовое имя — **Pickle** (device-tree
 `Yandex Pickle EVT`, `yandex,pickle-evt` / `yandex,pickle`, **`amlogic, a4`**). Не путать с
 [Мини 3 (bergamot)](station-mini3.md): там рутованная колонка сохраняет правки во всех
-разделах, а у Мини 3 Про — **только в `/data`**.
+разделах, а у Мини 3 Про на прошивке `.50` — **только в `/data`**. На заводской
+factory-12 правки корня, наоборот, [сохраняются](#factory-12).
 
 Новый для вики SoC — **Amlogic A4**; программная основа та же, что у
 [Миди](station-midi.md): ядро 5.4, Buildroot 2023.11.1, quasar/`maind`. Хранилище при этом
@@ -288,7 +289,8 @@ sysfs и **перерисовывает его на каждой смене ми
   и сторонние приёмники.
 - Громкость Алисы — это `amixer set Master N%` (так делает `set_volume.sh`). Чужая запись в
   `Master` меняет громкость, но Quasar о ней не знает: следующая кнопка считает от его уровня.
-- `native-volume` из пакета [station-volume](https://github.com/Yandex-Station-Universal-Repo/station-volume)
+- `native-volume` из пакета
+  [station-volume](https://github.com/Yandex-Station-Universal-Repo/station-volume)
   на factory-12 **читает** громкость (`stereo_pair`, порт 9921), но `volume_set` через
   `iohub_clients` (9910) Quasar не принимает: уровень не меняется.
 - **Петлевой канал** `LOOPBACK-A` (`hw:0,2`, 4 канала S16 48 кГц; 0 и 1 — левый и правый того,
@@ -302,8 +304,8 @@ sysfs и **перерисовывает его на каждой смене ми
     `/proc/asound/card0/pcm2c/sub0/status`) → включить микрофоны.
 
 **Микрофон программно.** Кнопка микрофона — устройство ввода `mute` (gpio-keys,
-на проверенной колонке `/dev/input/event2`), переключатель `SW_MUTE_DEVICE`. Записанное в это устройство событие Quasar
-обрабатывает как нажатие (`Mute microphones` / `Unmute microphones` в журнале):
+на проверенной колонке `/dev/input/event2`), переключатель `SW_MUTE_DEVICE`. Записанное
+в это устройство событие Quasar обрабатывает как нажатие (`Mute microphones` / `Unmute microphones` в журнале):
 
 ```sh
 dev=$(awk '/^N: Name="mute"/ { f = 1 } f && /^H:/ { if (match($0, /event[0-9]+/)) print substr($0, RSTART, RLENGTH); exit }' /proc/bus/input/devices)

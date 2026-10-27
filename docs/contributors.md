@@ -26,6 +26,7 @@
 | [@garenal1v3](https://github.com/garenal1v3) | [Директивы и capabilities](internals/directives.md): legacy и typed, `PayloadRaw` ([#27](https://github.com/Marker284/yandex-station-extended/pull/27)) |
 | [@rison1337](https://github.com/rison1337) | [голосовой режим сайта ChatGPT](recipes/llm.md#chatgpt-web), [обработанный микрофон VQE](recipes/microphone.md), [озвучка текста через `START_VOCALIZE`](recipes/sounds.md#native-tts) и `contrib/alice-say.py`, [подсветка Лайт 2 / Plum](recipes/led.md#plum-led) ([#36](https://github.com/Marker284/yandex-station-extended/pull/36)) |
 | [@ramory-l](https://github.com/ramory-l) | [Мини 3: retail CA из factory](start/retail-ca-mini3.md): resolver для `/register` в eQuasar, factory-4, хеш CA по сборкам, ADB после возврата DNS, DNS на Keenetic ([#31](https://github.com/Marker284/yandex-station-extended/pull/31)); [заметка по macOS и adb](internals/toolchain.md#adb-install) ([#31](https://github.com/Marker284/yandex-station-extended/pull/31)); [Лайт 1](devices/station-lite.md#root): порядок сброса, откат с `.50` через свой стенд, телефон на мобильном интернете ([#33](https://github.com/Marker284/yandex-station-extended/pull/33)) |
+| [@dimakolychev](https://github.com/dimakolychev) | [Мини 3 Про на factory-12](devices/station-mini3-pro.md#factory-12): ADB после возврата DNS, подсветка и LED-часы, звук и микрофон, AirPlay, `yse`/Entware, дамп NAND ([#47](https://github.com/Marker284/yandex-station-extended/pull/47)) |
 
 ## Данные для страниц моделей
 
