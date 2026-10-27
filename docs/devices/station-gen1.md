@@ -143,6 +143,14 @@ SHA-256 записанного раздела и перезагружает ко
 - Энтузиасты ставят свои бинарники в `/data/local/bin` (Android-путь) — например,
   `zsh`, `fastfetch`; можно поднять свой dropbear-SSH.
 
+## Свой Linux { #linux }
+
+На Станции 1 работает mainline-ядро **Linux 7.3** (DVFS, Wi-Fi, Bluetooth, оба усилителя,
+микрофоны, кольцо, кнопки) и чистый **Debian 13**: ставится одной командой из Android, рядом
+с Алисой или вместо неё, удаление возвращает сток —
+[Debian на Станции 1](../recipes/station1-debian.md). Исходники ядра и патчей —
+[MyszkinPL/yandex-station-linux](https://github.com/MyszkinPL/yandex-station-linux).
+
 ## Что ещё проверить
 
 - Влияние SELinux-политики на root из AliceBridge.
