@@ -5,3 +5,4 @@ __pycache__/
 *$py.class
 .cache/
 .DS_Store
+.claude/
