@@ -15,6 +15,7 @@
 | [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)), свой бэкенд ([quasard](llm.md#quasard)) или [голосовой режим сайта ChatGPT](llm.md#chatgpt-web) | Quasar Bridge — Станция 2, Quasar 3.21; quasard — ~1.56 и 3.x; ChatGPT — Лайт 2 / Plum |
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |
 | [Отключение обновлений](station1-disable-updates.md) | остановка цикла обязательного OTA, из-за которого Алиса отвечает с ошибками | проверено на Станции 1, прошивка 2.369.5.46 |
+| [Spotify Connect](spotify.md) | колонка как приёмник Spotify и «Алиса, поставь …» через Spotify | Станция 2 |
 | [ТВ-набор для Станции 1](station1-tv.md) | веб-пульт в браузере телефона, ТВ-лаунчер, YouTube (SmartTube) и VPN (v2rayNG) на HDMI | проверено на Станции 1, прошивка 2.369.5.46 |
 
 Готовые скрипты — в каталоге

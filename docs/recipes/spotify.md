@@ -4,7 +4,8 @@
 Алисой, а на «Алиса, поставь …» музыка включается из Spotify вместо Яндекс Музыки.
 
 !!! info "Проверено на Станции 2 (`yandexmidi`, прошивка `0.369.1.50.*` от 21.10.2026)"
-    `librespot 0.8.0`, Spotify Premium. Ставится поверх [AirPlay 2 одним набором](airplay.md#station-2-bundle):
+    `librespot 0.8.0`, Spotify Premium. Ставится поверх
+    [AirPlay 2 одним набором](airplay.md#station-2-bundle):
     тот же каталог `/data/local/opt/ap2`, распорядитель звука и автозапуск.
 
 ## Что нужно
