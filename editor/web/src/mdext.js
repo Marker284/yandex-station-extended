@@ -192,10 +192,16 @@ function iconShortcode(state, silent) {
   return true;
 }
 
-/** Номер строки исходника на блоках — для синхронной прокрутки и перехода к фрагменту. */
+/**
+ * Границы блока в исходнике — для синхронной прокрутки, перехода к фрагменту и правки
+ * прямо в превью. Отмечаются и вложенные блоки (пункты списка, строки таблицы, абзацы
+ * внутри admonition), чтобы в превью правился как можно более мелкий кусок исходника.
+ */
 function sourceLines(state) {
   for (const t of state.tokens) {
-    if (t.map && t.nesting >= 0 && t.level === 0 && t.type !== 'inline') t.attrSet('data-line', String(t.map[0]));
+    if (!t.map || t.nesting < 0 || t.type === 'inline') continue;
+    t.attrSet('data-line', String(t.map[0]));
+    t.attrSet('data-end', String(t.map[1]));
   }
 }
 
@@ -214,7 +220,11 @@ export function wikiMarkdown(md) {
     const lang = (/^[\w+#-]+/.exec(info) || [''])[0];
     const title = /title="([^"]*)"/.exec(info);
     const line = t.attrGet('data-line');
-    return `<div class="${lang ? `language-${escapeHtml(lang)} ` : ''}highlight"${line ? ` data-line="${line}"` : ''}>${title ? `<span class="filename">${escapeHtml(title[1])}</span>` : ''}<pre><span></span><code>${escapeHtml(t.content)}</code></pre></div>\n`;
+    const end = t.attrGet('data-end');
+    const map = line ? ` data-line="${line}"${end ? ` data-end="${end}"` : ''}` : '';
+    // data-code на <code>: содержимое фенса — строки между открывающей и закрывающей ```
+    const inner = line ? ` data-line="${Number(line) + 1}" data-code="1"${end ? ` data-end="${Number(end) - 1}"` : ''}` : '';
+    return `<div class="${lang ? `language-${escapeHtml(lang)} ` : ''}highlight"${map}>${title ? `<span class="filename">${escapeHtml(title[1])}</span>` : ''}<pre><span></span><code${inner}>${escapeHtml(t.content)}</code></pre></div>\n`;
   };
 
   // html_block с data-line тоже нужен для прокрутки: оборачиваем только открывающие

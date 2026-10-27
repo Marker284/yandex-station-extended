@@ -3,8 +3,9 @@
 
 import { Api, ApiError } from './api.js';
 import { h, clear, icon, spinner, formatTime, plural, store } from './dom.js';
-import { createEditor, commands, setDoc, setLineMarks, revealQuote, gotoLine, topVisibleLine, insertBlock } from './cm.js';
+import { createEditor, commands, setDoc, setLineMarks, revealQuote, gotoLine, topVisibleLine, insertBlock, undo, redo } from './cm.js';
 import { renderInto, elementForLine } from './preview.js';
+import { enableLiveEdit, markBlocks } from './live.js';
 import { lineStats, rebase } from './diff.js';
 import { scanChange, hasBlocking } from '../../shared/scan.js';
 import {
@@ -50,10 +51,12 @@ const S = {
   view: null,
   editor: null,
   preview: null,
+  live: null, // правка прямо в превью (live.js)
   findings: [],
   stats: { added: 0, removed: 0, changedLines: new Set() },
   submitted: false,
   sections: [],
+  hint: '',
 };
 
 const siteUrl = (path) => new URL(path ? pageUrlPath(path) : '', cfg.siteRoot).href;
@@ -545,9 +548,16 @@ let previewTimer = 0;
 let analyzeTimer = 0;
 let draftTimer = 0;
 
+function drawPreview() {
+  renderInto(S.preview, S.editor.state.doc.toString(), { pagePath: S.path, siteRoot: cfg.siteRoot, pendingImages: S.images });
+  markBlocks(S.preview);
+}
+
 function updatePreview() {
   if (!S.preview || S.view === 'source') return;
-  renderInto(S.preview, S.editor.state.doc.toString(), { pagePath: S.path, siteRoot: cfg.siteRoot, pendingImages: S.images });
+  // пока печатают в самом превью, перерисовка увела бы каретку
+  if (S.live?.isEditing()) return;
+  drawPreview();
   syncPreview();
 }
 
@@ -567,6 +577,19 @@ function analyze() {
   const danger = new Set(S.findings.filter((f) => f.severity === 'block').map((f) => f.line));
   S.editor.dispatch({ effects: setLineMarks.of({ changed: S.stats.changedLines, danger }) });
   renderStatus();
+}
+
+let hintTimer = 0;
+
+/** Короткая подсказка в строке состояния — вместо баннера, который пришлось бы закрывать. */
+function hint(text) {
+  S.hint = text;
+  renderStatus();
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => {
+    S.hint = '';
+    renderStatus();
+  }, 4000);
 }
 
 function renderStatus() {
@@ -601,7 +624,7 @@ function renderStatus() {
     ),
     scan,
     h('span', { class: 'yse-spacer' }),
-    h('span', { class: 'yse-status-hint' }, 'Ctrl+B / I / K · Ctrl+S — черновик · Ctrl+Enter — отправить'),
+    h('span', { class: 'yse-status-hint' }, S.hint || 'Печатать можно в обеих панелях · Ctrl+B / I / K · Ctrl+S — черновик · Ctrl+Enter — отправить'),
   );
   const send = root.querySelector('.yse-send');
   if (send) send.disabled = !S.isNew && added === 0 && removed === 0 && S.images.size === 0;
@@ -706,6 +729,12 @@ function editorScreen(content) {
     ),
   );
   S.preview = preview;
+  S.live = enableLiveEdit(preview, {
+    getView: () => S.editor,
+    rerender: () => drawPreview(),
+    notify: (text) => hint(text),
+  });
+  S.live.setHistory(undo, redo);
   S.editor = createEditor(sourcePane, {
     doc: content,
     onChange: () => {

@@ -16,7 +16,7 @@ import {
   lineNumbers,
   placeholder,
 } from '@codemirror/view';
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
+import { defaultKeymap, history, historyKeymap, indentWithTab, redo, undo } from '@codemirror/commands';
 import { parser as markdownParser, GFM } from '@lezer/markdown';
 import { HighlightStyle, Language, LanguageSupport, bracketMatching, defineLanguageFacet, indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { highlightSelectionMatches, search, searchKeymap } from '@codemirror/search';
@@ -355,6 +355,8 @@ export function gotoLine(view, n) {
 }
 
 /** Номер первой видимой строки (с 0) — для прокрутки превью. */
+export { undo, redo };
+
 export function topVisibleLine(view) {
   const block = view.lineBlockAtHeight(view.scrollDOM.scrollTop + 4);
   return view.state.doc.lineAt(block.from).number - 1;

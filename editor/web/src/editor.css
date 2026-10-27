@@ -1034,6 +1034,27 @@ body:has(.yse-app) .md-footer {
     margin-top: 0;
   }
 
+  /* превью редактируемое: курсор-каретка, подсветка блока под курсором мыши */
+  .yse-preview[contenteditable] {
+    outline: none;
+    caret-color: var(--md-primary-fg-color);
+    cursor: text;
+  }
+
+  .yse-preview[contenteditable] [data-line]:hover {
+    box-shadow: -10px 0 0 0 var(--yse-active-line), 0 0 0 0 transparent;
+    background: var(--yse-active-line);
+    border-radius: 3px;
+  }
+
+  .yse-preview[contenteditable] :is(.admonition-title, .tabbed-labels, .filename, summary) {
+    cursor: default;
+  }
+
+  .yse-preview[contenteditable] :is(.admonition-title, .tabbed-labels, .filename, summary):hover {
+    background: none;
+  }
+
   .yse-preview .yse-icon-shortcode {
     display: inline-block;
     width: 1.1em;

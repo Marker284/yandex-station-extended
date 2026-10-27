@@ -14,7 +14,7 @@ DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
 
 export function renderMarkdown(src) {
   return DOMPurify.sanitize(md.render(src), {
-    ADD_ATTR: ['data-line', 'data-tabs', 'target', 'open', 'checked', 'for', 'name'],
+    ADD_ATTR: ['data-line', 'data-end', 'data-code', 'data-tabs', 'target', 'open', 'checked', 'for', 'name'],
     ADD_TAGS: ['details', 'summary'],
     FORBID_TAGS: ['style', 'form', 'iframe', 'object', 'embed', 'script'],
   });
