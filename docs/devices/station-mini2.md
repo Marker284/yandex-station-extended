@@ -87,9 +87,10 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
   сама пишет `brightness` в sysfs. Поэтому понять, что кольцо занято Алисой, можно только по
   значениям `brightness`; способ «смотреть на кадр прошивки в `/dev/fb0`», как на Станции 2 и
   Мини 3, здесь не работает.
-- Заглушить родные часы можно bind-mount своих файлов поверх `.../clock*/brightness`. Двоеточие
-  в пути источника BusyBox `mount` принимает за NFS-адрес (`mount: bad address
-  '/tmp/x/mini2'`), поэтому в именах файлов-заглушек двоеточий быть не должно.
+- Заглушить родные часы можно bind-mount своих файлов поверх `.../clock*/brightness`. Без
+  `-t` BusyBox `mount` (1.31.1) принимает двоеточие в пути источника за NFS-адрес
+  (`mount: bad address '/tmp/x/mini2'`), поэтому указывайте тип:
+  `mount -t none --bind <файл> <цель>`.
 - Всё пишется из userspace напрямую (sysfs, root). Готовый скрипт для кольца —
   [`contrib/install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh).
 - Формат анимаций прошивки — `.led` (как на Лайте, но 6 зон вместо 3): см.
