@@ -23,11 +23,22 @@
     true,
   );
 
-  // если редактор открыли instant-навигацией (например, «назад»), перезагружаем страницу
+  // Если редактор открыли instant-навигацией (например, «назад»), его скрипт не
+  // выполнится — перезагружаем страницу. Но ровно один раз за вкладку: если сборка
+  // редактора не отдаётся (например, идёт выкладка сайта), бесконечные перезагрузки
+  // показывали бы вечный спиннер вместо подсказки «что-то долго».
   if (window.document$ && window.document$.subscribe) {
     window.document$.subscribe(function () {
       var el = document.getElementById('yse-editor');
-      if (el && !el.hasAttribute('data-booted') && !window.__yseEditorBooted) location.reload();
+      var booted = !el || el.hasAttribute('data-booted') || window.__yseEditorBooted;
+      try {
+        if (booted) return sessionStorage.removeItem('yse-editor-retry');
+        if (sessionStorage.getItem('yse-editor-retry')) return;
+        sessionStorage.setItem('yse-editor-retry', '1');
+      } catch (e) {
+        if (booted) return;
+      }
+      location.reload();
     });
   }
 
