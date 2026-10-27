@@ -177,10 +177,207 @@ done
 
 Пакеты (`yse`, Entware) ставятся в `/data` и переживают и перезагрузку, и OTA.
 
+## Прошивка factory-12: что отличается от `.50` { #factory-12 }
+
+!!! info "Проверено на `0.12.1.22.3114898626.20250530.factory-12`"
+    Колонка получила root через DNS-метод и осталась на этой сборке (обновления закрыты
+    `yandex-noupdate.sh`). Ниже — отличия от того, что описано на этой странице для `.50`.
+
+| | `.50` (выше на странице) | factory-12 |
+|---|---|---|
+| Правки корня (`/etc/init.d`, `/system/vendor/quasar`) после перезагрузки | пропадают | **сохраняются**: после `mount -o remount,rw /` и `sync` файлы на месте, `S99zdropbear` поднимает SSH на 13-й секунде загрузки |
+| Маркеры ADB | `/data/quasar/activate_*` | **старая схема** `/data/quasar_activate_*` (через подчёркивание): её читает `adb_options.inc` этой сборки |
+| `maind --gst-launch` ([Свои звуки](../recipes/sounds.md)) | — | **нет такого режима**: `maind` печатает справку. Для проигрывания есть системные `mpg123` и `aplay` |
+| `yandex-noupdate.sh` | — | работает, правки держатся после перезагрузки |
+
+Значит, автозапуск из `/etc/init.d` на factory-12 работает как на других моделях, а
+обходной путь с запуском SSH по ADB после каждого включения не нужен.
+
+## ADB после возврата DNS { #adb-after-dns }
+
+После того как DNS `179.254.167.126` убран с роутера, колонка синхронизируется с настоящим
+бэкендом. Его конфиг без раздела `adbd`, и через ~40 с после загрузки Quasar выключает ADB:
+
+```text
+adb_service.cpp:61 Read quasmodrom config section "adbd": forceDisable=undefined, remoteActivation=undefined, network=undefined
+adb_service.cpp:80 Deactivate adb service. Running command: /system/vendor/quasar/activate_adb.sh --quasmodrom deactivate
+```
+
+`deactivate` удаляет маркеры `/data/quasar_activate_*`, `chattr +i` на `/data/quasar/activate_*`
+на factory-12 не помогает (эти файлы сборка не читает). `user_config.dat` бэкенд перезаписывает
+при каждой синхронизации, так что вписывать туда `adbd` бесполезно.
+
+Рабочий вариант — не давать облачному конфигу выключать ADB. В начало
+`/system/vendor/quasar/activate_adb.sh` (сохранив оригинал в `/data`):
+
+```sh
+# Keep ADB on: ignore the deactivation that the cloud config sends when it has
+# no "adbd" section.
+q=; d=
+for a in "$@"; do [ "$a" = --quasmodrom ] && q=1; [ "$a" = deactivate ] && d=1; done
+if [ -n "$q" ] && [ -n "$d" ]; then
+    echo "`date`: quasmodrom deactivate ignored (patched)" >> /data/quasar/quasar_adb.log
+    exit 0
+fi
+```
+
+и включить ADB штатно: `activate_adb.sh --quasmodrom --network activate`. Проверено
+перезагрузкой с настоящим DNS: ADB поднимается, `adb connect` даёт root. SSH от DNS не
+зависит в любом случае.
+
+!!! note "Алиса с настоящим бэкендом"
+    CA-бандл factory-12 (`/system/vendor/quasar/ca-certificates.crt`) доверяет настоящему
+    `quasar.yandex.net`: `curl --cacert` с этим бандлом проходит проверку сертификата. Алиса
+    после возврата DNS работает как обычно.
+
+## Подсветка { #led-pickle }
+
+Кольцо — 48 файлов `/sys/class/leds/pickle:{red,green,blue}:ring0…ring15`, яркость 0–255,
+по умолчанию триггер `ledfb-ring` (анимации Quasar). Запись в `brightness` отцепляет триггер;
+чтобы вернуть кольцо Алисе, запишите `ledfb-ring` в `trigger` каждой зоны.
+
+**YAM.** Профиля Pickle в YAM нет, а `custom` нумерует светодиоды с 1. Подходит профиль `midi`:
+он считает с 0 и при остановке плагина возвращает триггер `ledfb-ring`. Ему нужны имена
+`cucumber:*`, поэтому в `/data` делаются ссылки на каталоги светодиодов:
+
+```sh
+D=/data/quazar/yam/leds-pickle; mkdir -p $D
+for c in red green blue; do for i in $(seq 0 15); do
+    ln -sfn /sys/class/leds/pickle:$c:ring$i $D/cucumber:$c:ring$i
+done; done
+```
+
+и в `settings.toml` YAM, раздел `[led]`: `profile = "midi"`, `count = 16`,
+`sysfs_root = "/data/quazar/yam/leds-pickle"`. После перезапуска `yamd` появляются
+`led.ring.rgb` и `led.ring.16`, Lua-плагины рисуют через `alice.set(...)` с 16 цветами.
+
+**Что сейчас показывает Алиса.** В `/data/quasar/daemons_logs/maind.log` каждая смена анимации:
+
+```text
+device_state_handler_base.cpp:709 Play animations: oknix [idle.led], ring [/system/vendor/quasar/ledpatterns/ring/alice_listening.led], clock [clock] ...
+```
+
+Значения кольца: `idle.led` (ничего), `alice_listening.led`, `alice_thinking.led`,
+`alice_speaking.led`, `ring_spectrogram` (Алиса играет музыку), `…_out.led idle.led`
+(затухание и возврат). По этим строкам можно уступать кольцо Алисе: свой эффект ставится на
+паузу при любом значении, кроме `idle.led`.
+
+## LED-часы { #clock }
+
+36 белых сегментов на AW21036 (`2-0034`), `/sys/class/leds/pickle:white:clock*`, яркость
+0–255 (Алиса ставит 90), триггер `none`:
+
+| Сегменты | Что |
+|---|---|
+| `A0`…`G3` | 4 семисегментные цифры слева направо: A верх, B правый верхний, C правый нижний, D низ, E левый нижний, F левый верхний, G середина |
+| `H0`…`H3` | восьмой сегмент позиции |
+| `DH`, `DL` | верхняя и нижняя точки двоеточия |
+| `DM` | средний элемент разделителя |
+| `DEGREE` | значок градуса |
+| `pickle:sync:clock` | служебный |
+
+Раскладка совпадает с Лайт 2 (plum): YAM определяет часы как `Plum` и выводит время
+(`PUT /api/clock {"time":"12:34"}`) и сегменты без доработок. Но время Quasar пишет прямо в
+sysfs и **перерисовывает его на каждой смене минуты**, так что своё изображение держится до
+конца текущей минуты. Анимации часов — `/system/vendor/quasar/ledpatterns/clock/*.scled`:
+строка — кадр из 4×7 яркостей цифр, 4 служебных значений и длительности в мс.
+
+## Звук { #audio }
+
+- ALSA `pcm.speakers` — общий `dmix` (`ipc_key 1024`) поверх `hw:0,0`, им пользуются и Алиса,
+  и сторонние приёмники.
+- Громкость Алисы — это `amixer set Master N%` (так делает `set_volume.sh`). Чужая запись в
+  `Master` меняет громкость, но Quasar о ней не знает: следующая кнопка считает от его уровня.
+- `native-volume` из пакета [station-volume](https://github.com/Yandex-Station-Universal-Repo/station-volume)
+  на factory-12 **читает** громкость (`stereo_pair`, порт 9921), но `volume_set` через
+  `iohub_clients` (9910) Quasar не принимает: уровень не меняется.
+- **Петлевой канал** `LOOPBACK-A` (`hw:0,2`, 4 канала S16 48 кГц; 0 и 1 — левый и правый того,
+  что играет колонка) Алиса держит для эхоподавления, **пока микрофоны включены**, и отпускает,
+  когда они выключены.
+
+!!! danger "Петлевой канал и падение Алисы"
+    Если включить микрофоны, пока `hw:0,2` занят чужим процессом, `maind --platformd` падает
+    («Skipping boot sequence after maind crash» в журнале) и перезапускается через ~2 с.
+    Порядок: выключить микрофоны → открыть канал; закрыть канал (дождаться `closed` в
+    `/proc/asound/card0/pcm2c/sub0/status`) → включить микрофоны.
+
+**Микрофон программно.** Кнопка микрофона — устройство ввода `mute` (gpio-keys,
+на проверенной колонке `/dev/input/event2`), переключатель `SW_MUTE_DEVICE`. Записанное в это устройство событие Quasar
+обрабатывает как нажатие (`Mute microphones` / `Unmute microphones` в журнале):
+
+```sh
+dev=$(awk '/^N: Name="mute"/ { f = 1 } f && /^H:/ { if (match($0, /event[0-9]+/)) print substr($0, RSTART, RLENGTH); exit }' /proc/bus/input/devices)
+z='\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000'
+printf "$z\005\000\016\000\001\000\000\000$z\000\000\000\000\000\000\000\000" > /dev/input/$dev   # 1 = выключить, \000 = включить
+```
+
+**Системные звуки** — `/system/vendor/quasar/sounds/`. Форматы на factory-12:
+
+| Файл | Формат |
+|---|---|
+| `boot.wav` | WAV PCM 44,1 кГц стерео |
+| `timer.wav` | **MP3** моно 44,1 кГц (расширение `.wav`) |
+| `notification_sound.mp3` | MP3 стерео 48 кГц |
+| `volume_sound.mp3` | MP3 моно 44,1 кГц, 0,1 с |
+| `bluetooth_turning_{on,off}_jingle.opus` | Ogg Opus 48 кГц стерео |
+
+Замена в том же формате подхватывается **сразу, без перезагрузки** (проверено на
+`volume_sound.mp3`).
+Звук загрузки не играет, пока есть `/data/quasar/data/no_boot_sound`; Алиса создаёт этот файл
+заново после синхронизации, если в облачном конфиге `"jingle": false`.
+
+## AirPlay { #airplay }
+
+[station-airplay](https://github.com/Yandex-Station-Universal-Repo/Station-airplay) 1.4.0 из
+yapkg работает на factory-12 (профиль `yandexmini_3_pro`, AArch64 Shairport Sync 5.6.2,
+`pcm.speakers`, Алиса сохраняется). Условия:
+
+- `allow_plugin_binaries = true` в настройках YAM;
+- модель для YAM — `data/device.toml` с `model = "yandexmini_3_pro"` (сам YAM Pickle не узнаёт).
+
+!!! warning "YAM после 26.10.2026 путает модель"
+    `recognized_model()` ищет подстроку, и `yandexmini_3_pro` превращается в `yandexmini`
+    (Мини 1) — даже из `device.toml`. AirPlay помечается несовместимым и останавливается. Обход
+    в своей сборке плагина: при `yandexmini` проверять `/proc/device-tree/model` на `Pickle`
+    и добавить `yandexmini` в `models` манифеста. Автообновление YAM (`[updates]` в
+    `settings.toml`) лучше выключить.
+
+Что можно добавить в профиль Mini 3 Pro патчем к исходникам плагина (`shairport-sync` этой
+сборки поддерживает соответствующие ключи):
+
+- `ignore_volume_control = "yes"` и `run_this_when_volume_is_set` → `amixer set Master`:
+  ползунок источника меняет громкость колонки (диапазон −30…0 дБ → 0…100 %).
+- `run_this_before_entering_active_state` / `run_this_after_exiting_active_state` →
+  выключение микрофона Алисы на время сеанса (см. выше) и свои действия, например светомузыка
+  по петлевому каналу.
+- Паузы и переключения треков с колонки нет: в сборке нет D-Bus/MPRIS-интерфейса.
+
+## `yse` и Entware { #yse }
+
+На factory-12 `yse install` не ставит пакеты Entware (`Unknown package`), а `.yap` не качаются
+(«для загрузки с GitHub нужен curl»). Причина — `LD_LIBRARY_PATH=/opt/lib`, который `yse`
+ставит для `opkg` и `curl`: в Entware glibc старее системной (2.36), и системные `/bin/sh` и
+`wget` падают с `GLIBC_2.34 not found`, а `opkg` под этой переменной видит 18 пакетов вместо
+~2960. Программам Entware переменная не нужна (интерпретатор и rpath у них свои). Убрать
+`LD_LIBRARY_PATH="$OPT/lib"` в функции `opkg()` и в `fetch_https()` — и Entware, и `.yap`
+ставятся.
+
+Статический `curl` для `fetch_https` — из пакета `curl` в yapkg (aarch64, OpenSSL, свой
+`cacert.pem`): системного CA-бандла `/etc/ssl/certs/ca-certificates.crt` на колонке нет,
+путь к сертификатам — через `~/.curlrc` (`HOME=/data/opt/home`).
+
+## Резервная копия флеш-памяти { #nand-dump }
+
+`nanddump -q /dev/mtdN` по SSH читает все разделы; суммы `mtd0`–`mtd9` совпадают при
+повторном чтении, `mtd10` (`data`, живой) — нет, его удобнее сохранять архивом файлов
+(`tar` без `z` + `gzip`: busybox `tar` здесь не умеет сжимать). На `mtd0` (`bootloader`)
+`nanddump` пишет `uncorrectable bitflip` в конце каждого блока — загрузчик Amlogic записан в
+своей разметке ECC, для его восстановления такая копия может не подойти.
+
 ## Что ещё проверить
 
 - Способ получить root на текущих прошивках.
-- Почему не сохраняются правки корневой ФС (SELinux в режиме `enforcing`, overlay или что-то
-  ещё) и можно ли перенести автозапуск в `/data`.
+- Почему на `.50` не сохраняются правки корневой ФС (SELinux в режиме `enforcing`, overlay или
+  что-то ещё), если на factory-12 они [сохраняются](#factory-12).
 - Версия quasar и роли `maind` на снимке.
 - Zigbee: какой радиочип и можно ли использовать его как координатор.
