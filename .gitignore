@@ -6,3 +6,7 @@ __pycache__/
 .cache/
 .DS_Store
 .claude/
+
+# сборка редактора (editor/ → npm run build)
+docs/assets/editor/
+editor/node_modules/

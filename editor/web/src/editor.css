@@ -1,0 +1,1303 @@
+/* Редактор вики. Цвета — из переменных Material, поэтому светлая и тёмная тема работают сами. */
+.yse-app,
+.yse-bubble {
+  --yse-ok: #1a7f4b;
+  --yse-ok-bg: #e3f4ea;
+  --yse-danger: #b3261e;
+  --yse-danger-bg: #fde8e7;
+  --yse-warn: #8a5a00;
+  --yse-warn-bg: #fff4d6;
+  --yse-info-bg: color-mix(in srgb, var(--md-primary-fg-color) 9%, var(--md-default-bg-color));
+  --yse-source-bg: color-mix(in srgb, var(--md-default-fg-color) 2.5%, var(--md-default-bg-color));
+  --yse-active-line: color-mix(in srgb, var(--md-primary-fg-color) 5%, transparent);
+  --yse-selection: color-mix(in srgb, var(--md-primary-fg-color) 26%, transparent);
+  --yse-search-match: color-mix(in srgb, #f5b400 40%, transparent);
+  --yse-changed: color-mix(in srgb, var(--yse-ok) 13%, transparent);
+  --yse-danger-line: color-mix(in srgb, var(--yse-danger) 16%, transparent);
+  --yse-syntax-heading: var(--md-primary-fg-color);
+  --yse-syntax-code: #a0367a;
+  --yse-syntax-html: #6b5bd2;
+  --yse-border: var(--md-default-fg-color--lightest);
+  --yse-surface: var(--md-default-bg-color);
+  --yse-surface-2: color-mix(in srgb, var(--md-default-fg-color) 4%, var(--md-default-bg-color));
+  --yse-radius: 10px;
+  --yse-header-h: 2.4rem;
+}
+
+[data-md-color-scheme="slate"] .yse-app {
+  --yse-ok: #5fd39a;
+  --yse-ok-bg: rgba(95, 211, 154, 0.12);
+  --yse-danger: #ff8a80;
+  --yse-danger-bg: rgba(255, 138, 128, 0.12);
+  --yse-warn: #f3c969;
+  --yse-warn-bg: rgba(243, 201, 105, 0.12);
+  --yse-syntax-heading: #b79bff;
+  --yse-syntax-code: #f0a6d4;
+  --yse-syntax-html: #a99cff;
+  --yse-surface-2: color-mix(in srgb, #fff 4%, var(--md-default-bg-color));
+}
+
+/* ---- страница редактора на всю ширину и высоту */
+.md-main__inner:has(.yse-app) {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.md-content:has(.yse-app) {
+  max-width: none;
+}
+
+.md-content__inner:has(.yse-app) {
+  margin: 0;
+  padding: 0;
+}
+
+.md-content__inner:has(.yse-app)::before {
+  display: none;
+}
+
+.md-sidebar:has(~ .md-content .yse-app) {
+  display: none;
+}
+
+.md-footer:has(~ * .yse-app),
+body:has(.yse-app) .md-footer {
+  display: none;
+}
+
+.yse-app {
+  position: relative;
+  height: calc(100dvh - var(--yse-header-h));
+  min-height: 480px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--md-default-fg-color);
+  font-family: var(--md-text-font-family, system-ui), system-ui, sans-serif;
+}
+
+.yse-app *,
+.yse-app *::before,
+.yse-app *::after {
+  box-sizing: border-box;
+}
+
+.yse-app :is(h1, h2):not(.yse-preview *) {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--md-default-fg-color);
+}
+
+.yse-app p:not(.yse-preview *) {
+  margin: 0;
+}
+
+.yse-app a:not(.yse-btn):not(.yse-chip):not(.yse-prcard):not(.yse-menu__item) {
+  color: var(--md-typeset-a-color);
+}
+
+@keyframes yse-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Компоненты редактора. Вложены в .yse-app, чтобы перебивать стили .md-typeset
+   (страница редактора живёт внутри статьи Material). */
+.yse-app {
+  /* списки интерфейса — без маркеров и отступов статьи (превью не трогаем) */
+  :is(ul, ol):not(.yse-preview *) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :is(ul, ol):not(.yse-preview *) > li {
+    margin: 0;
+  }
+
+  .yse-icon {
+    display: inline-flex;
+    flex: none;
+  }
+
+  .yse-spacer {
+    flex: 1;
+  }
+
+  .yse-muted {
+    color: var(--md-default-fg-color--light);
+  }
+
+  .yse-mono,
+  .yse-input--mono {
+    font-family: var(--md-code-font-family, monospace);
+  }
+
+  .is-add {
+    color: var(--yse-ok);
+    font-weight: 600;
+  }
+
+  .is-del {
+    color: var(--yse-danger);
+    font-weight: 600;
+  }
+
+  /* ---- загрузка, центр, карточки */
+  .yse-boot,
+  .yse-center {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 14px;
+    height: 100%;
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--md-default-fg-color--light);
+  }
+
+  .yse-spinner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid var(--yse-border);
+    border-top-color: var(--md-primary-fg-color);
+    animation: yse-spin 0.8s linear infinite;
+  }
+
+  .yse-spinner--sm {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+    border-color: color-mix(in srgb, currentColor 35%, transparent);
+    border-top-color: currentColor;
+  }
+
+  .yse-card {
+    background: var(--yse-surface);
+    border: 1px solid var(--yse-border);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: left;
+  }
+
+  .yse-card--narrow {
+    max-width: 480px;
+    width: 100%;
+    display: grid;
+    gap: 12px;
+  }
+
+  .yse-card h1 {
+    font-size: 26px;
+    line-height: 1.25;
+    margin-top: 6px;
+  }
+
+  .yse-card__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--yse-info-bg);
+    color: var(--md-primary-fg-color);
+  }
+
+  .yse-card__icon--ok {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--yse-ok-bg);
+    color: var(--yse-ok);
+  }
+
+  .yse-card__icon--warn {
+    background: var(--yse-warn-bg);
+    color: var(--yse-warn);
+  }
+
+  /* ---- кнопки и поля */
+  .yse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid var(--yse-border);
+    background: var(--yse-surface);
+    color: var(--md-default-fg-color);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .yse-btn:hover {
+    border-color: var(--md-default-fg-color--lighter);
+    background: var(--yse-surface-2);
+    color: var(--md-default-fg-color);
+  }
+
+  .yse-btn:focus-visible,
+  .yse-tool:focus-visible,
+  .yse-seg__btn:focus-visible,
+  .yse-iconbtn:focus-visible,
+  .yse-userbtn:focus-visible,
+  .yse-input:focus-visible {
+    outline: 2px solid var(--md-accent-fg-color);
+    outline-offset: 2px;
+  }
+
+  .yse-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .yse-btn--primary {
+    background: var(--md-primary-fg-color);
+    border-color: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color, #fff);
+  }
+
+  .yse-btn--primary:hover:not(:disabled) {
+    color: var(--md-primary-bg-color, #fff);
+    background: var(--md-primary-fg-color--dark);
+    border-color: var(--md-primary-fg-color--dark);
+  }
+
+  .yse-btn--dark {
+    background: #1d1830;
+    border-color: #1d1830;
+    color: #fff;
+  }
+
+  .yse-btn--dark:hover:not(:disabled) {
+    background: #2c2547;
+  }
+
+  [data-md-color-scheme="slate"] & .yse-btn--dark {
+    background: #f1eefc;
+    border-color: #f1eefc;
+    color: #1d1830;
+  }
+
+  [data-md-color-scheme="slate"] & .yse-btn--dark:hover:not(:disabled) {
+    background: #fff;
+  }
+
+  .yse-btn--ghost {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .yse-btn--lg {
+    min-height: 46px;
+    padding: 0 22px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+
+  .yse-btn--block {
+    width: 100%;
+  }
+
+  .yse-iconbtn {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--md-default-fg-color--light);
+    cursor: pointer;
+  }
+
+  .yse-iconbtn:hover {
+    background: var(--yse-surface-2);
+    color: var(--md-default-fg-color);
+  }
+
+  .yse-linkbtn {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--md-typeset-a-color);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .yse-link-muted {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    color: var(--md-default-fg-color--light) !important;
+  }
+
+  .yse-form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .yse-label {
+    display: block;
+    margin: 18px 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--md-default-fg-color);
+  }
+
+  .yse-input {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid var(--md-default-fg-color--lighter);
+    border-radius: 8px;
+    background: var(--yse-surface);
+    color: var(--md-default-fg-color);
+    font: inherit;
+    font-size: 15px;
+  }
+
+  textarea.yse-input {
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .yse-hint {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--md-default-fg-color--light);
+    word-break: break-all;
+  }
+
+  .yse-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .yse-actions--split {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ---- сообщения */
+  .yse-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: var(--yse-radius);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .yse-msg > .yse-icon {
+    margin-top: 1px;
+  }
+
+  .yse-msg__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .yse-msg--ok {
+    background: var(--yse-ok-bg);
+    color: var(--yse-ok);
+  }
+
+  .yse-msg--info {
+    background: var(--yse-info-bg);
+  }
+
+  .yse-msg--info > .yse-icon {
+    color: var(--md-primary-fg-color);
+  }
+
+  .yse-msg--warn {
+    background: var(--yse-warn-bg);
+  }
+
+  .yse-msg--warn > .yse-icon {
+    color: var(--yse-warn);
+  }
+
+  .yse-msg--danger {
+    background: var(--yse-danger-bg);
+  }
+
+  .yse-msg--danger > .yse-icon {
+    color: var(--yse-danger);
+  }
+
+  .yse-msg__close {
+    width: 26px;
+    height: 26px;
+    margin: -3px -6px -3px 0;
+  }
+
+  ul.yse-findings {
+    margin: 6px 0;
+    padding-left: 18px;
+  }
+
+  .yse-findings code {
+    font-size: 12px;
+    word-break: break-all;
+  }
+
+  /* ---- модальные окна */
+  .yse-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    /* flex + margin:auto у окна: по центру, а высокое окно не обрезается сверху */
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow-y: auto;
+    background: rgba(16, 12, 28, 0.6);
+    backdrop-filter: blur(2px);
+  }
+
+  .yse-dialog {
+    flex: none;
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+    padding: 32px;
+    border-radius: 16px;
+    background: var(--md-default-bg-color);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  }
+
+  .yse-overlay:has(form .yse-stepper) .yse-dialog {
+    max-width: 660px;
+  }
+
+  .yse-dialog__title {
+    margin-top: 20px !important;
+    font-size: 24px !important;
+    line-height: 1.25;
+  }
+
+  .yse-form .yse-dialog__title {
+    margin-top: 16px !important;
+  }
+
+  .yse-dialog > .yse-muted,
+  .yse-form > .yse-muted {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  ul.yse-checklist {
+    list-style: none;
+    margin: 22px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .yse-checklist__item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+
+  .yse-check {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+
+  .yse-check--ok {
+    background: var(--yse-ok-bg);
+    color: var(--yse-ok);
+  }
+
+  .yse-check--todo {
+    width: 16px;
+    height: 16px;
+    margin: 3px;
+    border: 2px solid var(--md-default-fg-color--lighter);
+  }
+
+  ul.yse-checklist--todo {
+    margin-top: 4px;
+    gap: 8px;
+  }
+
+  .yse-checklist--todo .yse-checklist__item {
+    font-size: 14px;
+  }
+
+  .yse-dialog > .yse-btn--block {
+    margin-top: 28px;
+  }
+
+  .yse-login__error:empty {
+    display: none;
+  }
+
+  .yse-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 22px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .yse-consent input {
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--md-primary-fg-color);
+    flex: none;
+  }
+
+  ul.yse-filelist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--yse-border);
+    border-radius: var(--yse-radius);
+    background: var(--yse-surface-2);
+  }
+
+  .yse-filelist__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 8px 6px 14px;
+    font-size: 13.5px;
+  }
+
+  .yse-filelist__item + .yse-filelist__item {
+    border-top: 1px solid var(--yse-border);
+  }
+
+  .yse-filelist__item code {
+    font-size: 12.5px;
+    word-break: break-all;
+    background: none;
+    padding: 0;
+  }
+
+  /* ---- шаги */
+  ol.yse-stepper {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+
+  .yse-stepper__step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--md-default-fg-color--light);
+  }
+
+  .yse-stepper__step.is-done {
+    color: var(--yse-ok);
+  }
+
+  .yse-stepper__step.is-current {
+    color: var(--md-default-fg-color);
+    font-weight: 600;
+  }
+
+  .yse-stepper__dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 12.5px;
+    border: 2px solid var(--md-default-fg-color--lighter);
+  }
+
+  .is-done .yse-stepper__dot {
+    border: 0;
+    background: var(--yse-ok-bg);
+  }
+
+  .is-current .yse-stepper__dot {
+    border: 0;
+    background: var(--md-primary-fg-color);
+    color: #fff;
+  }
+
+  .yse-stepper__bar {
+    width: 40px;
+    height: 2px;
+    background: var(--md-default-fg-color--lighter);
+  }
+
+  .yse-stepper__bar.is-done {
+    background: var(--yse-ok);
+  }
+
+  /* ---- скелет страницы под окном входа */
+  .yse-skeleton {
+    padding: 40px 48px;
+    display: grid;
+    gap: 16px;
+    max-width: 900px;
+  }
+
+  .yse-skeleton__bar {
+    height: 14px;
+    border-radius: 7px;
+    background: var(--yse-surface-2);
+  }
+
+  /* ---- редактор */
+  .yse-shell {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--md-default-bg-color);
+  }
+
+  .yse-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--yse-border);
+    flex-wrap: wrap;
+  }
+
+  .yse-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--yse-border);
+  }
+
+  .yse-path {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--yse-surface-2);
+    max-width: 34ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .yse-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: var(--yse-info-bg);
+    color: var(--md-primary-fg-color);
+    text-decoration: none;
+  }
+
+  .yse-chip--new {
+    background: var(--yse-ok-bg);
+    color: var(--yse-ok);
+  }
+
+  .yse-draft-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--yse-ok);
+  }
+
+  .yse-draft-status.is-warn {
+    color: var(--yse-warn);
+  }
+
+  .yse-user {
+    position: relative;
+  }
+
+  .yse-userbtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px 4px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--md-default-fg-color--light);
+    font: inherit;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+
+  .yse-userbtn:hover {
+    background: var(--yse-surface-2);
+  }
+
+  .yse-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--yse-info-bg);
+    color: var(--md-primary-fg-color);
+    font-weight: 600;
+    object-fit: cover;
+  }
+
+  .yse-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 5;
+    min-width: 210px;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid var(--yse-border);
+    background: var(--md-default-bg-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  }
+
+  .yse-menu[hidden] {
+    display: none;
+  }
+
+  .yse-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 38px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: var(--md-default-fg-color);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .yse-menu__item:hover,
+  .yse-menu__item:focus-visible {
+    background: var(--yse-surface-2);
+  }
+
+  .yse-menu__item code {
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--md-default-fg-color--light);
+    background: none;
+  }
+
+  .yse-menu--tool {
+    left: 0;
+    right: auto;
+    min-width: 280px;
+  }
+
+  .yse-adm-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: #448aff;
+  }
+
+  .yse-adm-item--tip .yse-adm-dot {
+    background: #00bfa5;
+  }
+
+  .yse-adm-item--info .yse-adm-dot {
+    background: #00b8d4;
+  }
+
+  .yse-adm-item--warning .yse-adm-dot {
+    background: #ff9100;
+  }
+
+  .yse-adm-item--danger .yse-adm-dot {
+    background: #ff1744;
+  }
+
+  .yse-adm-item--failure .yse-adm-dot {
+    background: #ff5252;
+  }
+
+  .yse-banners {
+    padding: 0 16px;
+  }
+
+  .yse-banners:empty {
+    display: none;
+  }
+
+  .yse-banners > .yse-msg {
+    margin: 10px 0 0;
+  }
+
+  .yse-banners > :last-child {
+    margin-bottom: 10px;
+  }
+
+  .yse-mine {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: var(--yse-radius);
+    border: 1px solid var(--yse-border);
+    background: var(--yse-surface-2);
+  }
+
+  .yse-mine__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .yse-mine__text {
+    font-size: 12.5px;
+    min-height: 0;
+  }
+
+  .yse-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--yse-border);
+    border-top: 1px solid var(--yse-border);
+    background: var(--yse-surface-2);
+    flex-wrap: wrap;
+  }
+
+  .yse-banners:empty + .yse-toolbar {
+    border-top: 0;
+  }
+
+  .yse-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--md-default-fg-color);
+    font: inherit;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+
+  .yse-tool:hover {
+    background: color-mix(in srgb, var(--md-default-fg-color) 8%, transparent);
+  }
+
+  .yse-tool--text {
+    padding: 0 10px;
+  }
+
+  .yse-tool-wrap {
+    position: relative;
+  }
+
+  .yse-toolbar__sep {
+    width: 1px;
+    height: 22px;
+    margin: 0 6px;
+    background: var(--yse-border);
+  }
+
+  .yse-seg {
+    display: flex;
+    padding: 3px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--md-default-fg-color) 7%, transparent);
+  }
+
+  .yse-seg__btn {
+    min-height: 30px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--md-default-fg-color--light);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .yse-seg__btn[aria-pressed="true"] {
+    background: var(--md-default-bg-color);
+    color: var(--md-default-fg-color);
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  .yse-panes {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .yse-panes[data-view="source"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .yse-panes[data-view="source"] .yse-pane--preview,
+  .yse-panes[data-view="preview"] .yse-pane--source {
+    display: none;
+  }
+
+  .yse-panes[data-view="preview"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .yse-pane {
+    min-height: 0;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  .yse-pane--source {
+    border-right: 1px solid var(--yse-border);
+    overflow: hidden;
+  }
+
+  .yse-pane--source .cm-editor {
+    height: 100%;
+  }
+
+  .yse-pane--preview {
+    position: relative;
+    padding: 18px 40px 40vh;
+    scroll-behavior: auto;
+  }
+
+  .yse-panes[data-view="preview"] .yse-pane--preview {
+    padding-inline: max(40px, calc((100% - 860px) / 2));
+  }
+
+  .yse-pane__label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--md-default-fg-color--light);
+    margin-bottom: 10px;
+  }
+
+  .yse-preview.md-typeset {
+    font-size: 0.8rem;
+  }
+
+  .yse-preview.md-typeset h1 {
+    margin-top: 0;
+  }
+
+  .yse-preview .yse-icon-shortcode {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: -0.15em;
+    border-radius: 3px;
+    background: var(--md-default-fg-color--lighter);
+  }
+
+  /* строки в CodeMirror */
+  .cm-yse-changed {
+    background: var(--yse-changed);
+  }
+
+  .cm-yse-danger {
+    background: var(--yse-danger-line) !important;
+  }
+
+  .cm-yse-changed-gutter {
+    color: var(--yse-ok) !important;
+    font-weight: 600;
+    box-shadow: inset -3px 0 0 var(--yse-ok);
+  }
+
+  .cm-yse-danger-gutter {
+    color: var(--yse-danger) !important;
+    font-weight: 600;
+    box-shadow: inset -3px 0 0 var(--yse-danger);
+  }
+
+  .cm-yse-block {
+    color: #b26a00;
+    font-weight: 600;
+  }
+
+  [data-md-color-scheme="slate"] & .cm-yse-block {
+    color: #f3c969;
+  }
+
+  .yse-statusbar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 40px;
+    padding: 6px 16px;
+    border-top: 1px solid var(--yse-border);
+    background: var(--yse-surface-2);
+    font-size: 13px;
+    color: var(--md-default-fg-color--light);
+    flex-wrap: wrap;
+  }
+
+  .yse-status-scan {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    padding: 0;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .yse-status-scan.is-ok {
+    color: var(--yse-ok);
+  }
+
+  .yse-status-scan.is-warn {
+    color: var(--yse-warn);
+    cursor: pointer;
+  }
+
+  .yse-status-scan.is-danger {
+    color: var(--yse-danger);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ---- экран «Готово» */
+  .yse-done {
+    height: 100%;
+    overflow: auto;
+    padding: 28px 16px 48px;
+    background: var(--yse-surface-2);
+  }
+
+  .yse-done__grid {
+    max-width: 960px;
+    margin: 24px auto 0;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .yse-done__grid > .yse-card:first-child {
+    flex: 999 1 520px;
+    min-width: 0;
+  }
+
+  .yse-card--side {
+    flex: 1 1 260px;
+    padding: 24px;
+    display: grid;
+    gap: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .yse-card--side h2 {
+    font-size: 16px;
+  }
+
+  .yse-done .yse-card h1 {
+    margin-top: 18px;
+  }
+
+  .yse-done .yse-card > .yse-muted {
+    margin-top: 10px;
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+
+  .yse-prcard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+    padding: 14px 16px;
+    border: 1px solid var(--yse-border);
+    border-radius: var(--yse-radius);
+    background: var(--yse-surface-2);
+    color: var(--md-default-fg-color);
+    text-decoration: none;
+  }
+
+  .yse-prcard > .yse-icon {
+    color: var(--yse-ok);
+  }
+
+  .yse-prcard:hover {
+    border-color: var(--md-default-fg-color--lighter);
+  }
+
+  .yse-prcard__title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .yse-prcard__meta {
+    margin-top: 3px;
+    font-size: 13px;
+    color: var(--md-default-fg-color--light);
+  }
+
+  ul.yse-progress {
+    list-style: none;
+    margin: 24px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+    font-size: 14.5px;
+  }
+
+  .yse-progress__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--md-default-fg-color--light);
+  }
+
+  .yse-progress__dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex: none;
+    border: 2px solid var(--md-default-fg-color--lighter);
+  }
+
+  .yse-progress__note {
+    font-size: 13px;
+    color: var(--md-default-fg-color--light);
+    font-weight: 400;
+  }
+
+  .yse-progress__item.is-done {
+    color: var(--md-default-fg-color);
+  }
+
+  .yse-progress__item.is-done .yse-progress__dot {
+    border: 0;
+    background: var(--yse-ok-bg);
+    color: var(--yse-ok);
+  }
+
+  .yse-progress__item.is-current {
+    color: var(--md-default-fg-color);
+    font-weight: 600;
+  }
+
+  .yse-progress__item.is-current .yse-progress__dot {
+    border-color: var(--md-primary-fg-color);
+    border-top-color: transparent;
+    animation: yse-spin 1.2s linear infinite;
+  }
+
+  .yse-progress__item.is-current .yse-progress__note {
+    color: var(--md-primary-fg-color);
+  }
+
+  .yse-progress__item.is-fail .yse-progress__dot {
+    border-color: var(--yse-danger);
+  }
+
+  .yse-progress__item.is-fail .yse-progress__note {
+    color: var(--yse-danger);
+  }
+
+  /* ---- узкие экраны */
+  @media (max-width: 760px) {
+    .yse-dialog,
+    .yse-card {
+      padding: 22px;
+    }
+    .yse-topbar {
+      gap: 8px;
+      padding: 8px 12px;
+    }
+    .yse-divider,
+    .yse-userbtn__name,
+    .yse-status-hint {
+      display: none;
+    }
+    .yse-path {
+      max-width: 22ch;
+    }
+    .yse-draft-status {
+      order: 10;
+      width: 100%;
+      font-size: 12px;
+    }
+    .yse-panes[data-view="split"] {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .yse-panes[data-view="split"] .yse-pane--source {
+      border-right: 0;
+      border-bottom: 1px solid var(--yse-border);
+    }
+    .yse-pane--preview,
+    .yse-panes[data-view="preview"] .yse-pane--preview {
+      padding: 14px 16px 30vh;
+    }
+    .yse-tool--text {
+      padding: 0 8px;
+    }
+
+    .yse-tool__label {
+      display: none;
+    }
+    .yse-skeleton {
+      padding: 24px 16px;
+    }
+  }
+}

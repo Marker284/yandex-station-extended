@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+{#- Страница /edit/: редактор вики. Сам редактор — сборка editor/ → assets/editor/. -#}
+
+{% block extrahead %}
+  {{ super() }}
+  <meta name="robots" content="noindex">
+{% endblock %}
+
+{% block styles %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ 'assets/editor/editor.css' | url }}">
+{% endblock %}
+
+{% block content %}
+  {% set editor = config.extra.editor if config.extra and config.extra.editor else {} %}
+  <div id="yse-editor" class="yse-app"
+       data-api="{{ editor.api or '' }}"
+       data-repo="{{ config.repo_name }}"
+       data-repo-url="{{ config.repo_url }}"
+       data-site-root="{{ base_url }}/"
+       data-edit-uri="{{ config.repo_url }}/{{ config.edit_uri }}">
+    <div class="yse-boot">
+      <div class="yse-spinner" aria-hidden="true"></div>
+      <p>Загружаем редактор…</p>
+      <noscript><p>Для редактора нужен JavaScript. Править можно и <a href="{{ config.repo_url }}">на GitHub</a>.</p></noscript>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script type="module" src="{{ 'assets/editor/editor.js' | url }}"></script>
+{% endblock %}

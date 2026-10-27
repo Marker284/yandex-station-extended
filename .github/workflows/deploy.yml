@@ -16,6 +16,14 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: editor/package-lock.json
+      - name: Сборка веб-редактора (docs/assets/editor/)
+        working-directory: editor
+        run: npm ci && npm run build
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x

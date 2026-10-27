@@ -1,0 +1,41 @@
+name: deploy-editor-worker
+# Деплой сервера редактора в Cloudflare при изменениях в editor/worker или editor/shared.
+# Нужен секрет репозитория CLOUDFLARE_API_TOKEN (шаблон «Edit Cloudflare Workers»).
+# Без секрета job пропускается — деплоить можно и вручную (editor/README.md).
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - editor/worker/**
+      - editor/shared/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.HAS_TOKEN == 'true'
+      - uses: actions/setup-node@v4
+        if: env.HAS_TOKEN == 'true'
+        with:
+          node-version: 22
+      - name: Тесты
+        if: env.HAS_TOKEN == 'true'
+        working-directory: editor
+        run: npm ci && npm test
+      - name: wrangler deploy
+        if: env.HAS_TOKEN == 'true'
+        working-directory: editor/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@4 deploy
+      - name: Нет CLOUDFLARE_API_TOKEN — пропуск
+        if: env.HAS_TOKEN != 'true'
+        run: echo "Секрет CLOUDFLARE_API_TOKEN не задан, деплой Worker пропущен."

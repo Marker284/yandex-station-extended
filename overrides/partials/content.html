@@ -1,0 +1,29 @@
+{#-
+  Статья + карточка «Нашли ошибку или хотите дополнить?» внизу.
+  Оригинал: material/partials/content.html.
+-#}
+{% set editor = config.extra.editor if config.extra and config.extra.editor else {} %}
+{% include "partials/tags.html" %}
+{% include "partials/actions.html" %}
+{% if "<h1" not in page.content %}
+  <h1>{{ page.title | d(config.site_name, true)}}</h1>
+{% endif %}
+{{ page.content }}
+{% if editor.api and page.edit_url and page.meta.template != "editor.html" %}
+  {% set src = "docs/" ~ page.file.src_uri %}
+  {% set section = page.file.src_uri.split("/")[0] if "/" in page.file.src_uri else "" %}
+  <aside class="yse-suggest" data-yse-path="{{ src }}" data-yse-title="{{ page.title | e }}" data-yse-edit-url="{{ base_url }}/edit/" aria-label="Правка страницы">
+    <div class="yse-suggest__text">
+      <p class="yse-suggest__title">Нашли ошибку или хотите дополнить?</p>
+      <p class="yse-suggest__hint">Правка займёт пару минут. Нужен только вход через GitHub, git знать не нужно. Можно выделить фрагмент текста и нажать «Предложить правку».</p>
+    </div>
+    <div class="yse-suggest__actions">
+      <a class="md-button md-button--primary" href="{{ base_url }}/edit/?path={{ src | urlencode }}" data-yse-edit>Править эту страницу</a>
+      <a class="md-button" href="{{ base_url }}/edit/?new=1{% if section %}&amp;dir={{ section | urlencode }}{% endif %}" data-yse-edit>Новая страница</a>
+      <a class="yse-suggest__report" href="#" data-yse-report>Только сообщить об ошибке</a>
+    </div>
+  </aside>
+{% endif %}
+{% include "partials/source-file.html" %}
+{% include "partials/feedback.html" %}
+{% include "partials/comments.html" %}

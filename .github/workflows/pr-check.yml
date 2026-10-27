@@ -1,0 +1,37 @@
+name: wiki-pr-check
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: editor/package-lock.json
+      - name: Зависимости редактора
+        working-directory: editor
+        run: npm ci
+      - name: Личные данные в правке (ключи, токены, MAC)
+        working-directory: editor
+        run: node scripts/check-pr.mjs "origin/${{ github.base_ref }}" HEAD
+      - name: Тесты редактора
+        working-directory: editor
+        run: npm test
+      - name: Сборка редактора
+        working-directory: editor
+        run: npm run build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - run: pip install -r requirements.txt
+      - name: Сборка сайта
+        run: mkdocs build --strict

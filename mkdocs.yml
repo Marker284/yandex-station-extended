@@ -9,6 +9,7 @@ copyright: Community wiki · материал для работы со свои�
 
 theme:
   name: material
+  custom_dir: overrides
   language: ru
   logo: assets/images/logo.png
   favicon: assets/images/favicon.png
@@ -50,6 +51,9 @@ theme:
         name: Тёмная тема
 
 extra:
+  # Веб-редактор (editor/): адрес Cloudflare Worker. Пусто — кнопки правки ведут на GitHub.
+  editor:
+    api: ""
   social:
     - icon: fontawesome/brands/telegram
       link: https://t.me/hackalice
@@ -60,9 +64,11 @@ extra:
 
 extra_javascript:
   - javascripts/toc-tabs.js
+  - javascripts/editor-entry.js
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/editor-entry.css
 
 markdown_extensions:
   - admonition
@@ -108,6 +114,10 @@ plugins:
         platform/quasar-api.md: internals/network.md
         platform/gotchas.md: internals/gotchas.md
         platform/toolchain.md: internals/toolchain.md
+
+# страница редактора не в меню
+not_in_nav: |
+  /edit.md
 
 nav:
   - Главная: index.md

@@ -12,6 +12,18 @@ python3 -m venv venv              # один раз
 # → http://127.0.0.1:8000
 ```
 
+## Веб-редактор
+
+Страница `/edit/` — редактор вики (исходники в `editor/`, настройка — `editor/README.md`).
+Его сборка кладёт `docs/assets/editor/`, поэтому перед `mkdocs build` / `serve`:
+
+```sh
+cd editor && npm ci && npm run build && cd ..
+```
+
+В CI это делает `deploy.yml`. Пока в `mkdocs.yml` пуст `extra.editor.api`, кнопки правки
+ведут на GitHub, как раньше.
+
 ## Сборка статики
 
 ```sh

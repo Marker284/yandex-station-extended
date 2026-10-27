@@ -1,0 +1,31 @@
+{#-
+  Кнопки над статьёй. С включённым редактором карандаш открывает /edit/ на сайте,
+  «исходник» по-прежнему ведёт на raw-файл в GitHub. Оригинал: material/partials/actions.html.
+-#}
+{% set editor = config.extra.editor if config.extra and config.extra.editor else {} %}
+{% if page.edit_url %}
+  {% if "content.action.edit" in features %}
+    {% if editor.api %}
+      <a href="{{ base_url }}/edit/?path=docs/{{ page.file.src_uri | urlencode }}" title="Править эту страницу" class="md-content__button md-icon" rel="edit" data-yse-edit>
+        {% set icon = config.theme.icon.edit or "material/file-edit-outline" %}
+        {% include ".icons/" ~ icon ~ ".svg" %}
+      </a>
+    {% else %}
+      <a href="{{ page.edit_url }}" title="{{ lang.t('action.edit') }}" class="md-content__button md-icon" rel="edit">
+        {% set icon = config.theme.icon.edit or "material/file-edit-outline" %}
+        {% include ".icons/" ~ icon ~ ".svg" %}
+      </a>
+    {% endif %}
+  {% endif %}
+  {% if "content.action.view" in features %}
+    {% if "/blob/" in page.edit_url %}
+      {% set part = "blob" %}
+    {% else %}
+      {% set part = "edit" %}
+    {% endif %}
+    <a href="{{ page.edit_url | replace(part, 'raw') }}" title="{{ lang.t('action.view') }}" class="md-content__button md-icon">
+      {% set icon = config.theme.icon.view or "material/file-eye-outline" %}
+      {% include ".icons/" ~ icon ~ ".svg" %}
+    </a>
+  {% endif %}
+{% endif %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{#- Веб-редактор вики: адрес сервера редактора из extra.editor.api (mkdocs.yml).
+    Пока он пуст, кнопки правки ведут на GitHub, как раньше. -#}
+{% block extrahead %}
+  {{ super() }}
+  {% set editor = config.extra.editor if config.extra and config.extra.editor else {} %}
+  {% if editor.api %}
+    <meta name="yse-editor-api" content="{{ editor.api }}">
+    <meta name="yse-editor-repo" content="{{ config.repo_name }}">
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+# Cloudflare Worker редактора вики. Деплой и настройка — editor/README.md.
+name = "yse-wiki-editor"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Свой поддомен (нужна зона hackalice.me в Cloudflare). Без него Worker доступен
+# на https://yse-wiki-editor.<аккаунт>.workers.dev — это тоже работает.
+# routes = [{ pattern = "edit-api.hackalice.me", custom_domain = true }]
+
+[vars]
+UPSTREAM_OWNER = "Marker284"
+UPSTREAM_REPO = "yandex-station-extended"
+UPSTREAM_BRANCH = "main"
+SITE_URL = "https://hackalice.me"
+ALLOWED_ORIGINS = "https://hackalice.me,http://127.0.0.1:8000,http://localhost:8000"
+GITHUB_CLIENT_ID = ""  # Client ID из GitHub OAuth App
+
+# Секреты (не в репозитории):
+#   npx wrangler secret put GITHUB_CLIENT_SECRET
+#   npx wrangler secret put SESSION_KEY        # случайная строка ≥ 32 символов

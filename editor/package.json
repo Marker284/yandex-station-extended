@@ -1,0 +1,30 @@
+{
+  "name": "yse-editor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Веб-редактор вики hackalice.me: правка страниц в браузере и Pull Request через GitHub",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "test": "vitest run",
+    "check-pr": "node scripts/check-pr.mjs",
+    "dev:worker": "node scripts/dev-worker.mjs"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/search": "^6.7.2",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
+    "@lezer/markdown": "^1.4.3",
+    "diff": "^8.0.4",
+    "dompurify": "^3.4.17",
+    "markdown-it": "^14.3.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "vitest": "^3.2.7"
+  }
+}
