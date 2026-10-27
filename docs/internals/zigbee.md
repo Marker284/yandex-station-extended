@@ -46,8 +46,8 @@ HTTP-команды и переводит их в бинарные директ�
 [`contrib/quasard-zigbee-operator.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/quasard-zigbee-operator.py).
 Это адаптированный из рабочей установки пример для одной Миди; отдельно на колонке
 эта сокращённая версия не проверялась. В нём оставлены только поиск, принятие
-и отмена; доступ разрешён с loopback сервера. Модуль использует внутреннюю функцию
-`aliceapi._classes()`, поэтому после обновления quasard его стоит перепроверить.
+и отмена; доступ разрешён с loopback сервера. Схему директив модуль читает сам
+из `aliceapi.desc`, а кадр собирает публичной `aliceapi.encode_server`.
 
 1. Скопируйте модуль в исходники quasard как `alice_server/zigbee_operator.py`.
 2. В `alice_server/app.py`, внутри функции `create_app()`, добавьте перед

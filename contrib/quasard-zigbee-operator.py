@@ -2,9 +2,22 @@
 from __future__ import annotations
 import base64
 import uuid
+from functools import lru_cache
+from pathlib import Path
 from fastapi import HTTPException, Request
-from google.protobuf import message_factory
+from google.protobuf import descriptor_pb2, descriptor_pool, message_factory
 from . import aliceapi
+
+
+@lru_cache(maxsize=1)
+def _pool():
+    """The same aliceapi.desc schema quasard ships, loaded without its private helpers."""
+    fds = descriptor_pb2.FileDescriptorSet.FromString(
+        (Path(aliceapi.__file__).parent / 'aliceapi.desc').read_bytes())
+    pool = descriptor_pool.DescriptorPool()
+    for f in fds.file:
+        pool.Add(f)
+    return pool
 
 
 def install(app, svc, store):
@@ -31,9 +44,7 @@ def install(app, svc, store):
             raise HTTPException(400, 'JSON body required')
         if not isinstance(body, dict):
             raise HTTPException(400, 'JSON object required')
-        server_cls, _ = aliceapi._classes()
-        pool = server_cls.DESCRIPTOR.file.pool
-        cls = message_factory.GetMessageClass(pool.FindMessageTypeByName(
+        cls = message_factory.GetMessageClass(_pool().FindMessageTypeByName(
             'NAlice.TIotDiscoveryCapability.' + types[action]))
         msg = cls()
         msg.Name = names[action]
