@@ -1,0 +1,44 @@
+#!/bin/sh
+# bt-proxy: Bluetooth-демоны колонки переезжают на приватную шину D-Bus, а на системной
+# имена org.bluez и org.bluealsa держит bt-proxy. MPRIS-плееры на приватной шине Алиса видит
+# как подключённые Bluetooth-телефоны (фокус, «дальше / пауза», общая громкость).
+# Проверено на Станции Лайт 2 (plum), прошивка 0.369.1.50. На других моделях не проверялось.
+# Откат: удалить этот файл, вернуть /usr/share/dbus-1/system-services/org.bluez.service
+# из org.bluez.service.disabled и перезагрузиться.
+D=/data/opt/btproxy
+BUS=unix:path=/tmp/btbus/socket
+BT="S51bluetoothd S52bluealsa S53bluealsa-aplay S54default-bluez-agent"
+# имена «телефонов» у Алисы по суффиксу MPRIS-имени плеера
+ALIASES="ShairportSync=AirPlay,spotifyd=Spotify"
+start() {
+  [ -x $D/bt-proxy ] || return 0
+  [ -f /tmp/btbus/supervisor.pid ] && kill -0 "$(cat /tmp/btbus/supervisor.pid)" 2>/dev/null && return 0
+  for s in S54default-bluez-agent S53bluealsa-aplay S52bluealsa S51bluetoothd; do /etc/init.d/$s stop; done
+  # start-stop-daemon не запустит новый, пока старый ещё выходит
+  i=0
+  while [ $i -lt 50 ] && pidof bluetoothd bluealsa bluealsa-aplay just-works-bluez-agent >/dev/null; do
+    usleep 100000; i=$((i+1))
+  done
+  mkdir -p /tmp/btbus
+  [ -S /tmp/btbus/socket ] || /usr/bin/dbus-daemon --config-file=$D/bus.conf --fork
+  for s in $BT; do DBUS_SYSTEM_BUS_ADDRESS=$BUS /etc/init.d/$s start; sleep 1; done
+  # без bt-proxy у Алисы пропадает Bluetooth — перезапускать при падении
+  (
+    while :; do
+      BT_PRIVATE_BUS=$BUS BT_PROXY_ALIASES=$ALIASES $D/bt-proxy >> /tmp/bt-proxy.log 2>&1
+      sleep 2
+    done
+  ) < /dev/null > /dev/null 2>&1 &
+  echo $! > /tmp/btbus/supervisor.pid
+}
+stop() {
+  [ -f /tmp/btbus/supervisor.pid ] && kill "$(cat /tmp/btbus/supervisor.pid)" 2>/dev/null
+  rm -f /tmp/btbus/supervisor.pid
+  killall bt-proxy 2>/dev/null # SIGTERM: bt-proxy снимает виртуальные устройства у maind
+}
+case "$1" in
+  start) start ;;
+  stop) stop ;;
+  restart) stop; sleep 1; start ;;
+esac
+exit 0

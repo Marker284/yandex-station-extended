@@ -126,6 +126,7 @@ nav:
       - recipes/index.md
       - USB Host (OTG): recipes/usb-host.md
       - AirPlay: recipes/airplay.md
+      - Плееры как Bluetooth (bt-proxy): recipes/bt-proxy.md
       - Spotify Connect: recipes/spotify.md
       - Свои звуки: recipes/sounds.md
       - Обработанный микрофон: recipes/microphone.md
