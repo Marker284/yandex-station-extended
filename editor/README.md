@@ -35,6 +35,9 @@
 
 ## Запуск в продакшене
 
+Редактор уже развёрнут: Worker — `https://yse-wiki-editor.push-to-claude-worker.workers.dev`,
+он же прописан в `mkdocs.yml` (`extra.editor.api`). Ниже — как это настроено и как повторить.
+
 ### 1. GitHub OAuth App
 
 https://github.com/settings/applications/new (или в организации — Settings → Developer settings):
@@ -45,6 +48,12 @@ https://github.com/settings/applications/new (или в организации �
   (например, `https://yse-wiki-editor.<аккаунт>.workers.dev/auth/callback`)
 
 Сохраните **Client ID** и создайте **Client secret**.
+
+Два флажка на форме выключить:
+
+- **Allow wildcard matching** — иначе токен уйдёт на любой поддомен и путь callback-адреса.
+- **Expire user access tokens** — Worker не обновляет токен по `refresh_token`, и с включённым
+  флажком вход отваливался бы через восемь часов.
 
 ### 2. Cloudflare Worker
 

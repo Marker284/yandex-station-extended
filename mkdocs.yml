@@ -53,7 +53,7 @@ theme:
 extra:
   # Веб-редактор (editor/): адрес Cloudflare Worker. Пусто — кнопки правки ведут на GitHub.
   editor:
-    api: ""
+    api: "https://yse-wiki-editor.push-to-claude-worker.workers.dev"
   social:
     - icon: fontawesome/brands/telegram
       link: https://t.me/hackalice

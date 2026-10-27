@@ -10,3 +10,4 @@ __pycache__/
 # сборка редактора (editor/ → npm run build)
 docs/assets/editor/
 editor/node_modules/
+editor/worker/.wrangler/
