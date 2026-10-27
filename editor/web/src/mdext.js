@@ -192,6 +192,53 @@ function iconShortcode(state, silent) {
   return true;
 }
 
+// <div class="…" markdown> … </div> — расширение md_in_html: содержимое такого блока
+// сайт разбирает как Markdown. Без этого превью показывало бы сырые `**жирный**`,
+// ссылки-кнопки и иконки внутри баннеров и карточек.
+const MD_IN_HTML = /^<([a-zA-Z][\w-]*)\b([^>]*\bmarkdown(?:="[^"]*")?[^>]*)>\s*$/;
+
+/** Содержимое строк [from, to) — как обычный Markdown, без добавочного отступа. */
+function tokenizeRange(state, from, to) {
+  const max = state.lineMax;
+  const parent = state.parentType;
+  state.lineMax = to;
+  state.parentType = 'root';
+  state.md.block.tokenize(state, from, to);
+  state.lineMax = max;
+  state.parentType = parent;
+}
+
+function mdInHtml(state, startLine, endLine, silent) {
+  if (state.sCount[startLine] - state.blkIndent >= 4) return false;
+  const open = lineText(state, startLine);
+  const m = MD_IN_HTML.exec(open);
+  if (!m) return false;
+  if (silent) return true;
+
+  const tag = m[1].toLowerCase();
+  const opens = new RegExp(`<${tag}\\b`, 'gi');
+  const closes = new RegExp(`</${tag}\\s*>`, 'gi');
+  let depth = 0;
+  let last = -1;
+  for (let i = startLine; i < endLine; i++) {
+    const t = lineText(state, i);
+    depth += (t.match(opens) || []).length - (t.match(closes) || []).length;
+    if (depth <= 0) {
+      last = i;
+      break;
+    }
+  }
+  // закрывающий тег должен стоять на своей строке, иначе текст рядом с ним
+  // попал бы в разметку дважды — пусть такой блок остаётся сырым, как раньше
+  if (last <= startLine || lineText(state, last).trim() !== `</${tag}>`) return false;
+
+  html(state, `${open}\n`, startLine);
+  if (last > startLine + 1) tokenizeRange(state, startLine + 1, last);
+  html(state, `</${tag}>\n`, last);
+  state.line = last + 1;
+  return true;
+}
+
 /**
  * Границы блока в исходнике — для синхронной прокрутки, перехода к фрагменту и правки
  * прямо в превью. Отмечаются и вложенные блоки (пункты списка, строки таблицы, абзацы
@@ -206,6 +253,7 @@ function sourceLines(state) {
 }
 
 export function wikiMarkdown(md) {
+  md.block.ruler.before('html_block', 'md_in_html', mdInHtml, { alt: ['paragraph', 'reference', 'blockquote', 'list'] });
   md.block.ruler.before('fence', 'admonition', admonition, { alt: ['paragraph', 'reference', 'blockquote', 'list'] });
   md.block.ruler.before('fence', 'tabbed', tabbed, { alt: ['paragraph', 'reference', 'blockquote', 'list'] });
   md.inline.ruler.before('emphasis', 'keys', keys);
