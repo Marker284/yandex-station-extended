@@ -186,7 +186,8 @@ function iconShortcode(state, silent) {
   if (!m) return false;
   if (!silent) {
     const t = state.push('html_inline', '', 0);
-    t.content = `<span class="twemoji yse-icon-shortcode" title=":${escapeHtml(m[1])}:"></span>`;
+    // сам SVG подставит превью: иконки приходят отдельным файлом (contrib/editor-icons.py)
+    t.content = `<span class="twemoji yse-icon-shortcode" data-icon="${escapeHtml(m[1])}" title=":${escapeHtml(m[1])}:"></span>`;
   }
   state.pos += m[0].length;
   return true;

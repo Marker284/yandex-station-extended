@@ -4,7 +4,7 @@
 import { Api, ApiError } from './api.js';
 import { h, clear, icon, spinner, formatTime, plural, store } from './dom.js';
 import { createEditor, commands, setDoc, setLineMarks, revealQuote, gotoLine, topVisibleLine, insertBlock, undo, redo } from './cm.js';
-import { renderInto, elementForLine } from './preview.js';
+import { renderInto, elementForLine, setIcons } from './preview.js';
 import { enableLiveEdit, markBlocks } from './live.js';
 import { lineStats, rebase } from './diff.js';
 import { scanChange, hasBlocking } from '../../shared/scan.js';
@@ -548,6 +548,18 @@ let previewTimer = 0;
 let analyzeTimer = 0;
 let draftTimer = 0;
 
+/** Иконки вики для превью — файл собирает contrib/editor-icons.py. */
+async function loadIcons() {
+  try {
+    const res = await fetch(new URL('assets/editor/icons.json', cfg.siteRoot).href, { cache: 'force-cache' });
+    if (!res.ok) return;
+    setIcons(await res.json());
+    if (S.preview && !S.live?.isEditing()) drawPreview();
+  } catch {
+    /* без иконок превью просто покажет квадратики */
+  }
+}
+
 function drawPreview() {
   renderInto(S.preview, S.editor.state.doc.toString(), { pagePath: S.path, siteRoot: cfg.siteRoot, pendingImages: S.images });
   markBlocks(S.preview);
@@ -1085,6 +1097,8 @@ async function start() {
     ]);
   }
 }
+
+loadIcons();
 
 if (!api) {
   const path = params.get('path');
