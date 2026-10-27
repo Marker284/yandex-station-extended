@@ -1,25 +1,31 @@
-#!/bin/bash
-# Install persistent ADB init script on a rooted Yandex Station.
-# Requires: adb access to <ip>:5555 (first-time needs eQuasar unlock).
-#
-# Usage: sh install-s97adb.sh <station-ip>
-set -e
-IP="${1:-<STATION_IP>}"
-SER="$IP:5555"
-cd "$(dirname "$0")"
+#!/bin/sh
+# Host-side helper for the native /data/quasar ADB markers (Buildroot stations).
+# Uses the mechanism documented in start/ssh.md, not a missing S97adb payload.
+# Requires existing root ADB. Does not reboot or change /etc/init.d.
+# Hardware verification of this wrapper is pending; see model-specific limitations.
+# Undo: chattr -i both markers, then remove them; keep another working entry point.
+set -eu
+# Git Bash must not rewrite absolute paths passed to the Android device.
+export MSYS_NO_PATHCONV=1
 
-[ -f S97adb ] || { echo "S97adb not found"; exit 1; }
-
-echo "[*] Installing S97adb on station $SER..."
-adb -s "$SER" shell "mount -o remount,rw /"
-adb -s "$SER" push S97adb /etc/init.d/S97adb >/dev/null
-adb -s "$SER" shell "sync; mount -o remount,ro /; chmod 755 /etc/init.d/S97adb; echo INSTALLED"
-echo "[*] Rebooting station..."
-adb -s "$SER" shell "sleep 1; reboot" 2>/dev/null || true
-sleep 60
-echo "[*] Checking port 5555..."
-if (exec 3<>/dev/tcp/$IP/5555) 2>/dev/null; then
-    echo "[+] ADB is alive after reboot. Now S97adb survives without eQuasar server."
-else
-    echo "[-] Port not open yet, wait a bit or rerun: adb connect $SER"
-fi
+[ "$#" = 1 ] || { echo "Usage: sh install-s97adb.sh <station-ip>" >&2; exit 2; }
+IP=$1
+case "$IP" in ''|*[!0-9.]*) echo 'Expected an IPv4 address.' >&2; exit 2 ;; esac
+SER=$IP:5555
+command -v adb >/dev/null 2>&1 || { echo 'adb not found' >&2; exit 1; }
+adb connect "$SER"
+[ "$(adb -s "$SER" shell id -u | tr -d '\r\n')" = 0 ] || {
+    echo 'Root ADB is required.' >&2; exit 1
+}
+adb -s "$SER" shell 'set -eu
+    [ -f /system/vendor/quasar/activate_adb.sh ] || {
+        echo "Native Buildroot ADB activation script is missing." >&2; exit 1
+    }
+    command -v chattr >/dev/null 2>&1
+    mkdir -p /data/quasar
+    touch /data/quasar/activate_adb_quasmodrom /data/quasar/activate_network_adb
+    chattr +i /data/quasar/activate_adb_quasmodrom /data/quasar/activate_network_adb
+    sync'
+echo '[+] Native ADB markers created and protected; no reboot was performed.'
+echo "After a manual reboot, verify: adb connect $SER; adb -s $SER shell id"
+echo 'Cloud deactivation/model-specific boot logic may still disable ADB; see start/ssh.md.'

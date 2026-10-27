@@ -19,9 +19,10 @@
 | **Мини 3 (bergamot)** | [retail CA и маркеры из factory](retail-ca-mini3.md) — для сборок после 21.10.2026; старые — DNS-методом |
 | **Лайт 2 (Plum)** | [retail CA из factory](retail-ca.md) — патч CA-бандла в factory mode |
 | Мини 3 Про | способ пока не описан; как закрепить доступ (сохраняется только `/data`) — на [странице модели](../devices/station-mini3-pro.md) |
+| **Мини 1 (2019)**, `YNDX-0004` | кроме DNS-метода — [root и ADB по USB](root-mini1-usb.md) через Station Mini Root: без смены DNS и заводского сброса |
 | Станция 1-го поколения | [AliceBridge](root-android.md#station-1): постоянный root через свой образ `boot` |
-| Станция Макс | способа пока нет (Android-платформа) |
-| Станция 3 (orion) | способа нет: DNS-метод не проходит проверку сертификата, см. [страницу модели](../devices/station-3.md#tls) |
+| **Станция Макс (YNDX-0008)** | [ADB Max](adb-max.md) — получение доступа через драйвер Mali, сброс не нужен |
+| Станция 3 (orion) | [DNS-метод](root.md), как на других Amlogic; свой стенд колонка не примет — [почему](../devices/station-3.md#tls) |
 | **JBL Link Music** (с Алисой) | [ADB по USB на старте](root-jbl-link-music.md) — маркеры сетевого ADB через сервисный Micro-USB |
 
 Без компьютера, с Android-телефона: [AliceBridge](root-android.md) — проверен на Лайт, Мини,

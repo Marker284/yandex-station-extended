@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 .cache/
 .DS_Store
+.claude/
 
 # сборка редактора (editor/ → npm run build)
 docs/assets/editor/

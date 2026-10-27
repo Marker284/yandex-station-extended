@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Пульт Станции</title>
+<style>
+  :root { --bg: #121214; --btn: #26262b; --btn-on: #3a3a42; --fg: #f2f2f5; --accent: #7b5cff; --muted: #8b8b94; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.3 system-ui, sans-serif;
+         display: flex; flex-direction: column; align-items: center; padding: 16px; gap: 18px; user-select: none; }
+  h1 { font-size: 15px; font-weight: 500; color: var(--muted); margin: 4px 0 0; }
+  button { background: var(--btn); color: var(--fg); border: 0; border-radius: 16px; font-size: 18px;
+           min-height: 64px; touch-action: manipulation; }
+  button:active { background: var(--btn-on); }
+  .row { display: flex; gap: 12px; width: 100%; max-width: 360px; }
+  .row button { flex: 1; }
+  .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 300px; }
+  .pad button { aspect-ratio: 1; font-size: 26px; }
+  .pad .ok { background: var(--accent); font-size: 20px; font-weight: 600; }
+  .apps button { font-size: 15px; }
+  form { display: flex; gap: 8px; width: 100%; max-width: 360px; }
+  input { flex: 1; min-width: 0; background: var(--btn); color: var(--fg); border: 0; border-radius: 12px;
+          padding: 0 14px; font-size: 16px; min-height: 52px; }
+  form button { min-height: 52px; padding: 0 18px; font-size: 16px; }
+  #st { font-size: 13px; color: var(--muted); min-height: 1em; }
+  details { width: 100%; max-width: 360px; background: #1b1b1f; border-radius: 16px; padding: 4px 14px 14px; }
+  summary { font-size: 16px; padding: 12px 0; cursor: pointer; }
+  details h2 { font-size: 14px; font-weight: 600; margin: 14px 0 8px; }
+  label.opt { display: flex; gap: 10px; align-items: center; padding: 10px 0; font-size: 16px; }
+  label.opt input { width: 20px; height: 20px; min-height: 0; flex: none; }
+  .warn { font-size: 13px; line-height: 1.4; color: #ffb35c; background: #2a2116; border-radius: 10px;
+          padding: 10px 12px; margin: 6px 0 4px; }
+  details > button { width: 100%; margin-top: 8px; min-height: 52px; font-size: 16px; }
+  details form { margin-top: 4px; }
+  details form button { flex: none; }
+  details button.danger { background: #4a2020; }
+</style>
+</head>
+<body>
+<h1>Пульт · Яндекс Станция</h1>
+
+<div class="row apps">
+  <button data-app="alice">Алиса</button>
+  <button data-app="launcher">Лаунчер</button>
+  <button data-app="smarttube">YouTube</button>
+  <button data-app="vpn">VPN</button>
+</div>
+
+<div class="pad">
+  <span></span><button data-k="up">▲</button><span></span>
+  <button data-k="left">◀</button><button class="ok" data-k="ok">OK</button><button data-k="right">▶</button>
+  <span></span><button data-k="down">▼</button><span></span>
+</div>
+
+<div class="row">
+  <button data-k="back">↩ Назад</button>
+  <button data-k="play">⏯</button>
+  <button data-k="menu">☰</button>
+</div>
+
+<div class="row">
+  <button data-k="voldown">− Тише</button>
+  <button data-k="mute">🔇</button>
+  <button data-k="volup">+ Громче</button>
+</div>
+
+<form id="tf">
+  <input id="t" placeholder="Текст для поиска (латиница)" autocomplete="off">
+  <button>Ввести</button>
+</form>
+<div id="st"></div>
+
+<details id="settings">
+  <summary>⚙ Настройки</summary>
+
+  <h2>VPN (v2rayNG)</h2>
+  <form id="vf">
+    <input id="v" placeholder="vless://… или ссылка подписки" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button>Добавить</button>
+  </form>
+  <div class="warn" style="color: var(--muted); background: #222226;">Ссылка уйдёт в v2rayNG на колонке;
+    подтвердите импорт на экране телевизора кнопкой OK. После импорта включите VPN в v2rayNG.</div>
+
+  <h2>Лаунчер при загрузке колонки</h2>
+  <label class="opt"><input type="radio" name="boot" value="alice"> Алиса (Яндекс)</label>
+  <label class="opt"><input type="radio" name="boot" value="couchy"> Couchy Launcher</label>
+  <div class="warn">Если при загрузке не запускается лаунчер Алисы, распознавание голоса работать не будет:
+    Алиса не ответит, пока вы не выберете здесь «Алиса» и не перезагрузите колонку.</div>
+
+  <h2>Выгрузить лаунчер Яндекса</h2>
+  <div class="warn">Освобождает память для ТВ-лаунчера и YouTube, но голосовые функции Алисы работать
+    не будут до перезагрузки колонки.</div>
+  <button class="danger" id="kick">Выгрузить лаунчер Яндекса</button>
+
+  <button id="reboot">Перезагрузить колонку</button>
+</details>
+
+<script>
+  const st = document.getElementById('st');
+  function send(q, okMsg = '') {
+    fetch('/cgi-bin/k?' + q).then(r => r.text()).then(t => { st.textContent = t.trim() === 'ok' ? okMsg : t; })
+      .catch(() => { st.textContent = 'Нет связи с колонкой'; });
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+  // Стрелки повторяются, пока палец держит кнопку
+  document.querySelectorAll('[data-k]').forEach(b => {
+    let timer;
+    const repeat = ['up', 'down', 'left', 'right', 'volup', 'voldown'].includes(b.dataset.k);
+    const stop = () => { clearTimeout(timer); clearInterval(timer); };
+    b.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      send('k=' + b.dataset.k);
+      // нажатие обрабатывается ~1 с, поэтому повтор редкий, чтобы запросы не копились
+      if (repeat) timer = setTimeout(() => { timer = setInterval(() => send('k=' + b.dataset.k), 900); }, 900);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+  });
+  document.querySelectorAll('[data-app]').forEach(b => b.addEventListener('click', () => send('app=' + b.dataset.app)));
+  document.getElementById('tf').addEventListener('submit', e => {
+    e.preventDefault();
+    const t = document.getElementById('t');
+    if (t.value) send('text=' + encodeURIComponent(t.value));
+    t.value = '';
+  });
+
+  document.getElementById('vf').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = document.getElementById('v');
+    if (v.value.trim()) send('vpn=' + encodeURIComponent(v.value.trim()), 'Ссылка отправлена в v2rayNG — смотрите на экран');
+    v.value = '';
+  });
+
+  // Настройки: лаунчер при загрузке, выгрузка Яндекса, перезагрузка
+  const radios = document.querySelectorAll('input[name=boot]');
+  fetch('/cgi-bin/k?get=settings').then(r => r.text()).then(t => {
+    const m = t.match(/boot=(\w+)/);
+    const v = m ? m[1] : 'alice';
+    radios.forEach(r => { r.checked = r.value === v; });
+  }).catch(() => {});
+  radios.forEach(r => r.addEventListener('change', () => {
+    if (r.value === 'couchy' && !confirm('При загрузке будет запускаться Couchy, а лаунчер Алисы — нет. ' +
+        'Распознавание голоса работать не будет. Продолжить?')) {
+      radios.forEach(x => { x.checked = x.value === 'alice'; });
+      return;
+    }
+    send('set=boot&v=' + r.value, 'Сохранено. Сработает при следующей загрузке колонки.');
+  }));
+  document.getElementById('kick').addEventListener('click', () => {
+    if (confirm('Выгрузить лаунчер Яндекса? Голосовые функции Алисы не будут работать до перезагрузки колонки.'))
+      send('act=kick');
+  });
+  document.getElementById('reboot').addEventListener('click', () => {
+    if (confirm('Перезагрузить колонку? Это займёт около минуты.')) {
+      send('act=reboot', 'Колонка перезагружается…');
+    }
+  });
+</script>
+</body>
+</html>

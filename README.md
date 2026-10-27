@@ -23,6 +23,9 @@
 получить root без разборки, закрепить доступ и отключить обновления. Ещё — как поставить свой
 софт и подключить USB-периферию, и как устроены прошивка, сеть и железо каждой модели.
 
+Сейчас в вики — **15 разобранных моделей** и **13 рецептов**: от USB-периферии и AirPlay
+до своей LLM вместо Алисы.
+
 <div align="center">
 
 **⭐ Пригодилось? Поставьте звезду — это мотивирует вести проект дальше.**
@@ -41,8 +44,17 @@
 - 📦 **[Пакеты](https://hackalice.me/start/packages/)** — `yse` (Entware и `.yap`),
   [YAM](https://hackalice.me/recipes/yam/) с веб-панелью и Lua-плагинами.
 - 🔌 **[USB Host](https://hackalice.me/recipes/usb-host/)** — флешки, USB-Ethernet, наушники и ЦАП.
-- 🎵 **[AirPlay](https://hackalice.me/recipes/airplay/)**, [свои звуки](https://hackalice.me/recipes/sounds/),
-  [подсветка](https://hackalice.me/recipes/led/), [своя LLM вместо Алисы](https://hackalice.me/recipes/llm/).
+- 🎵 **[AirPlay](https://hackalice.me/recipes/airplay/)** и
+  **[Spotify Connect](https://hackalice.me/recipes/spotify/)**,
+  [любой плеер как Bluetooth-источник](https://hackalice.me/recipes/bt-proxy/),
+  [свои звуки](https://hackalice.me/recipes/sounds/),
+  [подсветка](https://hackalice.me/recipes/led/).
+- 🤖 **[Своя LLM вместо Алисы](https://hackalice.me/recipes/llm/)** — Home Assistant, свой
+  бэкенд или голосовой режим сайта ChatGPT; рядом —
+  [обработанный микрофон VQE](https://hackalice.me/recipes/microphone/) и
+  [озвучка своего текста](https://hackalice.me/recipes/sounds/#native-tts).
+- 📺 **[ТВ-набор для Станции 1](https://hackalice.me/recipes/station1-tv/)** — веб-пульт,
+  ТВ-лаунчер, YouTube и VPN на HDMI.
 - 🧩 **[Железо моделей](https://hackalice.me/devices/)** — SoC, разделы флеша, I2C, звук, индикация.
 - ⚙️ **[Как это устроено](https://hackalice.me/internals/architecture/)** — прошивка quasar,
   сеть и порты, голосовой тракт Алисы, сборка своего софта.
@@ -52,13 +64,14 @@
 | Модель | Root | Подробнее |
 |---|:---:|---|
 | Лайт, Мини, Мини 2, Миди, Станция 2, Стрит, Умный хаб | ✅ | [DNS-метод](https://hackalice.me/start/root/) |
+| Станция 3 | ✅ | [DNS-метод](https://hackalice.me/start/root/); свой стенд колонка не примет — [почему](https://hackalice.me/devices/station-3/#tls) |
+| Мини 1 (2019), `YNDX-0004` | ✅ | ещё и [root с ADB по USB](https://hackalice.me/start/root-mini1-usb/) — без DNS и сброса |
 | Мини 3 | ✅ | [retail CA и маркеры](https://hackalice.me/start/retail-ca-mini3/) |
 | Лайт 2 | ✅ | [retail CA из factory](https://hackalice.me/start/retail-ca/) |
 | Станция 1-го поколения | ✅ | [AliceBridge](https://hackalice.me/start/root-android/#station-1) |
 | JBL Link Music (с Алисой) | ✅ | [ADB по USB на старте](https://hackalice.me/start/root-jbl-link-music/) |
 | Мини 3 Про | 🟡 | [только закрепление доступа](https://hackalice.me/devices/station-mini3-pro/) |
-| Станция 3 | ❌ | [DNS-метод закрыт](https://hackalice.me/devices/station-3/) |
-| Станция Макс | ❌ | [Android-платформа](https://hackalice.me/devices/station-max/) |
+| Станция Макс (`YNDX-0008`) | 🟡 | [ADB Max](https://hackalice.me/start/adb-max/): разовые команды с повышенными правами, постоянного root нет (dm-verity). Вариант с Zigbee (`YNDX-00052`) — [своя страница](https://hackalice.me/devices/station-max-zigbee/) |
 
 Актуальная таблица — на сайте: [какой способ для вашей колонки](https://hackalice.me/start/#root-by-model).
 Нет вашей модели? [Пришлите данные](https://github.com/Marker284/yandex-station-extended/issues/new/choose).
@@ -72,6 +85,7 @@ docs/          страницы вики (Markdown) — сайт hackalice.me с
   devices/     страницы моделей
   internals/   прошивка, сеть, сборка софта
 contrib/       скрипты и статические бинарники для колонок (описание — contrib/README.md)
+  tests/       тесты хостовых утилит: python3 -m unittest discover -s contrib/tests
 mkdocs.yml     навигация и настройки сайта (MkDocs Material)
 ```
 

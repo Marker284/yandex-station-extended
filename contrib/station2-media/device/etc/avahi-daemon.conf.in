@@ -1,0 +1,17 @@
+# @HOSTNAME@ подставляет ap2.sh: имя, которое уже публикует maind.
+# Адреса публикует сам maind, поэтому publish-addresses=no — иначе конфликт
+# обратной записи и бесконечное переименование.
+[server]
+host-name=@HOSTNAME@
+use-ipv4=yes
+use-ipv6=no
+ratelimit-interval-usec=1000000
+ratelimit-burst=1000
+
+[wide-area]
+enable-wide-area=no
+
+[publish]
+publish-addresses=no
+publish-hinfo=no
+publish-workstation=no

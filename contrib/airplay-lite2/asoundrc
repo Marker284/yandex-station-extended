@@ -1,0 +1,11 @@
+# ~/.asoundrc shairport-sync (HOME=/data/opt/airplay), системная alsa-lib колонки.
+# airplay -> softvol «AirPlay» (громкость с iPhone/Mac) -> штатный default (Master Алисы -> dmix 48 кГц)
+pcm.airplay { type plug; slave.pcm "airplayvol"; }
+pcm.airplayvol {
+  type softvol
+  slave.pcm "default"
+  control { name "AirPlay Playback Volume"; card 0; count 1; }
+  resolution 256
+  min_dB -50.0
+  max_dB 0.0
+}

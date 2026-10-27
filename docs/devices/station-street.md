@@ -35,7 +35,7 @@
 
 ## Карта флеша (MTD)
 
-```
+```text
 mtd0 "bootloader" 2 MB    mtd1 "tpl" 8 MB     mtd2 "tee" 1 MB -> /tee (jffs2, RO)
 mtd3 "recovery" 50 MB     mtd4 "boot" 12 MB
 mtd5 "system" 80 MB -> ubi0:rootfs (ubifs, RO)

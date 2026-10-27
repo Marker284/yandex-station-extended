@@ -18,6 +18,7 @@
 | **`nano`** | 325 КБ | [Скачать nano](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/nano) | Удобный консольный текстовый редактор. |
 | **`zsh`** | 3.6 МБ | [Скачать zsh](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/zsh-5.9.2-aarch64-musl) | Мощная командная оболочка Zsh (версия 5.9.2). |
 | **`yse`** | 20 КБ | [Скачать yse](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/yse) | Пакетный менеджер: Entware + `.yap`-пакеты с GitHub. Установщик с ПК — [`install-yse.sh`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/install-yse.sh), [инструкция](https://hackalice.me/start/packages/). |
+| **`bt-proxy`** | 1.2 МБ | [Скачать bt-proxy](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/bt-proxy) | MPRIS-плееры как Bluetooth-источник Алисы; `armv7-linux-musleabihf`, сборка — [`bt-proxy/build.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bt-proxy/build.sh). [Рецепт](https://hackalice.me/recipes/bt-proxy/). |
 
 ---
 
@@ -59,6 +60,7 @@
 | **`mini2-ssh.tar.gz`** | 7.6 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/mini2-ssh.tar.gz) | Готовый самораспаковывающийся архив SSH для Станции Мини 2. |
 | **`librespot-micro-installer.zip`**| 2.3 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/librespot-micro-installer.zip) | Установщик клиента Spotify Connect для Станции Лайт. |
 | **`Station1_ROOT.zip`** | 2.8 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/Station1_ROOT.zip) | Архив инструментов рутирования для первой Станции (Allwinner). |
+| **`airplay-lite2-armhf.tar.gz`** | 1.4 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz) | shairport-sync 5.6.2 (AirPlay 2, MPRIS, soxr) и nqptp 1.2.9 для Станции Лайт 2: armhf, штатная glibc колонки, 9 библиотек рядом. Собран [`airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile), SHA256 `1521dbbd29c86ff265c40ca158f8795d71332bb7062d4d7eead8cf9cdb9cd1a9`. Ставится [`airplay-lite2/install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh). |
 
 ---
 
@@ -67,12 +69,19 @@
 ### Безопасность и блокировка обновлений:
 * **[`yandex-noupdate.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-noupdate.sh)** — полная блокировка OTA-обновлений, вырезание `updatesd` и подмена публичного ключа.
 * **[`station1-freeze-updatesd.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/station1-freeze-updatesd.sh)** — Станция 1 (Android, root через AliceBridge): фоновая заморозка `maind --updatesd` сигналом `SIGSTOP`, без правок `/system`. [Рецепт](https://hackalice.me/recipes/station1-disable-updates/).
+* **[`station1-tv/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-tv)** — Станция 1: веб-пульт (`lighttpd` + CGI на `sh`, порт 8080) и установщик `install.ps1`, который ставит его вместе с Couchy Launcher, SmartTube и v2rayNG 1.9.45. [Рецепт](https://hackalice.me/recipes/station1-tv/).
 * **[`killswitch.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/killswitch.sh)** — аварийный киллсвич для мгновенной изоляции колонки от облачных серверов Яндекса.
-* **[`rollback.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/rollback.sh)** — скрипт отката изменений и восстановления заводских файлов.
+* **[`rollback.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/rollback.sh)** —
+  непроверенная запись собственных дампов Мини 2 через root ADB в среде восстановления.
+  Требует явных адреса, каталога и `--write`; отказывает при подключённом system UBI.
+  Не очищает `/data` и не восстанавливает отдельные конфиги. См. [восстановление](../docs/start/recovery.md).
 * **[`yandex-station-privacy.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-privacy.sh)** — отключение отправки логов и телеметрии (`telemetryd`, `fluent-bitd`).
 
 ### Доступ и ADB:
-* **[`install-s97adb.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-s97adb.sh)** — добавление демона ADB в автозагрузку через `/etc/init.d/S97adb`.
+* **[`install-s97adb.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-s97adb.sh)** —
+  закрепление штатных маркеров ADB в `/data/quasar` с компьютера. Историческое имя сохранено;
+  отдельный `S97adb` не нужен, `/etc/init.d` не меняется, перезагрузка не выполняется.
+  Нужен уже работающий root ADB. Ограничения моделей — в [шаге 2](../docs/start/ssh.md#perm-adb).
 * **[`patch_boot.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_boot.py)** — модификация boot-образа ядра для снятия флага `rh_unlock=0` (UART-консоль).
 * **[`patch_max_adb_candidate.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_max_adb_candidate.py)** — патчер для включения отладки на Станции Макс.
 * **[`decrypt_ota.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/decrypt_ota.py)** — распаковка и расшифровка OTA-пакетов прошивки.
@@ -86,9 +95,38 @@
   [Рецепт](https://hackalice.me/recipes/sounds/#native-tts), проверка пакетов и ошибок:
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
-* **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** — запуск клиента Spotify Connect (`librespot`).
+* **[`bt-proxy/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bt-proxy)** — исходники (Rust) и автозапуск `bt-proxy`: любой MPRIS-плеер виден Алисе как Bluetooth-телефон. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/bt-proxy/).
+* **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — установщик `install.sh` (одна команда с компьютера, откат `--uninstall`), Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
+* **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`) и Spotify
+  одним каталогом с общей с Алисой громкостью, установка за окно ADB, сторож обновлений.
+  [Рецепт](https://hackalice.me/recipes/airplay/#station-2-bundle).
+* **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** —
+  запуск с ПК комплектного `librespot-micro-installer.zip`: **только Лайт/Micro v1.2**,
+  не Мини 2. По умолчанию проверяет, для установки нужен `--install` (см. ниже).
 * **[`music.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/music.go)** / **[`qstream.go`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/qstream.go)** — стриминг звука через сокет `tcp_alsa_writer`.
 * **[`mic-tap.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/mic-tap.sh)** — захват микрофонного потока с PDM-матрицы.
+
+### Spotify: комплектный установщик для Лайт/Micro
+
+На ПК нужны POSIX `sh`, `adb` и `unzip`. Сначала подключите **конкретную** колонку:
+
+```sh
+adb connect <IP>:5555
+sh contrib/spotify.sh <IP>:5555             # только проверка, это режим по умолчанию
+sh contrib/spotify.sh <IP>:5555 --install   # проверка, затем установка
+```
+
+Обёртка откажется работать с другой моделью до загрузки файлов. Комплектный установщик
+дополнительно проверяет root, ядро, звук, свободное место и контрольные суммы; существующую
+установку не перезаписывает. Временные файлы проверки удаляются, сама колонка не перезагружается.
+При `--check` пакет временно копируется на колонку, но конфиги и автозапуск не устанавливаются.
+
+Нужен Spotify Premium. При установке меняется общий `/etc/asound.conf`; сохраните резервную
+копию установщика вне колонки. Запуск, проверка звука и откат описаны в `README.txt` внутри
+архива. Обёртка проверена только с подставным ADB, на колонке не испытывалась.
+
+Для Мини 2 см. ссылку на сторонний клиент в [«Колонка без Яндекса»](../docs/recipes/standalone.md).
+Поддержка Мини 2 этим установщиком не заявляется.
 
 ### Индикация и LED:
 * **[`install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh)** — управление 6 RGB-зонами Станции Мини 2.

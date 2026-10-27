@@ -30,10 +30,19 @@ rw(){ mount -o remount,rw / 2>/dev/null || { err "remount rw / не удался
 ro(){ sync; mount -o remount,ro / 2>/dev/null; }
 
 backup(){
-  mkdir -p "$BK" || exit 1
-  [ -f "$BK/launch.json.orig" ]          || cp "$LJ"    "$BK/launch.json.orig"
-  [ -f "$BK/ota_script.pub.orig" ]       || cp "$PUB"   "$BK/ota_script.pub.orig"
-  [ -f "$BK/device_ota_update.sh.orig" ] || cp "$OTASH" "$BK/device_ota_update.sh.orig"
+  mkdir -p "$BK" || return 1
+  for name in launch.json ota_script.pub device_ota_update.sh; do
+    [ -s "$Q/$name" ] || return 1
+    if [ ! -e "$BK/$name.orig" ] && [ ! -L "$BK/$name.orig" ]; then
+      copy=$(mktemp "$BK/.$name.XXXXXX") || return 1
+      cp -p "$Q/$name" "$copy" && cmp -s "$Q/$name" "$copy" &&
+        mv "$copy" "$BK/$name.orig" || {
+          rm -f "$copy"; return 1
+        }
+    fi
+    [ -f "$BK/$name.orig" ] && [ -s "$BK/$name.orig" ] &&
+      [ ! -L "$BK/$name.orig" ] || return 1
+  done
 }
 
 json_ok(){
@@ -60,7 +69,8 @@ strip_updatesd(){
 }
 
 ota_off(){
-  rw; backup; TMP=/tmp/.kit.$$
+  backup || { err "резервная копия не создана — системные файлы не изменены"; exit 1; }
+  rw; TMP=/tmp/.kit.$$
   printf '%s\n' "$DUMMY_PUB" > "$PUB" && say "ota_script.pub -> чужой ключ (OTA не пройдёт подпись)"
   printf '#!/bin/sh\n# disabled by yandex-micro-kit\nlogger -t noupdate "OTA apply blocked" 2>/dev/null\nexit 0\n' > "$OTASH"
   chmod +x "$OTASH" && say "device_ota_update.sh -> заглушка (без flash/reboot)"
@@ -87,7 +97,10 @@ do_all(){ need_root; ota_off; adb_on; echo; say "ГОТОВО. Перезагр�
 
 do_restore(){
   need_root
-  [ -d "$BK" ] || { err "нет бэкапа $BK"; exit 1; }
+  for name in launch.json ota_script.pub device_ota_update.sh; do
+    [ -f "$BK/$name.orig" ] && [ -s "$BK/$name.orig" ] &&
+      [ ! -L "$BK/$name.orig" ] || { err "неполный бэкап $BK"; exit 1; }
+  done
   rw
   [ -f "$BK/ota_script.pub.orig" ]       && cp "$BK/ota_script.pub.orig"       "$PUB"   && say "ota_script.pub восстановлен"
   [ -f "$BK/device_ota_update.sh.orig" ] && cp "$BK/device_ota_update.sh.orig" "$OTASH" && chmod +x "$OTASH" && say "device_ota_update.sh восстановлен"

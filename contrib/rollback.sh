@@ -1,13 +1,23 @@
-#!/bin/bash
+#!/bin/sh
 # ==============================================================================
 # Скрипт отката / прошивки дампов Яндекс Станции Мини 2 (Amlogic A113X)
-# Поддерживает как откат через рабочий root ADB по сети, так и через Amlogic Burn Tool
+# Только root ADB в среде восстановления; USB Burning Tool здесь не реализован.
+# На устройстве этот вариант не проверялся. --write явно разрешает запись разделов.
+# Пользовательские данные не удаляются; откат возможен только из собственных дампов.
 # ==============================================================================
 
-set -e
+set -eu
 
-DEVICE_IP="${1:-192.168.0.154:5555}"
-IMAGE_DIR="${2:-./images}"
+[ "$#" = 3 ] && [ "$3" = --write ] || {
+    echo "Usage: sh rollback.sh <adb-serial> <image-dir> --write" >&2
+    echo "WARNING: raw NAND restore is unverified and can brick the station." >&2
+    exit 2
+}
+DEVICE_IP=$1
+IMAGE_DIR=$2
+case "$DEVICE_IP" in ''|-*|*[!a-zA-Z0-9_.:-]*) exit 2 ;; esac
+export MSYS_NO_PATHCONV=1
+command -v adb >/dev/null 2>&1 || { echo 'adb not found' >&2; exit 1; }
 
 echo "=== Яндекс Станция Мини 2: Мастер отката прошивки ==="
 echo "Целевое устройство ADB: $DEVICE_IP"
@@ -23,12 +33,42 @@ if [ ! -d "$IMAGE_DIR" ]; then
     exit 1
 fi
 
+found=0
+for image in boot.img system.ubi system.img recovery.img; do
+    if [ -e "$IMAGE_DIR/$image" ]; then
+        [ -s "$IMAGE_DIR/$image" ] || { echo "Empty image: $image" >&2; exit 1; }
+        found=1
+    fi
+done
+[ "$found" = 1 ] || { echo 'No images found; nothing to restore.' >&2; exit 1; }
+[ ! -e "$IMAGE_DIR/system.ubi" ] || [ ! -e "$IMAGE_DIR/system.img" ] || {
+    echo 'Provide either system.ubi or system.img, not both.' >&2; exit 1
+}
+
 echo "[1/4] Проверка связи со станцией через ADB..."
 adb connect "$DEVICE_IP" || true
 if ! adb -s "$DEVICE_IP" get-state 1>/dev/null 2>&1; then
     echo "[-] Устройство $DEVICE_IP недоступно по ADB!"
-    echo "    Если станция окирпичена, используйте тестпоинт и Amlogic USB Burning Tool (см. README.md)."
+    echo "    Этот скрипт требует уже работающий ADB в среде восстановления."
     exit 1
+fi
+[ "$(adb -s "$DEVICE_IP" shell id -u | tr -d '\r\n')" = 0 ] || {
+    echo 'Root ADB is required.' >&2; exit 1
+}
+adb -s "$DEVICE_IP" shell 'set -eu
+    tr "\000" "\n" < /proc/device-tree/compatible | grep -qx "yandex,station-mini2"
+    grep -q "^mtd2:.*\"boot\"$" /proc/mtd
+    grep -q "^mtd3:.*\"system\"$" /proc/mtd
+    grep -q "^mtd6:.*\"recovery\"$" /proc/mtd'
+if [ -e "$IMAGE_DIR/system.ubi" ] || [ -e "$IMAGE_DIR/system.img" ]; then
+    # Never erase an attached UBI device, including the running retail rootfs.
+    adb -s "$DEVICE_IP" shell 'set -eu
+        for path in /sys/class/ubi/ubi*/mtd_num; do
+            [ -f "$path" ] || continue
+            if [ "$(cat "$path")" = 3 ]; then
+                echo "Refusing system restore: mtd3 is attached to UBI." >&2; exit 1
+            fi
+        done'
 fi
 echo "[+] Станция на связи в режиме root!"
 
@@ -67,20 +107,11 @@ if [ -f "$IMAGE_DIR/recovery.img" ]; then
     echo " [+] Recovery успешно прошит!"
 fi
 
-echo "[4/4] Защита от автообновления и очистка пользовательских данных..."
-adb -s "$DEVICE_IP" shell "rm -rf /data/quasar/data/updates/* /bkupgrade/* 2>/dev/null || true"
-
-# Блокировка OTA серверов в hosts
-adb -s "$DEVICE_IP" shell "
-grep -q 'api.quasar.yandex.net' /etc/hosts || cat << 'EOF' >> /etc/hosts
-127.0.0.1 api.quasar.yandex.net
-127.0.0.1 quasar.s3.yandex.net
-127.0.0.1 clck.yandex.net
-EOF
-"
+echo "[4/4] Синхронизация и перезагрузка (без очистки /data)..."
 
 echo "======================================================"
 echo "[+] Откат на целевую прошивку завершен!"
 echo "    Перезагружаю станцию: adb -s $DEVICE_IP reboot"
-adb -s "$DEVICE_IP" shell "sync && reboot" || true
+adb -s "$DEVICE_IP" shell sync
+adb -s "$DEVICE_IP" reboot
 echo "======================================================"

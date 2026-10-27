@@ -57,7 +57,7 @@ build-профиль `yandexstation_2_tv/127`). Это флагман-медиа
 ## Разметка (Android, eMMC)
 
 Разделы `/dev/block/`:
-```
+```text
 boot bootloader cache cri_data data dtbo env logo md0 metadata misc
 odm param platform product recovery reserved rsv sysrecovery system
 tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
@@ -107,8 +107,9 @@ tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
 - **ADB по сети** работает (`:5555`, после серверной активации конфига), но **без root**
   (`uid=2000(shell)`, SELinux enforcing). `/data/local/tmp` — для записи (`/tmp` закрыт).
 - Полноценного рута «из коробки» нет: мешают AVB + dm-verity + SELinux + production adbd.
-  Путь к руту здесь — не правка rootfs (как на Buildroot-моделях), а разблокировка
-  загрузчика / эксплойт (**нужно исследование**).
+  Правка rootfs (как на Buildroot-моделях) невозможна, но **расширенный доступ реализован
+  через сервисную утилиту в ADB** — см. [Станция Макс — ADB Max](../start/adb-max.md).
+  Она даёт повышенные права для выполнения команд в оперативной памяти без записи на диск.
 
 ## Что ещё проверить
 
