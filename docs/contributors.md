@@ -29,6 +29,7 @@
 | [@dimakolychev](https://github.com/dimakolychev) | [Мини 3 Про на factory-12](devices/station-mini3-pro.md#factory-12): ADB после возврата DNS, подсветка и LED-часы, звук и микрофон, AirPlay, `yse`/Entware, дамп NAND ([#47](https://github.com/Marker284/yandex-station-extended/pull/47)) |
 | [@chkzz](https://github.com/chkzz) | [bt-proxy](recipes/bt-proxy.md): MPRIS-плееры как Bluetooth-источник Алисы; [AirPlay 2 на Лайт 2](recipes/airplay.md) вместе с Алисой ([#42](https://github.com/Marker284/yandex-station-extended/pull/42)) |
 | [@superkai-sdk1](https://github.com/superkai-sdk1) | Станция 2: [AirPlay 2 одним набором](recipes/airplay.md#station-2-bundle), общая с Алисой громкость, сторож OTA ([#43](https://github.com/Marker284/yandex-station-extended/pull/43)); [Spotify Connect](recipes/spotify.md) и голосовые команды ([#44](https://github.com/Marker284/yandex-station-extended/pull/44)) |
+| [@theJorDea](https://github.com/theJorDea) | `contrib`: починка `spotify.sh` и `install-s97adb.sh`, защита бэкапов в `yandex-noupdate.sh` и `yandex-micro-kit.sh`, проверки в [`rollback.sh`](start/recovery.md) и 17 тестов ([#49](https://github.com/Marker284/yandex-station-extended/pull/49)) |
 
 ## Данные для страниц моделей
 
