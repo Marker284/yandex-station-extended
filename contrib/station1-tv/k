@@ -1,0 +1,46 @@
+#!/system/bin/sh
+# CGI веб-пульта:
+#   ?k=<кнопка>  ?app=<alice|launcher|smarttube>  ?text=<латиница>
+#   ?get=settings  ?set=boot&v=<alice|couchy>  ?act=<kick|reboot>
+# Нажатия — через input keyevent (~1 с на нажатие). monkey не используется: он ломает Алису.
+export ANDROID_DATA=/data ANDROID_ROOT=/system PATH=/system/bin:/sbin:/bin
+BB=/sbin/busybox
+CONF=/data/dropbear/tv.conf
+printf 'Content-Type: text/plain; charset=utf-8\r\n\r\n'
+
+key() { input keyevent "$1"; }
+boot_launcher() { $BB sed -n 's/^BOOT_LAUNCHER=//p' $CONF 2>/dev/null | $BB head -1; }
+
+case "$QUERY_STRING" in
+    k=up) key 19;; k=down) key 20;; k=left) key 21;; k=right) key 22;; k=ok) key 23;;
+    k=back) key 4;; k=play) key 85;; k=menu) key 82;;
+    k=volup) key 24;; k=voldown) key 25;; k=mute) key 164;;
+    app=alice) am start -n ru.yandex.quasar.app/.MainActivity >/dev/null 2>&1;;
+    app=launcher) am start -n com.conreo.couchytv/.MainActivity >/dev/null 2>&1;;
+    app=smarttube) am start -n org.smarttube.stable/com.liskovsoft.smartyoutubetv2.tv.ui.browse.BrowseActivity >/dev/null 2>&1;;
+    app=vpn) am start -n com.v2ray.ang/.ui.MainActivity >/dev/null 2>&1;;
+    # Ссылка на подписку (http/https) или конфиг (vless://, vmess://, …) — в v2rayNG через v2rayng://.
+    # Значение приходит закодированным один раз (encodeURIComponent). UrlSchemeActivity v2rayNG 1.9.45
+    # декодирует параметр url дважды (getQueryParameter + URLDecoder), поэтому кодируем ещё раз: % -> %25.
+    vpn=?*)
+        u=$(echo "${QUERY_STRING#vpn=}" | $BB sed 's/%/%25/g')
+        case "$u" in http%253A*|https%253A*) what=install-sub;; *) what=install-config;; esac
+        am start -n com.v2ray.ang/.ui.UrlSchemeActivity -a android.intent.action.VIEW \
+            -d "v2rayng://$what?url=$u" >/dev/null 2>&1;;
+    text=*)
+        # input text понимает только ASCII; пробел — %s
+        t=$($BB printf '%b' "$(echo "${QUERY_STRING#text=}" | $BB sed 's/+/ /g; s/%\([0-9A-Fa-f][0-9A-Fa-f]\)/\\x\1/g')" | $BB tr -cd '[:print:]' | $BB sed 's/ /%s/g')
+        [ -n "$t" ] && input text "$t";;
+    get=settings)
+        b=$(boot_launcher); echo "boot=${b:-alice}"; exit 0;;
+    set=boot\&v=alice|set=boot\&v=couchy)
+        echo "BOOT_LAUNCHER=${QUERY_STRING##*v=}" > $CONF;;
+    # Выгрузка интерфейса Яндекса (ru.yandex.quasar.app): освобождает память,
+    # но без него Алиса не отвечает голосом. Вернуть — перезагрузка колонки.
+    act=kick)
+        am start -n com.conreo.couchytv/.MainActivity >/dev/null 2>&1
+        am force-stop ru.yandex.quasar.app;;
+    act=reboot) echo ok; sync; ( sleep 1; reboot ) & exit 0;;
+    *) echo "неизвестная команда"; exit 0;;
+esac
+echo ok
