@@ -128,4 +128,4 @@ mkdocs.yml     навигация и настройки сайта (MkDocs Mater
 
 **Вы обязаны указать авторство и разместить прямую ссылку на этот репозиторий:**
 > Автор: [ Марк Писаренко / Yandex Station Extended / hackalice]  
-> Ссылка: `[https://github.com/ваш-username/название-репозитория](https://github.com/Marker284/yandex-station-extended/)`
+> Ссылка: `(https://github.com/Marker284/yandex-station-extended/)`
