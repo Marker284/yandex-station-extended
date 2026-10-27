@@ -108,7 +108,7 @@ tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
   (`uid=2000(shell)`, SELinux enforcing). `/data/local/tmp` — для записи (`/tmp` закрыт).
 - Полноценного рута «из коробки» нет: мешают AVB + dm-verity + SELinux + production adbd.
   Правка rootfs (как на Buildroot-моделях) невозможна, но **root получен локальным
-  эксплойтом** — см. [Станция Макс — получение root](../start/root-s905x2.md).
+  эксплойтом** — см. [Станция Макс — ADB Max](../start/adb-max.md).
   Он даёт root на одном процессе в домене `u:r:kernel:s0`, ничего не записывая на диск;
   постоянного доступа не даёт.
 
