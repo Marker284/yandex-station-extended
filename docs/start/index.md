@@ -21,7 +21,7 @@
 | Мини 3 Про | способ пока не описан; как закрепить доступ (сохраняется только `/data`) — на [странице модели](../devices/station-mini3-pro.md) |
 | Станция 1-го поколения | [AliceBridge](root-android.md#station-1): постоянный root через свой образ `boot` |
 | Станция Макс | способа пока нет (Android-платформа) |
-| Станция 3 (orion) | способа нет: DNS-метод не проходит проверку сертификата, см. [страницу модели](../devices/station-3.md#tls) |
+| Станция 3 (orion) | [DNS-метод](root.md), как на других Amlogic; свой стенд колонка не примет — [почему](../devices/station-3.md#tls) |
 | **JBL Link Music** (с Алисой) | [ADB по USB на старте](root-jbl-link-music.md) — маркеры сетевого ADB через сервисный Micro-USB |
 
 Без компьютера, с Android-телефона: [AliceBridge](root-android.md) — проверен на Лайт, Мини,
