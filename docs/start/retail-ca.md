@@ -426,7 +426,7 @@ reboot
 
 ??? failure "Файл CA не найден"
     Проверьте, что в выбранном UBI-томе есть файл по пути
-    `/mnt/retail/system/vendor/quasar/certs/ca-certificates.crt`. Если файла нет,
+    `/mnt/retail/system/vendor/quasar/certs/ca-certificates.crt`. Если директории `certs` нет, проверьте наличие файла по пути `/mnt/retail/system/vendor/quasar/ca-certificates.crt` Если после этого файла всё ещё нет,
     остановитесь.
 
 ??? failure "Retail-система загрузилась, но ADB нет"
