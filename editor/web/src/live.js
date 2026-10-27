@@ -293,22 +293,30 @@ export function enableLiveEdit(preview, { getView, rerender, notify }) {
     if (!el) return;
     current = el;
     typing = true;
+    // после перерисовки innerHTML фокус мог уйти с панели — вернуть, иначе каретки не видно
+    if (!preview.contains(document.activeElement)) preview.focus({ preventScroll: true });
     setCaret(el, offset);
   }
 
-  // отменой заведует CodeMirror: иначе история браузера разойдётся с исходником
+  // Отменой заведует CodeMirror: иначе история браузера разойдётся с исходником.
+  // Клавиша берётся из e.code, а не из e.key: при русской раскладке Ctrl+Z приходит
+  // как «я», и сравнение с 'z' ничего не находило.
   preview.addEventListener('keydown', (e) => {
-    const mod = e.ctrlKey || e.metaKey;
-    if (!mod || !/^(z|y)$/i.test(e.key)) return;
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const isUndo = e.code === 'KeyZ' && !e.shiftKey;
+    const isRedo = e.code === 'KeyY' || (e.code === 'KeyZ' && e.shiftKey);
+    if (!isUndo && !isRedo) return;
     e.preventDefault();
     if (current && dirty && !flush(current)) return revert(current);
     const view = getView();
     if (!view) return;
-    const undo = e.key.toLowerCase() === 'z' && !e.shiftKey;
-    view.focus();
-    (undo ? opts.undo : opts.redo)?.(view);
+    const line = current ? Number(current.dataset.line) : null;
+    (isUndo ? opts.undo : opts.redo)?.(view);
     rerender();
     reset();
+    // каретка остаётся в превью: уводить её в левую панель посреди набора незачем
+    const again = line === null ? null : preview.querySelector(`[data-line="${line}"]`);
+    if (again) focusBlock(again, again.textContent.length);
   });
 
   preview.addEventListener('focusout', () => {
