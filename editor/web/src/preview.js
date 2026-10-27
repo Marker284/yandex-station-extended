@@ -29,6 +29,7 @@ export function renderInto(el, src, { pagePath, siteRoot, pendingImages }) {
   const root = new URL(siteRoot, location.href);
   for (const img of el.querySelectorAll('img[src]')) {
     const s = img.getAttribute('src');
+    img.dataset.src = s; // путь как в Markdown — по нему картинка находится в исходнике
     if (/^(https?:|data:|blob:)/i.test(s)) continue;
     const repoPath = resolveRelative(pagePath, s.split('#')[0]);
     if (pendingImages?.has(repoPath)) img.src = pendingImages.get(repoPath).url;

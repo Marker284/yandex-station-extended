@@ -638,7 +638,11 @@ pickImage.addEventListener('change', () => {
   pickImage.value = '';
 });
 
-async function addImages(files) {
+/**
+ * Добавляет картинки в правку. `at` — смещение в исходнике (картинку принесли
+ * в превью): тогда она встаёт отдельным блоком именно туда, а не к каретке слева.
+ */
+async function addImages(files, at = null) {
   for (const file of files) {
     if (file.size > MAX_IMAGE_BYTES) {
       banner('warn', `«${file.name}» больше 2 МБ — уменьшите картинку и вставьте снова.`);
@@ -663,6 +667,12 @@ async function addImages(files) {
     S.images.set(repoPath, { name, base64, url: URL.createObjectURL(file), size: file.size });
     const alt = baseName.replace(/-/g, ' ');
     const link = relativeLink(S.path, repoPath);
+    if (at !== null) {
+      const insert = `\n\n![${alt}](${link})`;
+      S.editor.dispatch({ changes: { from: at, insert } });
+      at += insert.length;
+      continue;
+    }
     const r = S.editor.state.selection.main;
     const line = S.editor.state.doc.lineAt(r.from);
     if (line.text.trim()) insertBlock(S.editor, `![${alt}](${link})`, alt);
@@ -672,7 +682,11 @@ async function addImages(files) {
     }
   }
   renderStatus();
-  updatePreview();
+  // картинку принесли в превью — перерисовать его, даже если каретка осталась там
+  if (at !== null) {
+    S.live?.reset();
+    drawPreview();
+  } else updatePreview();
 }
 
 function editorScreen(content) {
@@ -733,6 +747,7 @@ function editorScreen(content) {
     getView: () => S.editor,
     rerender: () => drawPreview(),
     notify: (text) => hint(text),
+    onImages: (files, at) => addImages(files, at),
   });
   S.live.setHistory(undo, redo);
   S.editor = createEditor(sourcePane, {

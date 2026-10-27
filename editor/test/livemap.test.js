@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import MarkdownIt from 'markdown-it';
 import { wikiMarkdown } from '../web/src/mdext.js';
-import { alignToSource, caretToSource, diffText, sourceEdit } from '../web/src/livemap.js';
+import { alignToSource, caretToSource, diffText, imageSpan, sourceEdit } from '../web/src/livemap.js';
 
 const md = wikiMarkdown(new MarkdownIt({ html: true, linkify: true, typographer: false }));
 
@@ -81,6 +81,40 @@ describe('sourceEdit', () => {
 
   it('если текст не сопоставляется — отказ, а не порча исходника', () => {
     expect(sourceEdit('Ctrl+C', 'Ctrl+D', '++ctrl+c++')).toBeNull();
+  });
+});
+
+describe('imageSpan', () => {
+  const cut = (src, path) => {
+    const s = imageSpan(src, path);
+    return s === null ? null : src.slice(0, s.from) + src.slice(s.to);
+  };
+
+  it('убирает картинку из Markdown целиком', () => {
+    expect(cut('![Карта светодиодов](../assets/images/led.png)', '../assets/images/led.png')).toBe('');
+    expect(cut('До ![подпись](a.png) после', 'a.png')).toBe('До  после');
+  });
+
+  it('забирает и атрибуты за скобками', () => {
+    expect(cut('![a](a.png){ width="300" }', 'a.png')).toBe('');
+  });
+
+  it('понимает картинку в HTML', () => {
+    expect(cut('<p align="center"><img src="assets/images/logo.png" width="140"></p>', 'assets/images/logo.png')).toBe(
+      '<p align="center"></p>',
+    );
+  });
+
+  it('ищет с заданного места — одинаковые пути не находятся дважды', () => {
+    const src = '![a](x.png) и ![b](x.png)';
+    const first = imageSpan(src, 'x.png');
+    const second = imageSpan(src, 'x.png', first.to);
+    expect(src.slice(first.from, first.to)).toBe('![a](x.png)');
+    expect(src.slice(second.from, second.to)).toBe('![b](x.png)');
+  });
+
+  it('нет такой картинки — null', () => {
+    expect(imageSpan('![a](a.png)', 'b.png')).toBeNull();
   });
 });
 

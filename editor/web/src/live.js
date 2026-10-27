@@ -6,9 +6,13 @@
 // Пока каретка внутри блока, превью не перерисовывается, чтобы не прыгал курсор;
 // перерисовка — при переходе к другому блоку и при уходе из превью.
 
-import { caretToSource, sourceEdit } from './livemap.js';
+import { caretToSource, imageSpan, sourceEdit } from './livemap.js';
 
 const snapshots = new WeakMap();
+const imageLists = new WeakMap();
+
+/** Пути картинок блока — в том виде, в каком они записаны в Markdown. */
+const imagesOf = (el) => [...el.querySelectorAll('img')].map((i) => i.dataset.src || i.getAttribute('src') || '');
 
 // Части превью без своих строк в исходнике: заголовок admonition, ярлыки вкладок,
 // имя файла у блока кода. Их правку некуда перенести, поэтому они только для чтения.
@@ -16,7 +20,11 @@ const CHROME = '.admonition-title, .tabbed-labels, .filename, summary';
 
 /** Запомнить текст блоков — вызывается после каждой полной отрисовки превью. */
 export function markBlocks(preview) {
-  for (const el of preview.querySelectorAll('[data-line]')) snapshots.set(el, el.textContent);
+  for (const el of preview.querySelectorAll('[data-line]')) {
+    snapshots.set(el, el.textContent);
+    imageLists.set(el, imagesOf(el));
+    for (const img of el.querySelectorAll('img')) img.draggable = false;
+  }
   for (const el of preview.querySelectorAll(CHROME)) el.contentEditable = 'false';
 }
 
@@ -121,7 +129,7 @@ function shiftBlocks(preview, afterLine, delta) {
  * @param opts.rerender  (restore) => void — полная перерисовка превью
  * @param opts.notify    (text) => void — подсказка, когда блок правится только слева
  */
-export function enableLiveEdit(preview, { getView, rerender, notify }) {
+export function enableLiveEdit(preview, { getView, rerender, notify, onImages }) {
   const opts = {}; // команды отмены CodeMirror, см. setHistory
   let current = null; // блок, в котором каретка
   let dirty = false; // в текущем блоке есть неотрисованная правка
@@ -133,10 +141,44 @@ export function enableLiveEdit(preview, { getView, rerender, notify }) {
     typing = false;
   };
 
+  /**
+   * Удалённые в превью картинки — из исходника. У картинки нет текста, поэтому
+   * обычное сопоставление её пропадания не замечает, и при следующей отрисовке
+   * она возвращалась бы обратно.
+   */
+  function flushImages(el, view) {
+    const was = imageLists.get(el);
+    if (!was || !was.length) return;
+    const now = imagesOf(el);
+    const gone = [...was];
+    for (const path of now) {
+      const i = gone.indexOf(path);
+      if (i >= 0) gone.splice(i, 1);
+    }
+    if (!gone.length) return;
+    const range = blockRange(view, el);
+    if (!range) return;
+    let src = view.state.doc.sliceString(range.from, range.to);
+    const changes = [];
+    for (const path of gone) {
+      const span = imageSpan(src, path);
+      if (!span) continue;
+      changes.push({ from: range.from + span.from, to: range.from + span.to, insert: '' });
+      // затираем найденное, чтобы одинаковые пути не нашлись дважды
+      src = src.slice(0, span.from) + '\u0000'.repeat(span.to - span.from) + src.slice(span.to);
+    }
+    if (!changes.length) return;
+    changes.sort((a, b) => a.from - b.from);
+    view.dispatch({ changes });
+    imageLists.set(el, now);
+    snapshots.set(el, el.textContent);
+  }
+
   /** Переносит правку блока в исходник. true — перенесена или нечего переносить. */
   function flush(el) {
     const view = getView();
     if (!view || !el || !el.isConnected) return true;
+    flushImages(el, view);
     const before = snapshots.get(el);
     const after = el.textContent;
     if (before === undefined || before === after) return true;
@@ -380,17 +422,41 @@ export function enableLiveEdit(preview, { getView, rerender, notify }) {
   preview.contentEditable = 'true';
   preview.spellcheck = true;
 
-  // вставка — только текстом: иначе в превью попадёт чужой HTML, которому нет места
-  // в Markdown, а правка перестанет сопоставляться с исходником
+  /** Куда класть картинку: сразу после блока, в который её принесли. */
+  function insertPointFor(el) {
+    const view = getView();
+    if (!view) return null;
+    const range = el ? blockRange(view, el) : null;
+    return range ? range.to : view.state.doc.length;
+  }
+
+  function addImagesAt(files, el) {
+    if (current && dirty && !flush(current)) return revert(current);
+    const at = insertPointFor(el);
+    if (at !== null) onImages?.(files, at);
+  }
+
+  const imagesIn = (list) => [...(list || [])].filter((f) => f.type.startsWith('image/'));
+
+  // Вставка: картинка — в репозиторий и ссылкой в исходник, всё остальное — только
+  // текстом, иначе в превью попадёт чужой HTML, которому нет места в Markdown.
   preview.addEventListener('paste', (e) => {
     e.preventDefault();
+    const files = imagesIn(e.clipboardData?.files);
+    if (files.length) return addImagesAt(files, blockOf(preview, window.getSelection()?.anchorNode) || current);
     const text = e.clipboardData?.getData('text/plain');
     if (text) document.execCommand('insertText', false, text);
   });
 
-  // перетаскивание файлов и текста в превью: картинки добавляются кнопкой на панели
-  preview.addEventListener('drop', (e) => e.preventDefault());
+  // перетаскивание: картинка встаёт после того блока, на который её бросили
   preview.addEventListener('dragover', (e) => e.preventDefault());
+  preview.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const files = imagesIn(e.dataTransfer?.files);
+    if (!files.length) return;
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    addImagesAt(files, (under && blockOf(preview, under)) || current);
+  });
 
   return {
     /** Перерисовку превью снаружи придержать, пока в нём печатают. */

@@ -61,6 +61,28 @@ export function sourceEdit(before, after, src) {
   return { from, to, insert: inserted };
 }
 
+/**
+ * Границы записи картинки в исходнике по её пути: `![подпись](путь)`, `<img src="путь">`
+ * или `![подпись](путь){ width="300" }`. Нужны, чтобы удаление картинки в превью
+ * (у неё нет текста, и правка текста её не заметит) убрало её и из Markdown.
+ */
+export function imageSpan(src, path, from = 0) {
+  const at = src.indexOf(path, from);
+  if (at < 0) return null;
+
+  const md = src.lastIndexOf('![', at);
+  const close = src.indexOf(')', at);
+  if (md >= 0 && close > at && src.slice(md, close).includes('](')) {
+    const attrs = /^\s*\{[^}\n]*\}/.exec(src.slice(close + 1));
+    return { from: md, to: close + 1 + (attrs ? attrs[0].length : 0) };
+  }
+
+  const tag = src.lastIndexOf('<img', at);
+  const end = src.indexOf('>', at);
+  if (tag >= 0 && end > at) return { from: tag, to: end + 1 };
+  return null;
+}
+
 /** Позиция каретки (смещение в тексте блока) в координатах исходника блока. */
 export function caretToSource(text, src, offset) {
   const pos = alignToSource(text, src);
