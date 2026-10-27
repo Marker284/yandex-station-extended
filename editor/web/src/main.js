@@ -1003,6 +1003,12 @@ function doneScreen(res, payload) {
           ),
           steps,
           h(
+            'p',
+            { class: 'yse-done__close' },
+            icon('check', 14),
+            'Страницу можно закрыть: правка уже на GitHub, проверки и ревью идут без неё.',
+          ),
+          h(
             'div',
             { class: 'yse-actions' },
             h('a', { class: 'yse-btn yse-btn--primary', href: back }, 'Вернуться на страницу'),

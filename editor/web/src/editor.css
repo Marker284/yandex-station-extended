@@ -1181,6 +1181,21 @@ body:has(.yse-app) .md-footer {
     line-height: 1.65;
   }
 
+  /* «страницу можно закрыть» под списком шагов */
+  .yse-done__close {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 0;
+    color: var(--md-default-fg-color--light);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .yse-done__close .yse-icon {
+    color: var(--yse-ok);
+  }
+
   .yse-prcard {
     display: flex;
     align-items: center;
