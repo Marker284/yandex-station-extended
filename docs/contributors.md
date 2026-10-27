@@ -30,6 +30,7 @@
 | [@chkzz](https://github.com/chkzz) | [bt-proxy](recipes/bt-proxy.md): MPRIS-плееры как Bluetooth-источник Алисы; [AirPlay 2 на Лайт 2](recipes/airplay.md) вместе с Алисой ([#42](https://github.com/Marker284/yandex-station-extended/pull/42)) |
 | [@superkai-sdk1](https://github.com/superkai-sdk1) | Станция 2: [AirPlay 2 одним набором](recipes/airplay.md#station-2-bundle), общая с Алисой громкость, сторож OTA ([#43](https://github.com/Marker284/yandex-station-extended/pull/43)); [Spotify Connect](recipes/spotify.md) и голосовые команды ([#44](https://github.com/Marker284/yandex-station-extended/pull/44)); [Станция 2](devices/station-2.md#sound): устройства звука, кнопка Алисы и её состояния, цепочка OTA ([#45](https://github.com/Marker284/yandex-station-extended/pull/45)) |
 | [@theJorDea](https://github.com/theJorDea) | `contrib`: починка `spotify.sh` и `install-s97adb.sh`, защита бэкапов в `yandex-noupdate.sh` и `yandex-micro-kit.sh`, проверки в [`rollback.sh`](start/recovery.md) и 17 тестов ([#49](https://github.com/Marker284/yandex-station-extended/pull/49)) |
+| [@hertebeznat-cell](https://github.com/hertebeznat-cell) | [Мини 1: root и ADB по USB](start/root-mini1-usb.md) через Station Mini Root; починен якорь `#gpu-model` на странице Макс с Zigbee ([#46](https://github.com/Marker284/yandex-station-extended/pull/46)) |
 
 ## Данные для страниц моделей
 

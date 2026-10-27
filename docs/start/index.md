@@ -19,6 +19,7 @@
 | **Мини 3 (bergamot)** | [retail CA и маркеры из factory](retail-ca-mini3.md) — для сборок после 21.10.2026; старые — DNS-методом |
 | **Лайт 2 (Plum)** | [retail CA из factory](retail-ca.md) — патч CA-бандла в factory mode |
 | Мини 3 Про | способ пока не описан; как закрепить доступ (сохраняется только `/data`) — на [странице модели](../devices/station-mini3-pro.md) |
+| **Мини 1 (2019)**, `YNDX-0004` | кроме DNS-метода — [root и ADB по USB](root-mini1-usb.md) через Station Mini Root: без смены DNS и заводского сброса |
 | Станция 1-го поколения | [AliceBridge](root-android.md#station-1): постоянный root через свой образ `boot` |
 | Станция Макс | способа пока нет (Android-платформа) |
 | Станция 3 (orion) | [DNS-метод](root.md), как на других Amlogic; свой стенд колонка не примет — [почему](../devices/station-3.md#tls) |
