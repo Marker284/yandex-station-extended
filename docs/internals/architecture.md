@@ -38,7 +38,7 @@ S54default-bluez-agent  S60touch_buttons_settings  S70unbound  S98pstore-clear  
 |---|---|
 | `--platformd` | основной процесс; в том числе читает кнопки (`/dev/input/event1`) |
 | `--mediad` | плеер: ответы Алисы и музыка, вывод в ALSA |
-| `--telemetry` | телеметрия |
+| `--telemetry` | [телеметрия](telemetry.md): что собирает и куда отправляет |
 | `--fluent-bitd` | логи |
 | `--updatesd` | обновления (OTA); убирается при [отключении обновлений](../start/ssh.md#kill-ota) |
 | `--updater_gateway` | шлюз обновлятора через unix-сокет `/tmp/updater.sock` |
