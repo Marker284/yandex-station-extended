@@ -1,0 +1,23 @@
+#!/bin/sh
+# Автозапуск: SSH на 2222 и AirPlay 2. Загрузку не держит — ждёт /data и звуковую
+# карту в фоне (на раннем старте их ещё нет). Удалить файл — отключить автозапуск.
+AP=/data/local/opt/ap2
+wait_for() { # секунд условие...
+  n=$1; shift
+  i=0
+  while [ "$i" -lt "$n" ] && ! "$@"; do i=$((i+1)); sleep 1; done
+}
+case "$1" in
+  start)
+    (
+      wait_for 120 test -x "$AP/ap2.sh"
+      "$AP/ap2.sh" ssh
+      wait_for 120 test -e /dev/snd/pcmC0D0p
+      "$AP/ap2.sh" start
+    ) </dev/null >/dev/null 2>&1 &
+    ;;
+  stop)
+    [ -x "$AP/ap2.sh" ] && "$AP/ap2.sh" stop
+    ;;
+esac
+exit 0
