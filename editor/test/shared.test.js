@@ -120,6 +120,13 @@ describe('paths', () => {
     expect(addToNav(mkdocs, 'Нет такого', 'x', 'docs/x/y.md')).toBeNull();
   });
 
+  it('заголовок с переводом строки не подделывает пункты nav', () => {
+    const out = addToNav(mkdocs, 'Рецепты', 'Строка\n      - Подделка', 'docs/recipes/x.md');
+    expect(out.split('\n').length).toBe(mkdocs.split('\n').length + 1);
+    expect(out).toContain('"Строка\\n      - Подделка": recipes/x.md');
+    expect(out).not.toContain('- Подделка: recipes/x.md');
+  });
+
   it('вставка в раздел с вложенными группами', () => {
     const out = addToNav(mkdocs, 'Начало работы', 'Новый шаг', 'docs/start/new.md');
     const lines = out.split('\n');

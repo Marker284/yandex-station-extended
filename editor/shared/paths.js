@@ -139,7 +139,9 @@ export function navSections(yml) {
 }
 
 function yamlKey(title) {
-  return /^[^\s"'#&*!|>%@`{}[\],?:-][^:#]*$/.test(title) && !/\s$/.test(title)
+  // Перевод строки и управляющие символы всегда в кавычки: иначе заголовок
+  // с \n вставил бы в nav лишний пункт.
+  return /^[^\s"'#&*!|>%@`{}[\],?:-][^:#]*$/.test(title) && !/\s$/.test(title) && !/[\u0000-\u001f]/.test(title)
     ? title
     : JSON.stringify(title);
 }
