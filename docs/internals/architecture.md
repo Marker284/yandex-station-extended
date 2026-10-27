@@ -94,7 +94,7 @@ LD_LIBRARY_PATH=/system/vendor/quasar:libs ./maind --gst-launch \
 | `/system/vendor/quasar/quasar.cfg` | конфиг всех демонов (адреса, звук, VQE, громкость) |
 | `/system/vendor/quasar/ota_script.pub` | ключ проверки подписи OTA |
 | `/data/quasar/devices.json` | ключи и токены устройства — **никогда не публикуйте** |
-| `/data/quasar/activate_adb_quasmodrom`, `activate_network_adb` | маркеры автозапуска ADB |
+| `/data/quasar/activate_adb_quasmodrom`, `activate_network_adb` | маркеры автозапуска ADB; на старых сборках — `/data/quasar_activate_*`, см. [шаг 1](../start/ssh.md#perm-adb) |
 | `/data/quasar/daemons_logs/` | логи: `maind.log`, `mediad.log`, `yiod.log`, `wifid.log`, `updatesd.log` … |
 | `/etc/asound.conf` | маршрутизация звука ALSA |
 

@@ -30,7 +30,7 @@
 | ISA | ARMv8.2 (atomics, fphp, asimdhp, asimddp, lrcpc, dcpop) |
 | ОЗУ | **~980 МБ** (MemTotal 997788 kB; в DT `memory` = `0x3F800000`) |
 | Ядро | Linux **5.4.180** aarch64, Linaro GCC 6.3.1 |
-| Userspace | Buildroot **2023.11.1** (заметно новее, чем у AXG-моделей) |
+| Userspace | Buildroot **2023.11.1** (заметно новее, чем у AXG-моделей); на [factory-6](#factory-6) — 2020.02.1 |
 | Хранилище | **eMMC** HS400, 8 бит (MTD пуст, UBI не используется), см. [разделы](#partitions) |
 | NPU | **Vivante VIPNano-Q** (`galcore`) — нейроускоритель; GPU нет |
 | DSP | **Cadence HiFi4** (`hifi4dsp`) @ 800 МГц + аппаратный VAD |
@@ -47,6 +47,7 @@
 |---|---|---|---|
 | снимок 1 | 3.21 (`0.369.1.46.4778262955.20261013`) | 20261013 | — |
 | снимок 2 | `0.369.1.50.4794663100.20261021.160` | 21.10.2026 | `01.01.261021.115421` |
+| [factory-6](#factory-6) | `0.6.1.40.1928882720.20230914.factory-6` | 14.09.2023 | `01.01.230914.220025` |
 
 ## Чем принципиально отличается
 
@@ -221,6 +222,26 @@ arecord -D hw:0,1 -f S32_LE -c 4 -r 96000 -t raw > /tmp/mics.raw   # S16_LE то
 | ota | `mmcblk0p11` | 1.5G | ext4, `/ota` — `swupdate.*`, `data/wpa_supplicant.conf`, `data/quasar` |
 | data | `mmcblk0p12` | 2.8G | ext4, `/data` |
 
+Что смонтировано на [factory-6](#factory-6) (`/proc/mounts`, `/etc/fstab`):
+
+| Точка | Раздел | ФС, режим |
+|---|---|---|
+| `/` | system | ext4, `ro` |
+| `/tee` | tee | ext4, `ro` |
+| `/ota` | ota | ext4, `rw,noatime` |
+| `/data` | data | ext4, `rw,noatime` |
+
+- `/` ядро монтирует в `ro`, а строка `::sysinit:/bin/mount -o remount,rw /` в
+  `/etc/inittab` закомментирована. Правки корня — через `mount -o remount,rw /`, после
+  перезагрузки они сохраняются (см. [factory-6](#factory-6)).
+- `/data` — отдельный раздел (2.5 ГБ), а не `/bkupgrade/data`, как на
+  [Лайте](station-lite.md). `/bkupgrade` — ссылка на `/ota`.
+
+!!! danger "Разделы открыты на запись"
+    У всех разделов `ro=0`, у самого eMMC и загрузочных областей `mmcblk0boot0/1` (в них
+    U-Boot) — `force_ro=0`. Ничто не мешает `dd` затереть загрузчик: не пишите в блочные
+    устройства напрямую.
+
 !!! warning "Личные данные"
     Кроме `data`, личное лежит в **`ota`** (пароли Wi-Fi, состояние quasar — в том числе
     в удалённых блоках), **`env`** (серийник, `cpu_id`), **`reserved`** (unifykeys:
@@ -265,13 +286,77 @@ CPU-регулятор `vddcpu0` — PWM, 0.689…1.049 В; governor `schedutil`
 quasar-роли на снимке: `--platformd`, `--mediad`, `--loggerd` (на AXG-моделях
 логирование было `--telemetry` / `--fluent-bitd`).
 
+## Заводская прошивка factory-6 { #factory-6 }
+
+!!! info "Проверено на `0.6.1.40.1928882720.20230914.factory-6`"
+    Колонка с завода не обновлялась. Root — [DNS-методом](../start/root.md), дальше — шаги
+    [SSH и отключение обновлений](../start/ssh.md). Ниже — отличия от снимков `0.369`
+    выше на странице.
+
+| | `0.369` (снимки выше) | factory-6 |
+|---|---|---|
+| Buildroot | 2023.11.1 | 2020.02.1, userspace 64-битный (`busybox` — ELF64) |
+| Verified boot | `androidboot.verifiedbootstate=green` | в `/proc/cmdline` нет, device-mapper не используется |
+| Роли quasar | `--platformd`, `--mediad`, `--loggerd` | без `--platformd`, см. ниже |
+| Правки корня после перезагрузки | не проверялось | **сохраняются** (`/system/vendor/quasar`, `/etc/init.d`) |
+| Маркеры ADB | — | старая схема `/data/quasar_activate_*`, см. [ADB](#factory-6-adb) |
+| `yandex-noupdate.sh` | — | ключ и заглушка ставятся, `updatesd` остаётся, см. [Обновления](#factory-6-ota) |
+| Dropbear из `contrib/bin` | — | работает (сборка armhf, в ядре `CONFIG_COMPAT=y`), SSH поднят к 23-й секунде загрузки |
+
+Задачи в `/system/vendor/quasar/launch.json`: `updatesd`, `wifid`, `mediad`, `telemetry`,
+`maind` (`--cucumber`), `glagold`, `fluent-bitd`, `fluent-bit`, `calld`, `begemot`. Роли
+`--platformd` нет; судя по имени задачи, основной процесс здесь — `maind --cucumber`
+*(вывод)*. Логирование, как на AXG-моделях, — `--telemetry` / `--fluent-bitd`.
+
+### Обновления { #factory-6-ota }
+
+`yandex-noupdate.sh` подменяет ключ и заглушает `device_ota_update.sh`, а правку `launch.json`
+отбраковывает: проверка результата требует `--platformd`, которого в этой сборке нет. Файл
+остаётся исходным, `status` показывает `updatesd ПРИСУТСТВУЕТ`. Сама вырезка блока корректна:
+та же awk-программа на копии файла даёт валидный JSON без `updatesd`.
+
+Пока `updatesd` работает, колонка обращается за обновлениями. Установку должны блокировать
+ключ и заглушка; реальную попытку установки на factory-6 не наблюдали.
+
+Блок `updatesd` убирали и вручную: он первый в `tasks`, после удаления файл остаётся валидным
+JSON. После перезагрузки стартуют остальные девять задач, `updatesd.log` больше не пишется.
+Ошибка в `launch.json` может помешать запуску Алисы, поэтому правьте копию, проверьте её
+JSON-парсером на ПК и только потом записывайте на место. Оригинал —
+`/data/opt/backup/launch.json.orig`. ADB при этом не пропадёт: `onboot.sh` поднимает его до
+запуска `quasar_launcher2`.
+
+### ADB { #factory-6-adb }
+
+`adb_options.inc` этой сборки читает маркеры в корне `/data`:
+`/data/quasar_activate_adb_quasmodrom` и `/data/quasar_activate_network_adb`. Файлы
+`/data/quasar/activate_*` из [шага 1](../start/ssh.md#perm-adb) она не читает. `onboot.sh`
+маркеры не чистит.
+
+Конфиг без раздела `adbd` выключает ADB командой `activate_adb.sh --quasmodrom deactivate`:
+она удаляет маркеры и останавливает `adbd`. В `/data/quasar/quasar_adb.log` это
+`Deactivate adb by quasmodrom config`; на этой колонке так случилось, когда она связалась с
+настоящим бэкендом. Закрепить маркеры:
+
+```sh
+chattr +i /data/quasar_activate_adb_quasmodrom /data/quasar_activate_network_adb
+```
+
+- С флагом `deactivate` не может удалить маркеры, пишет `adb still activated` и выходит,
+  не останавливая `adbd`. Проверено запуском той же команды вручную и перезагрузкой; с
+  настоящим бэкендом — не проверялось.
+- Включение ADB конфигом тоже перестаёт срабатывать (`touch` по неизменяемому файлу). На
+  работу это не влияет: `adbd` уже запущен при загрузке.
+- Вернуть: `chattr -i` для тех же файлов.
+
 ## Что ещё проверить
 
 - Формат кадра LED-framebuffer'ов и анимаций сегментов циферблата.
 - Zigbee: точная модель Telink и можно ли использовать его как полноценный
   Zigbee-координатор.
 - USB-C PD: что отдаёт `husb238`, профили питания.
-- Отключение OTA и durable-доступ на ядре 5.4 / eMMC-rootfs.
+- Отключение OTA и правки корня на `0.369` (`verifiedbootstate=green`); на factory-6 правки
+  сохраняются, см. [factory-6](#factory-6).
+- Что стирает сброс к заводским настройкам: `/data` здесь — отдельный раздел eMMC.
 
 ---
 
