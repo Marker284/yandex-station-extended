@@ -23,7 +23,8 @@
 | Индикация | кольцо **6 RGB-зон** + **LED-часы**, оба на **IS31FL3236** |
 | Радио | **Unisoc UWE5621** (модули `uwe5621_bsp_sdio`, `sprdwl_ng`, `sprdbt_tty`) |
 | Выход на наушники | есть (`AML-AUGESOUND Headphones`) |
-| quasar | 3.21 (`0.369.1.25…20260928`, `0.369.1.46…20261013`) |
+| quasar | 3.21 (`0.369.1.25…20260928`, `0.369.1.46…20261013`); стоковая на 26.10.2026 — `0.372.1.13…20261021` (стенд не принимает) |
+| factory-образ | `0.17.1.32.1145264292.20211203.factory-3` (после сброса) |
 | Температура | `soc_thermal` ~42 °C в простое |
 
 ## Отличия от Станции Лайт
@@ -53,6 +54,17 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
 и Micron `MT29F2G08-A` (OOB 64). rootfs — ubifs **RO** (dm-verity не применён → durable-правки
 возможны, см. [Доступ](../start/ssh.md)).
 
+## Прошивка и root { #firmware }
+
+- Стоковая `0.372.1.13.4794674157.20261021.302` не доверяет сертификату стенда (TLS-алерт
+  `unknown_ca`). Root получается через [свой стенд](../start/root.md#local-stand): сброс до
+  factory `0.17.1.32…`, затем стенд откатывает её на `0.369.1.46.4778262943.20261013.299`.
+- OTA-файл Мини 2 — архив **cpio newc** (начинается с `070702`), а не zip, хотя по ссылке он
+  называется `.zip`. `crc32` совпадает с `metadata.json`, в конце нули.
+- После возврата обычного DNS Quasar выключает ADB при синхронизации с облаком
+  (`Deactivate adb by quasmodrom config`), SSH остаётся — см.
+  [шаг 7](../start/root.md#restore-dns).
+
 ## Шина I2C и периферия
 
 | Шина:адрес | Чип | Назначение |
@@ -71,6 +83,13 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
 - **Кольцо, 6 RGB-зон**: `/sys/class/leds/mini2:{red,green,blue}:ring{1..6}` (18 каналов).
 - **LED-часы**: `/sys/class/leds/mini2:white:clock*` — сегменты `clockA1`…`clockG4`, `clockDEGREE`,
   `clockMINUS`, `clockPLUS1`…`clockPLUS4`.
+- Framebuffer нет (`/dev/fb*` отсутствует), у всех светодиодов `trigger` = `none`: прошивка
+  сама пишет `brightness` в sysfs. Поэтому понять, что кольцо занято Алисой, можно только по
+  значениям `brightness`; способ «смотреть на кадр прошивки в `/dev/fb0`», как на Станции 2 и
+  Мини 3, здесь не работает.
+- Заглушить родные часы можно bind-mount своих файлов поверх `.../clock*/brightness`. Двоеточие
+  в пути источника BusyBox `mount` принимает за NFS-адрес (`mount: bad address
+  '/tmp/x/mini2'`), поэтому в именах файлов-заглушек двоеточий быть не должно.
 - Всё пишется из userspace напрямую (sysfs, root). Готовый скрипт для кольца —
   [`contrib/install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh).
 - Формат анимаций прошивки — `.led` (как на Лайте, но 6 зон вместо 3): см.
@@ -86,12 +105,24 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
 
 ## Вход
 
-- `sar0_pad0` — касание через SAR-сенсор AW96103.
+- `sar0_pad0` (`/dev/input/event0`) — касание через SAR-сенсор AW96103. Коды клавиш:
+  `KEY_VOLUMEDOWN` 114, `KEY_VOLUMEUP` 115, `KEY_VOICECOMMAND` 582 (активация Алисы).
+  Прошивка читает это устройство, поэтому записанные в него события `input_event` она
+  обрабатывает как нажатия.
 - `AML-AUGESOUND Headphones` — детектор подключения наушников.
 - Отдельного `gpio-keys` нет (на Лайте — `gpio-keys-filter`).
+
+## Окружение
+
+- iptables `1.8.3 (legacy)` без модуля `multiport` (`Couldn't load match 'multiport'`) и без
+  `LOG` (`unknown option "--log-prefix"`). Правила для нескольких портов пишите по одному на
+  порт, а для отладки считайте пакеты правилами со счётчиком (`-m comment`).
+- Порты `maind --platformd`: `tcp 1961` (glagol), `tcp/udp 7447` (Zenoh), `tcp 5081` (SIP для
+  звонков) — как на Лайт, см. [Сеть](../internals/network.md).
 
 ## Что ещё проверить на этой модели
 
 - Точный формат `.led` для 6 зон.
-- Отключение OTA — по общей схеме: [шаг 2](../start/ssh.md#kill-ota).
+- Отключение OTA по общей схеме ([шаг 2](../start/ssh.md#kill-ota)) работает: после
+  `yandex-noupdate.sh` `updatesd` не запускается, `0.369.1.46…299` держится после перезагрузок.
 - Карту регистров ES8156 / SY6045S через `i2cdump` (аккуратно).
