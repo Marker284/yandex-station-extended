@@ -1039,6 +1039,9 @@ body:has(.yse-app) .md-footer {
     outline: none;
     caret-color: var(--md-primary-fg-color);
     cursor: text;
+    /* как на сайте: переводы строк из разметки markdown-it не должны быть видны
+       (Chrome для contenteditable="plaintext-only" навязывал white-space: pre-wrap) */
+    white-space: normal;
   }
 
   .yse-preview[contenteditable] [data-line]:hover {

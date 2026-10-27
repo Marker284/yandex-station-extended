@@ -319,6 +319,52 @@ export function enableLiveEdit(preview, { getView, rerender, notify }) {
     if (again) focusBlock(again, again.textContent.length);
   });
 
+  /** Обернуть выделение в превью разметкой (`**`, `*`, `` ` ``) — прямо в исходнике. */
+  function wrapSelection(marker) {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+    const el = blockOf(preview, sel.anchorNode);
+    if (!el || blockOf(preview, sel.focusNode) !== el) {
+      notify?.('Выделение вышло за один блок — разметка ставится в левой панели.');
+      return;
+    }
+    if (!flush(el)) return revert(el);
+    const view = getView();
+    const range = blockRange(view, el);
+    if (!view || !range) return;
+    const src = view.state.doc.sliceString(range.from, range.to);
+    const text = el.textContent;
+    const r = sel.getRangeAt(0);
+    const from = caretToSource(text, src, offsetIn(el, r.startContainer, r.startOffset));
+    const to = caretToSource(text, src, offsetIn(el, r.endContainer, r.endOffset));
+    if (from === null || to === null || to <= from) return revert(el);
+    const line = Number(el.dataset.line);
+    const end = offsetIn(el, r.endContainer, r.endOffset);
+    view.dispatch({
+      changes: [
+        { from: range.from + from, insert: marker },
+        { from: range.from + to, insert: marker },
+      ],
+    });
+    rerender();
+    focusBlock(preview.querySelector(`[data-line="${line}"]`), end);
+  }
+
+  // Ctrl+B/I/K браузер превратил бы в <b>/<i>, которым нет места в Markdown
+  preview.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.shiftKey) return;
+    const marker = { KeyB: '**', KeyI: '*', KeyE: '`' }[e.code];
+    if (marker) {
+      e.preventDefault();
+      wrapSelection(marker);
+      return;
+    }
+    if (e.code === 'KeyU' || e.code === 'KeyK') {
+      e.preventDefault();
+      notify?.(e.code === 'KeyK' ? 'Ссылку ставит кнопка на панели или левая панель.' : 'Подчёркивания в разметке вики нет.');
+    }
+  });
+
   preview.addEventListener('focusout', () => {
     if (preview.contains(document.activeElement)) return;
     if (current && dirty && !flush(current)) return revert(current);
@@ -327,11 +373,24 @@ export function enableLiveEdit(preview, { getView, rerender, notify }) {
     if (had) rerender();
   });
 
-  // плашки, у которых нет своих строк в исходнике (заголовок admonition, ярлыки
-  // вкладок, имя файла у блока кода) — только для чтения, иначе правка некуда деться
-  preview.contentEditable = 'plaintext-only';
-  if (preview.contentEditable !== 'plaintext-only') preview.contentEditable = 'true';
+  // Обычный contenteditable, не plaintext-only: для plaintext-only Chrome навязывает
+  // white-space: pre-wrap, и переводы строк из разметки markdown-it становятся видны —
+  // отступы расходятся с сайтом. Вставку из буфера и форматирование браузером,
+  // ради которых был plaintext-only, закрываем сами (ниже).
+  preview.contentEditable = 'true';
   preview.spellcheck = true;
+
+  // вставка — только текстом: иначе в превью попадёт чужой HTML, которому нет места
+  // в Markdown, а правка перестанет сопоставляться с исходником
+  preview.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = e.clipboardData?.getData('text/plain');
+    if (text) document.execCommand('insertText', false, text);
+  });
+
+  // перетаскивание файлов и текста в превью: картинки добавляются кнопкой на панели
+  preview.addEventListener('drop', (e) => e.preventDefault());
+  preview.addEventListener('dragover', (e) => e.preventDefault());
 
   return {
     /** Перерисовку превью снаружи придержать, пока в нём печатают. */
