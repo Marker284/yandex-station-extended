@@ -19,7 +19,7 @@
 | `tcp 1961` | glagol (`glagold`) — локальный API управления |
 | `tcp 5555` | ADB (после [получения root](../start/index.md#root-by-model)) |
 | `tcp 2222` | SSH, Dropbear (после [шага 2](../start/ssh.md)) |
-| `tcp 5081` | сервис прошивки (назначение не изучали) |
+| `tcp 5081` | SIP-телефония Алисы (звонки) — транспорт pjsip, открыт только во время звонка/регистрации; см. [Звонки Алисы](calls.md) |
 | `tcp/udp 7447` | Zenoh |
 | `udp 5353` | mDNS (`maind --platformd`); свой avahi рядом — см. [Подводные камни](gotchas.md#avahi) |
 | `udp 11125` | `net_clock` |
