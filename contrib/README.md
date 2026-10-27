@@ -132,3 +132,10 @@ sh contrib/spotify.sh <IP>:5555 --install   # проверка, затем ус�
 * **[`install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh)** — управление 6 RGB-зонами Станции Мини 2.
 * **[`smiley_editor.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/smiley_editor.py)** — визуальный редактор пиксельных смайликов и анимаций часов.
 * **[`ring.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/ring.sh)** — прямое управление кольцевой подсветкой через `/dev/fb0` на Станции Мини 3.
+
+### Zigbee через quasard
+
+* **[`quasard-zigbee-operator.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/quasard-zigbee-operator.py)** —
+  пример серверного расширения quasard для сопряжения Zigbee на одной Миди через бинарный
+  Alice API. Установка, ограничения и примеры команд —
+  [Zigbee на Миди с quasard](https://hackalice.me/internals/zigbee/).
