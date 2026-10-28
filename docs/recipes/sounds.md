@@ -98,6 +98,10 @@ sync; mount -o remount,ro /
 
 ## Системные звуки
 
+На свежих прошивках (проверено на Мини 2, 0.369.1.50) системные звуки лежат в `/data/quasar/data/sounds/{common,ru-RU}/*.opus` — это rw-раздел (`/data` — симлинк на `/bkupgrade/data`), замена не требует `remount,rw`. Путь `/system/vendor/quasar/sounds/` относится к старым сборкам и factory-образам — там корень придётся перемонтировать.
+
+Сигнал отклика на «Алису» берётся из набора `seam_activation_feedback_1..9.opus`: какой прозвучит, решает секция `activation_feedback_player` в `quasar.cfg` (`probabilities`, значения 11–100, по виду кумулятивные). Формат файлов — Opus 48 кГц, моно.
+
 Лежат в `/system/vendor/quasar/sounds/`: `common/` (общие: `spotter_start.opus`,
 `spotter_cancel.opus`, `volume_sound.opus`, `notification_sound.opus`, `timer.opus`,
 `calls_*`…) и `ru-RU/` (фразы). Формат — Ogg Opus.
