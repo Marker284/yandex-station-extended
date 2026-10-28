@@ -182,6 +182,7 @@ nav:
   - Как это устроено:
       - Архитектура прошивки: internals/architecture.md
       - Сеть и порты: internals/network.md
+      - Звонки Алисы (порт 5081): internals/calls.md
       - Голосовой тракт Алисы: internals/voice.md
       - Телеметрия: internals/telemetry.md
       - Директивы и capabilities: internals/directives.md
