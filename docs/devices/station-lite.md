@@ -8,9 +8,9 @@
 [Как это устроено](../internals/architecture.md). Здесь — только то, что специфично для
 железа этой модели.
 
-## Платформа в двух словах
+## Платформа в двух словах { #platform }
 
-| | |
+| Что | Значение |
 |---|---|
 | SoC | **Amlogic AXG (A113-семейство)**, `amlogic, axg` |
 | CPU | 4× ARM Cortex-A53 (part `0xd03` r0p4), до **1.2 ГГц**, governor `interactive` |
@@ -30,7 +30,7 @@
     удобнее собирать статикой под **aarch64/musl** — см.
     [Сборка софта](../internals/toolchain.md).
 
-### Kernel cmdline
+### Kernel cmdline { #cmdline }
 
 ```text
 androidboot.serialno=... androidboot.deviceid=... androidboot.localization=RU.RU
@@ -43,7 +43,32 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 [UART](../start/recovery.md#serial)), `otg_device=1` (Type-C в режиме device — host-режим
 включается в рантайме, см. [USB Host](../recipes/usb-host.md)), `ramoops.*` (pstore для крэш-логов).
 
-## Карта флеша (MTD / UBI)
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | работает | [подмена DNS](../start/root.md) |
+| USB Host (OTG) | работает | [USB Host](../recipes/usb-host.md) |
+| AirPlay | не проверялось | — |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | работает | [Свои звуки](../recipes/sounds.md) |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
+| YAM | работает | [YAM и BetterYAM](../recipes/yam.md#betteryam) |
+| Своя LLM | не проверялось | — |
+
+## Получение root { #root }
+
+- Основной способ — [DNS-метод](../start/root.md). Сброс у Лайт свой: сначала подать питание,
+  потом сразу зажать кнопку паузы до жёлто-зелёной подсветки.
+- На сборках после 21 октября 2026 года (`0.369.1.50…`) —
+  [свой сервер обновлений на компьютере](../start/root.md#local-stand)
+  с откатом: сброс грузит factory-образ из `recovery` (`0.5.1.20…20230208.factory-4`), сервер
+  ставит ему `0.369.1.46.4778262442.20261013.297`, и уже эта сборка включает ADB с root.
+- Дальше — [SSH и отключение обновлений](../start/ssh.md).
+
+## Разделы флеша { #partitions }
 
 ```text
 mtd0  "bootloader"  2 MB     U-Boot / BL2+BL3x
@@ -68,7 +93,7 @@ recovery, rsv, system, tee` (`instaboot` — snapshot/hibernation, `misc` — re
   сюда ставится свой софт (`/data/opt`).
 - `/tmp`, `/run`, `/dev/shm` — tmpfs. `/tee` — jffs2 RO на разделе `nv`.
 
-## Шина I2C и периферия
+## Шина I2C и периферия { #i2c }
 
 Две шины Meson I2C: `i2c-0` (`ffd1f000.i2c`, домен EE/cbus) и `i2c-1`
 (`ff805000.i2c`, домен AO/aobus).
@@ -95,7 +120,7 @@ recovery, rsv, system, tee` (`instaboot` — snapshot/hibernation, `misc` — re
     Запись в усилитель (`0x2a`) или SAR-сенсор (`0x12`) может сорвать работу Алисы.
     Делать осознанно и с бэкапом регистров (`i2cdump`).
 
-## LED-кольцо
+## Индикация { #led }
 
 - `/sys/class/leds/micro:{red,green,blue}:ring{1,2,3}` — **3 RGB-зоны**, яркость
   0–255, пишется из userspace напрямую (sysfs, root).
@@ -120,7 +145,7 @@ RRGGBB  RRGGBB  RRGGBB   1000   # цвет ring1 ring2 ring3  +  длитель�
 тривиально пишется руками → можно делать свои анимации (см.
 [Рецепты](../recipes/led.md)).
 
-## Звуковой тракт
+## Звук { #audio }
 
 - ALSA card0 `AML-AUGESOUND`:
   - `device 0` — `TDM-B` → усилитель NTP8910A (playback **и** capture);
@@ -131,7 +156,7 @@ RRGGBB  RRGGBB  RRGGBB   1000   # цвет ring1 ring2 ring3  +  длитель�
 - Утилиты: `aplay`, `arecord` (запись с микрофонов), `alsamixer`, `alsactl`.
 - Громкость: `/system/vendor/quasar/set_volume.sh N` = `amixer set Master N%`.
 
-## Прочее железо
+## Прочее железо { #hardware }
 
 - **GPIO**: `gpiochip0` (AO, 497–511), `gpiochip1` (EE, 411–496). Именованные:
   `pdn` (power-down усилителя), `sdio_wifi`, `bt_rfkill`, `aw9110_shdn`, `3V3 WLAN`.
@@ -141,21 +166,13 @@ RRGGBB  RRGGBB  RRGGBB   1000   # цвет ring1 ring2 ring3  +  длитель�
 - **Вход**: `event0` = `gpio-keys-filter` (физическая кнопка), `event1` = `sar0_pad0`
   (касание через SAR-сенсор).
 
-## Получение root { #root }
-
-- Основной способ — [DNS-метод](../start/root.md). Сброс у Лайт свой: сначала подать питание,
-  потом сразу зажать кнопку паузы до жёлто-зелёной подсветки.
-- На сборках после 21 октября 2026 года (`0.369.1.50…`) — [свой стенд](../start/root.md#local-stand)
-  с откатом: сброс грузит factory-образ из `recovery` (`0.5.1.20…20230208.factory-4`), стенд
-  ставит ему `0.369.1.46.4778262442.20261013.297`, и уже эта сборка включает ADB с root.
-- Дальше — [SSH и отключение обновлений](../start/ssh.md).
-
-## Что проверено именно на этой модели
+## Что проверено именно на этой модели { #tested }
 
 - rootfs RW без verity → durable-правки переживают ребут.
 - Отключение OTA тремя правками rootfs — работает после перезагрузки.
 - Сетевой ADB поднимается по маркерам `/data/quasar/activate_adb_*` + `activate_network_adb`.
 - `maind --gst-launch` играет через родной GStreamer.
-- USB Host (OTG) через хаб с питанием: флешки/SSD, Ethernet RTL8153, USB-звук — [рецепт](../recipes/usb-host.md).
+- USB Host (OTG) через хаб с питанием: флешки/SSD, Ethernet RTL8153, USB-звук —
+  описано в [рецепте USB Host](../recipes/usb-host.md).
 
 Подробности методов — в разделе [«Как это устроено»](../internals/architecture.md).

@@ -10,32 +10,35 @@
     распознавание речи (ASR) и понимание (VINS/Megamind) — **в облаке** (`withLocalVins: false`).
     Без доступа к `uniproxy` колонка не превращает речь в текст.
 
-```text
- 4 PDM-микрофона ─┐                       maind --platformd (aliced)
- (ALSA card0 dev2 │   ┌──────────────┐    ┌─────────────────────────────────────┐
-  "dmicarray",    ├──►│ Yandex VQE   │───►│ канал vqe_0 (16 кГц, моно)          │
-  48 кГц, 4 кан.) │   │ AEC + beam-  │    │  ├─ activation spotter "алиса"/"яндекс"
- петля динамика ──┘   │ forming + NS │    │  ├─ counteractivation (ложные срабатывания)
- raw_spk_0/1          └──────────────┘    │  ├─ command spotter (стоп/громче/…)
- (эталон для эхоподавления)               │  └─ bio: ECAPA-TDNN голосовой отпечаток,
-                                          │          пол/возраст (tflite)
-                                          └──────────────┬──────────────────────┘
-                                   срабатывание "Алиса"  │ earcon + LED
-                                                         ▼
-                              SpeechKit: Opus-кодирование (OggOpusEncoder)
-                                                         │
-                  wss://uniproxy.alice.yandex.net/uni.ws │ protobuf (useProtoAliceApi),
-                                                         │ сжатие zstd
-                                                         ▼
-                ┌──────────────── облако Яндекса ────────────────────────┐
-                │ VoiceInput → ASR (модель quasar-general, partials)      │
-                │   → AsrResult (текст) → VINS/Megamind (смысл, навыки)   │
-                │   → AliceResponse (директивы) + TtsSpeak (речь, Opus)   │
-                └────────────────────────────┬───────────────────────────┘
-                                             ▼
-                   directive_sequencer → capabilities (музыка → mediad,
-                   уведомления, будильники, громкость, GeoSync, …)
-                   TTS → audio_client: appsrc ! opusparse ! opusdec ! alsasink
+```mermaid
+flowchart TD
+    subgraph capture["Захват и очистка звука"]
+        MIC["4 PDM-микрофона<br>(ALSA card0 dev2, 48 кГц)"] --> VQE["Yandex VQE<br>(эхо-, шумоподавление, beamforming)"]
+        SPK["Петля динамика raw_spk_0/1<br>(эталон для эхоподавления)"] --> VQE
+    end
+
+    subgraph platformd["maind --platformd (aliced)"]
+        VQE --> VQE0["Канал vqe_0<br>(16 кГц, моно)"]
+        VQE0 --> ACT["activation spotter<br>«Алиса» / «Яндекс»"]
+        VQE0 --> CNT["counteractivation<br>(фильтр ложных срабатываний)"]
+        VQE0 --> CMD["command spotter<br>(стоп, громче и другие команды)"]
+        VQE0 --> BIO["bio: ECAPA-TDNN<br>(отпечаток, пол, возраст)"]
+    end
+
+    ACT -->|"срабатывание (earcon + LED)"| OPUS["OggOpusEncoder<br>(сжатие в Opus)"]
+
+    subgraph cloud["Облако Яндекса (uniproxy)"]
+        OPUS -->|"WebSocket: uni.ws<br>(Protobuf + zstd)"| VI["VoiceInput"]
+        VI --> ASR["ASR: quasar-general<br>(распознавание речи)"]
+        ASR -->|"AsrResult (текст)"| VINS["VINS / Megamind<br>(смысл и навыки)"]
+        VINS -->|"AliceResponse (директивы)"| RESP["Директивы"]
+        VINS -->|"TtsSpeak (речь, Opus)"| TTS["Синтез речи"]
+    end
+
+    subgraph playback["Исполнение на колонке"]
+        RESP --> SEQ["directive_sequencer<br>(mediad, громкость, будильники)"]
+        TTS --> AUDIO["audio_client (GStreamer)<br>appsrc ! opusdec ! alsasink"]
+    end
 ```
 
 ## 1. Захват звука — `audiod`
@@ -73,7 +76,8 @@
 
 ## 4. Активация → поток в облако (SpeechKit)
 
-- На срабатывание: earcon (`playStartVoiceInputEarcon`, `activation_feedback_player`) и анимация LED.
+- На срабатывание: звуковой сигнал earcon (`playStartVoiceInputEarcon`,
+  `activation_feedback_player`) и анимация светодиодов.
 - `RecognizerSession`/`Recorder` → `OggOpusEncoder` → `UniProxyImpl` по WebSocket на `uniProxyUrl`.
 - Протокол: **protobuf Alice API** (`useProtoAliceApi: true`), сжатие **zstd** (`wsUseZstd: true`).
 - Соединение держится постоянно (в логе `UniProxyProtocolState … PongTimeoutElapsed` при обрывах).
@@ -82,7 +86,8 @@
 |---|---|
 | `VoiceInput`, `TextInput`, `AsrRecognize`, `LogSpotter`, `MatchedUser`, `TtsGenerate` | `InputStartAck`, `AsrResult`, `SpotterValidation`, `AliceResponse`, `TtsSpeak`, `TtsTimings` |
 
-- `SpotterValidation` — сервер перепроверяет ключевое слово по присланному аудио *(вывод по названию)*.
+- `SpotterValidation` — сервер перепроверяет ключевое слово по присланному аудио
+  *(вывод по названию)*.
 - `vadEnabled: false` → конец фразы определяет **сервер**, а не локальный VAD.
 
 ## 5. Облако
@@ -100,6 +105,26 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   `appsrc ! opusparse ! opusdec ! volume ! alsasink`. Музыка — в `maind --mediad`.
 - Текстовые запросы (из приложения) идут как `Vins.TextInput` и **минуют ASR**.
 
+## Звук активации { #activation-sound }
+
+Короткий сигнал, который станция проигрывает при обращении, звучит **в начале ответа**, а не на
+срабатывании. Прошивка играет сохранённый звук на директиву `tts_play_placeholder` из
+`AliceResponse` (`client_action`, payload `{"channel": "Dialog"}`, `IsLedSilent: true`): в логе —
+`routeDirective … tts_play_placeholder.activation via AliceCapability`, директива завершается
+`completed=SUCCESS` через одну–две секунды, заметно позже `onPhraseSpotted`.
+
+Управляет им настройка «звук активации» в приложении: она приходит с синхронизацией аккаунта
+в конфиг станции, в `account_config` это флаг `jingle` (подробно о `"jingle": false` —
+[Mini 3 Pro, «Звук»](../devices/station-mini3-pro.md#audio)). При выключенной настройке станция
+молчит и на срабатывании, и на ответе; `playStartVoiceInputEarcon` при этом не звучит ни в каком
+состоянии — отдельного звука «на слово» у прошивки нет.
+
+Для своего uniproxy-сервера звук доступен без root: достаточно присылать ту же директиву в ответе.
+Проверено на Станции Лайт (quasar 0.369.1.46.4778262442.20261013.297) с подменённым `uniProxyUrl`
+на эмулятор uniproxy ([quasard](../recipes/llm.md#quasard) с бэкендом своего ассистента): станция
+проигрывает свой сохранённый джингл на ответ эмулятора так же, как на ответ облака. Какой именно
+файл она при этом играет, не проверялось.
+
 ## Отправка аудио помимо запросов
 
 `audiosender` держит кольцевой буфер `historySeconds: 10` по всем 7 каналам.
@@ -116,14 +141,14 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   `vqe_0`/`raw_mic_*` живут внутри `maind`, ALSA-устройство `hw:0,2` занято `audiod`
   *(одновременный захват не проверялся)*.
 - **Произнести свой текст** проще всего локально — через API glagol на порту 1961, как это
-  делает интеграция YandexStation для Home Assistant (см. [Сеть → glagol](network.md#glagol));
-  для Plum также проверен [вызов `START_VOCALIZE` через SSH](../recipes/sounds.md#native-tts).
+  делает интеграция YandexStation для Home Assistant — см. [Сеть → glagol](network.md#glagol).
+  Для Plum также проверен [вызов `START_VOCALIZE` через SSH](../recipes/sounds.md#native-tts).
   Оба варианта используют облачный синтез; из облака ответ приходит как `AliceResponse.TtsSpeak`.
-- **Подмена адреса**: пиннинга сертификатов нет (см. [Подводные камни](gotchas.md)),
-  `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS.
+- **Подмена адреса**: пиннинга сертификатов нет — см. [Подводные камни](gotchas.md).
+  Параметр `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS.
 - **Рабочий пример** — [quasard](../recipes/llm.md#quasard): свой uniproxy (JSON и protobuf
   `AAPI`), ASR, LLM и TTS вместо облака.
 
-!!! warning "Приватность"
+!!! warning "Колонка может отправлять фрагменты звука в облако"
     Колонка постоянно держит соединение с облаком, а для «beta»-групп может отправлять случайные
-    звуковые фрагменты. При изоляции это стоит учитывать.
+    звуковые фрагменты. Учитывайте это при изоляции колонки от внешнего интернета.

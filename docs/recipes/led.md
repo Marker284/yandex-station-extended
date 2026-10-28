@@ -4,13 +4,13 @@
 
 | Модель | Как устроено | Где описано |
 |---|---|---|
-| Лайт | 3 RGB-зоны кольца через sysfs | ниже |
+| Лайт | 3 RGB-зоны кольца через sysfs | [управление через sysfs](#lite-led) |
 | Лайт 2 / Plum | 3 RGB-зоны через sysfs; штатный trigger `led_ring_fb` | [временное управление](#plum-led) |
 | Мини 2 | 6 RGB-зон + LED-часы через sysfs | [`contrib/install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh), [страница модели](../devices/station-mini2.md) |
 | Станция 2 | панель из 88 светодиодов через framebuffer `/dev/fb0` (`89×1`) | [страница модели](../devices/station-2.md#led) |
 | Мини 3 | кольцо через framebuffer `/dev/fb0` | [страница модели](../devices/station-mini3.md), [`contrib/ring.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/ring.sh) |
 
-## Станция Лайт: sysfs
+## Станция Лайт: sysfs { #lite-led }
 
 Зоны — `/sys/class/leds/micro:{red,green,blue}:ring{1,2,3}`, яркость 0–255:
 
@@ -105,15 +105,19 @@ ssh alice 'rm /data/opt/alice-led/indicator.sh && rmdir /data/opt/alice-led'
 
 ## Анимации прошивки: формат `.led`
 
-Анимации лежат в `/system/vendor/quasar/ledpatterns/*.led` (на Лайт — 33 штуки:
-`alice_listening`, `alice_speaking`, `timer`, `volume`, `bluetooth_*`, `error` …).
-Формат текстовый:
+Анимации лежат в `/system/vendor/quasar/ledpatterns/*.led` — на Лайт их 33:
+`alice_listening`, `alice_speaking`, `timer`, `volume`, `bluetooth_*`, `error` и другие.
+Формат текстовый и пишется руками: строка на кадр, в ней цвета зон и длительность.
+Разбор с примером — на [странице Лайт](../devices/station-lite.md#led-format).
 
-```text
-gammacorrection          # применять гамма-коррекцию
-loop                     # зациклить
-1D761D  1D761D  1D761D   1000   # цвет зон ring1 ring2 ring3 и длительность кадра, мс
-2D8624  2D8624  2D8624   1000
-```
+## Откат { #rollback }
 
-Подробнее — на [странице Лайт](../devices/station-lite.md#led-format).
+- Освободить подсветку и вернуть штатные анимации — записать `0` в файл владения
+  (см. [команды и возврат анимаций](#plum-led-ownership)).
+- Демонстрационный обработчик — завершить и удалить:
+
+    ```sh
+    ssh alice 'rm /data/opt/alice-led/indicator.sh && rmdir /data/opt/alice-led'
+    ```
+
+Системные файлы и автозапуск рецепт не меняет, поэтому ничего больше возвращать не нужно.

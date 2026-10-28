@@ -1,25 +1,15 @@
 # JBL Link Music (с Алисой)
 
 Колонка **JBL Link Music** со встроенной Алисой. Внутри другой мир, чем у Станций: SoC
-**MediaTek** (`mediatek,mt8167`, платформа `aud8516`), **32-битное** ядро 4.4 и **Yocto** с
+**MediaTek** (`mediatek,mt8167`, платформа aud8516), **32-битное** ядро 4.4 и **Yocto** с
 systemd вместо Buildroot. Поверх — тот же quasar/`maind`.
 
 Каталоги `/vendor/wiimu` и имя хоста `A118SmartAudio_XXXX` указывают на модуль **LinkPlay**
 (WiiMu) — на нём построена колонка.
 
-## Получение root { #root }
+## Платформа в двух словах { #platform }
 
-[ADB по USB на старте](../start/root-jbl-link-music.md): после включения ADB по USB
-несколько секунд работает с root. В это окно ставятся маркеры, после которых ADB работает по
-сети (`5555`) и переживает перезагрузку. Нужен только кабель Micro-USB — сервисный разъём
-под резиновой подложкой на дне.
-
-В [AliceBridge](../start/root-android.md) есть профиль `jbl_link_music`, но полный проход на
-этой модели не проверен.
-
-## Платформа в двух словах
-
-| | |
+| Что | Значение |
 |---|---|
 | SoC | **MediaTek MT8516** (в device-tree — `MT8167`, `mediatek,mt8167`; `androidboot.hardware=aud8516p1_linux`) |
 | CPU | 4× **Cortex-A35** (`0xd04`), 1040 / 1196 / **1300 МГц** |
@@ -34,12 +24,36 @@ systemd вместо Buildroot. Поверх — тот же quasar/`maind`.
 | Прошивка quasar | `1.80.0.228.3676124705.20251219` |
 | UART | `ttyS0`, **921600** бод (`console=ttyS0,921600n1`) |
 
-!!! warning "32-битная платформа"
-    Как и на [Станции Стрит](station-street.md), здесь всё 32-битное. Сборки под `aarch64`
-    (пакеты [`.yap`](../start/packages.md#yap), [YAM](../recipes/yam.md), `fastfetch` из
-    вики) не запустятся — нужны сборки под ARMv7.
+!!! warning "Сборки под aarch64 не запустятся"
+    Как и на [Станции Стрит](station-street.md), здесь всё 32-битное — нужен ARMv7. Это касается пакетов [`.yap`](../start/packages.md#yap),
+    YAM и утилиты `fastfetch` из вики.
 
-## Флеш и разделы { #partitions }
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | работает | [ADB по USB на старте](../start/root-jbl-link-music.md) |
+| USB Host (OTG) | не проверялось | — |
+| AirPlay | не проверялось | — |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | не проверялось | — |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | не проверялось | — |
+| YAM | не проверялось | — |
+| Своя LLM | не проверялось | — |
+
+## Получение root { #root }
+
+[ADB по USB на старте](../start/root-jbl-link-music.md): после включения ADB по USB
+несколько секунд работает с root. В это окно ставятся маркеры, после которых ADB работает по
+сети через порт 5555 и переживает перезагрузку. Нужен только кабель Micro-USB — сервисный разъём
+под резиновой подложкой на дне.
+
+В [AliceBridge](../start/root-android.md) есть профиль `jbl_link_music`, но полный проход на
+этой модели не проверен.
+
+## Разделы флеша { #partitions }
 
 Разметка A/B: загрузочный образ, TEE и корень — в двух копиях.
 
@@ -58,14 +72,14 @@ systemd вместо Buildroot. Поверх — тот же quasar/`maind`.
 
 Монтирование:
 
-- `/` — `ubi0:aud8516m3v4-slc-32b-rootfs`, UBIFS **ro**. В снятом отчёте `ubi.mtd=9`, то есть
-  активен слот `ROOTFS2`;
-- `/data` и `/var` — один том `useradata`, UBIFS `rw,sync`: всё, что пишется сюда, сразу
-  уходит на флеш и переживает перезагрузку;
-- `/factory` — `rw,sync`, заводские данные. Не трогайте;
+- `/` — `ubi0:aud8516m3v4-slc-32b-rootfs`, UBIFS `ro`. В отчёте активен слот `ROOTFS2`
+  (`ubi.mtd=9`);
+- `/data` и `/var` — один том `useradata`, UBIFS `rw,sync`: данные сразу уходят на флеш
+  и сохраняются после перезагрузки;
+- `/factory` — `rw,sync`, заводские данные. Не изменяйте;
 - `/tmp` — tmpfs, очищается при перезагрузке.
 
-## Шина I2C и периферия
+## Шина I2C и периферия { #i2c }
 
 | Шина:адрес | Чип | Назначение |
 |---|---|---|
@@ -75,10 +89,10 @@ systemd вместо Buildroot. Поверх — тот же quasar/`maind`.
 | `1-0060` | **SYM827** | регулятор питания (DC-DC) |
 | `2-0048` | **TAS5782M** | усилитель класса D |
 
-Кнопки: `mtk-kpd` (клавиатурный контроллер SoC), `mtk-pmic-keys` (питание), `gpio-keys`.
-В `/sys/class/leds` отчёт устройств не нашёл.
+Кнопки: `mtk-kpd` (клавиатура SoC), `mtk-pmic-keys` (питание) и `gpio-keys`.
+В каталоге `/sys/class/leds` устройств нет.
 
-## Звук
+## Звук { #audio }
 
 Одна карта `mt-snd-card`:
 
@@ -96,19 +110,19 @@ systemd вместо Buildroot. Поверх — тот же quasar/`maind`.
 | `00-10` | `ULM_Capture` | захват |
 | `00-11` | `SPDIF_OUT Playback` | воспроизведение, S/PDIF |
 
-## Прошивка
+## Прошивка { #firmware }
 
 - quasar запускается с ролями `--calld`, `--glagold`, `--mediad`, `--updatesd`, `--wifid`,
   `--yiod`;
-- ADB — `android-tools-adbd.service` (systemd); сетевой режим включается файлом
-  `/data/network_adb`, подробнее — в [гайде по root](../start/root-jbl-link-music.md);
+- ADB — сервис `android-tools-adbd.service` (systemd); сетевой режим включается файлом
+  `/data/network_adb`, инструкция — в [руководстве по root](../start/root-jbl-link-music.md);
 - датчики температуры: `mtktscpu`, `mtktspmic`, `mtktsAP` (в отчёте 58–73 °C), `mtktswmt`.
 
-## Что ещё проверить
+## Что ещё проверить { #todo }
 
 - Как отключить обновления на Yocto-прошивке (роль `--updatesd`, конфиг запуска quasar).
 - Какие из маркеров ADB, кроме `/data/network_adb`, реально нужны.
-- Можно ли перемонтировать `/` в `rw` и сохраняются ли правки в корне.
-- Работает ли `dropbear` из `contrib/bin` (armhf) и Entware для ARMv7.
+- Можно ли перемонтировать корень `/` в `rw` и сохраняются ли правки.
+- Работает ли `dropbear` из каталога `contrib/bin` (сборка `armhf`) и Entware для ARMv7.
 
 Есть данные — [дополните](../contributing.md).
