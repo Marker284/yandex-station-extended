@@ -1,9 +1,11 @@
 #!/bin/sh
 # hackalice.me/install.sh — short address for the YAM installer (https://github.com/nyakokitsu/yam).
 # GitHub Pages cannot do HTTP redirects, so this script fetches the current install.sh from the
-# YAM repository and runs it with the same arguments:
+# YAM repository and runs it with the same arguments and environment:
 #   curl -fsSL https://hackalice.me/install.sh | sh
-#   curl -fsSL https://hackalice.me/install.sh | sh -s -- --uninstall
+#   curl -fsSL https://hackalice.me/install.sh | sh -s -- 0.1.15
+#   curl -fsSL https://hackalice.me/install.sh | sh -s -- --remove-old
+#   curl -fsSL https://hackalice.me/install.sh | YAM_PLATFORM=yandexmini_2 sh
 set -eu
 URL=https://raw.githubusercontent.com/nyakokitsu/yam/refs/heads/main/install.sh
 tmp=$(mktemp "${TMPDIR:-/tmp}/yam-install.XXXXXX")

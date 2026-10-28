@@ -75,18 +75,12 @@ BetterYAM **0.1.18** (октябрь 2026). Если что-то разошло�
 
         Веб-панель — `http://192.168.1.120:8099` в браузере.
 
-    Конкретная версия и удаление CLI:
+    Конкретная версия, явная платформа и удаление старого `yamd` из `/data/quazar/yam`:
 
     ```powershell
-    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Version 0.1.13
-    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Uninstall
-    ```
-
-    `-Uninstall` в Windows-установщике удаляет только CLI на компьютере. `yamd` с колонки
-    уберите вручную:
-
-    ```powershell
-    adb shell "kill `$(cat /data/quazar/yam/yamd.pid); rm -rf /data/quazar/yam"
+    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) 0.1.15
+    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Platform yandexmini_2
+    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -RemoveOld
     ```
 
 === "Linux / macOS"
@@ -109,11 +103,12 @@ BetterYAM **0.1.18** (октябрь 2026). Если что-то разошло�
     CLI ставится в `~/.local/bin/yam`. Если команда не находится, добавьте папку в `PATH`:
     `export PATH="$HOME/.local/bin:$PATH"` в `~/.bashrc` или `~/.zshrc`.
 
-    Конкретная версия и удаление (CLI и `yamd` на колонке):
+    Конкретная версия, явная платформа и удаление старого `yamd` из `/data/quazar/yam`:
 
     ```sh
-    curl -fsSL https://hackalice.me/install.sh | sh -s -- 0.1.13
-    curl -fsSL https://hackalice.me/install.sh | sh -s -- --uninstall
+    curl -fsSL https://hackalice.me/install.sh | sh -s -- 0.1.15
+    curl -fsSL https://hackalice.me/install.sh | YAM_PLATFORM=yandexmini_2 sh
+    curl -fsSL https://hackalice.me/install.sh | sh -s -- --remove-old
     ```
 
 Что делает установщик:
