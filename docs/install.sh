@@ -1,13 +1,12 @@
 #!/bin/sh
 # hackalice.me/install.sh — short address for the YAM installer (https://github.com/nyakokitsu/yam).
 # GitHub Pages cannot do HTTP redirects, so this script fetches the current install.sh from the
-# YAM repository and runs it with the same arguments.
-# Pinned to v0.1.19: the installer on main belongs to YAM v2, which has no release yet
-# and fails with "Не найден релиз канала yam-v".
+# YAM repository (branch main) and runs it with the same arguments and environment:
 #   curl -fsSL https://hackalice.me/install.sh | sh
-#   curl -fsSL https://hackalice.me/install.sh | sh -s -- --uninstall
+#   curl -fsSL https://hackalice.me/install.sh | sh -s -- --remove-old
+#   curl -fsSL https://hackalice.me/install.sh | YAM_PLATFORM=yandexmini_2 sh
 set -eu
-URL=https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.sh
+URL=https://raw.githubusercontent.com/nyakokitsu/yam/refs/heads/main/install.sh
 tmp=$(mktemp "${TMPDIR:-/tmp}/yam-install.XXXXXX")
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
 if command -v curl >/dev/null 2>&1; then
