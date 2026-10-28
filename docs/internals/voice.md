@@ -105,6 +105,26 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   `appsrc ! opusparse ! opusdec ! volume ! alsasink`. Музыка — в `maind --mediad`.
 - Текстовые запросы (из приложения) идут как `Vins.TextInput` и **минуют ASR**.
 
+## Звук активации { #activation-sound }
+
+Короткий сигнал, который станция проигрывает при обращении, звучит **в начале ответа**, а не на
+срабатывании. Прошивка играет сохранённый звук на директиву `tts_play_placeholder` из
+`AliceResponse` (`client_action`, payload `{"channel": "Dialog"}`, `IsLedSilent: true`): в логе —
+`routeDirective … tts_play_placeholder.activation via AliceCapability`, директива завершается
+`completed=SUCCESS` через одну–две секунды, заметно позже `onPhraseSpotted`.
+
+Управляет им настройка «звук активации» в приложении: она приходит с синхронизацией аккаунта
+в конфиг станции, в `account_config` это флаг `jingle` (подробно о `"jingle": false` —
+[Mini 3 Pro, «Звук»](../devices/station-mini3-pro.md#audio)). При выключенной настройке станция
+молчит и на срабатывании, и на ответе; `playStartVoiceInputEarcon` при этом не звучит ни в каком
+состоянии — отдельного звука «на слово» у прошивки нет.
+
+Для своего uniproxy-сервера звук доступен без root: достаточно присылать ту же директиву в ответе.
+Проверено на Станции Лайт (quasar 0.369.1.46.4778262442.20261013.297) с подменённым `uniProxyUrl`
+на эмулятор uniproxy ([quasard](../recipes/llm.md#quasard) с бэкендом своего ассистента): станция
+проигрывает свой сохранённый джингл на ответ эмулятора так же, как на ответ облака. Какой именно
+файл она при этом играет, не проверялось.
+
 ## Отправка аудио помимо запросов
 
 `audiosender` держит кольцевой буфер `historySeconds: 10` по всем 7 каналам.
