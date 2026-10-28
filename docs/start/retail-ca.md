@@ -288,11 +288,13 @@ mount -t ubifs -o rw ubi2:rootfs /mnt/retail
 
 ```sh
 TARGET=/mnt/retail/system/vendor/quasar/certs/ca-certificates.crt
+test -f "$TARGET" || TARGET=/mnt/retail/system/vendor/quasar/ca-certificates.crt
 test -f "$TARGET" && echo OK
 mount | grep '/mnt/retail'
 ```
 
-Ожидается `OK` и режим `rw`.
+Ожидается `OK` и режим `rw`. На части сборок каталога `certs` нет, и файл лежит прямо
+в `/mnt/retail/system/vendor/quasar/` — вторая строка это учитывает.
 
 Если раздел подключился как ro:
 
@@ -422,4 +424,4 @@ reboot
 | Приложение пишет «не удалось настроить Алису» | Нормально: смотрите лог eQuasar, важны запросы Quasar и появление ADB, а не экран приложения |
 | `adb connect` не подключается | Проверьте актуальный IP после загрузки сервисного режима, отсутствие изоляции клиентов на точке доступа (AP isolation), доступность портов 80 и 443 и работу подмены DNS |
 | `ubiattach` сообщает, что устройство уже подключено | Не повторяйте команду: найдите существующий том `ubiN:rootfs` через `ubinfo -a` |
-| Файл CA не найден | Проверьте путь `/mnt/retail/system/vendor/quasar/certs/ca-certificates.crt` в выбранном томе. Если файла нет — остановитесь и не трогайте другие разделы |
+| Файл CA не найден | Проверьте путь `/mnt/retail/system/vendor/quasar/certs/ca-certificates.crt` в выбранном томе. Каталога `certs` может не быть — тогда файл лежит в корне: `/mnt/retail/system/vendor/quasar/ca-certificates.crt`. Если нет и там — остановитесь и не трогайте другие разделы |
