@@ -1,24 +1,28 @@
 # AirPlay (Shairport Sync)
 
-Станция как приёмник **AirPlay 2** для iPhone, iPad и Mac. Скрипт
-[`contrib/yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)
-чинит две известные проблемы уже установленного пакета AirPlay.
+Станция как приёмник **AirPlay 2** для iPhone, iPad и Mac. Путей три, выберите свой.
 
-!!! info "Проверено на Станции Мини 3"
-    `shairport-sync 4.3.7` (AirPlay 2) + `nqptp 1.2.4`. На других моделях пути те же,
-    а патч `airplayd` применяется, только если байты в нужном месте совпадают.
+| Колонка | Что делаем |
+|---|---|
+| Мини 3 с уже установленным пакетом `/data/shairport` | [чиним две известные проблемы скриптом](#fix) |
+| Лайт 2 (Plum) | [своя сборка, AirPlay виден Алисе как Bluetooth-телефон](#lite2) |
+| Станция 2 | [готовый набор из исходников](#station-2-bundle) |
 
-## Что нужно заранее
+## Починка готового пакета { #fix }
 
-- root по ADB ([шаг 1](../start/root.md));
-- установленный пакет AirPlay в `/data/shairport` (`airplay.sh`, `airplayd`, `ap2/shairport-sync-ap2`).
+**Проверено на Станции Мини 3:** `shairport-sync 4.3.7` (AirPlay 2) + `nqptp 1.2.4`.
+На других моделях пути те же, а патч `airplayd` применяется, только если байты
+в нужном месте совпадают.
 
-!!! note "Откуда взять пакет `/data/shairport`"
-    Инструкции по установке самого пакета в вики пока нет. Если знаете источник —
-    [дополните страницу](../contributing.md). Другой путь — своя сборка shairport-sync без
-    `/data/shairport`, см. [Станция Лайт 2](#lite2).
+Скрипт [`contrib/yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)
+чинит две проблемы уже установленного пакета AirPlay. Нужны:
 
-## Установка фикса
+- доступ root по ADB — [шаг 1](../start/root.md);
+- сам пакет в `/data/shairport`: `airplay.sh`, `airplayd`, `ap2/shairport-sync-ap2`.
+  Откуда его взять, в вики пока не описано — [подскажите](../contributing.md), если знаете.
+
+### Установка фикса
+
 
 С компьютера:
 
@@ -37,7 +41,7 @@
 После переустановки пакета AirPlay (`airplay.sh setup`) запустите скрипт ещё раз —
 конфиг пересоздаётся без хуков.
 
-## Использование
+### Использование
 
 На iPhone/Mac в той же Wi-Fi-сети: «Пункт управления» → AirPlay → выберите колонку.
 
@@ -45,12 +49,10 @@
 примерно через 2 секунды. Play надёжнее нажимать с телефона: после возврата Алисы
 кнопку на колонке могут поймать оба демона.
 
----
-
-## Что чинит скрипт
+### Что чинит скрипт
 
 1. **AirPlay подключается, но звука нет** (или он появляется только после смены трека).
-   `airplayd` зависает в функции часов (`time()`/`localtime_r`) и перестаёт читать
+   `airplayd` зависает при вызове `time()` или `localtime_r()` и перестаёт читать
    `/tmp/sps.fifo`, а `shairport-sync` блокируется на записи. Скрипт патчит 4 байта по
    смещению 7344 и убирает этот вызов. Побочный эффект: может перестать обновляться время
    на дисплее (если важно — `--no-patch`).
@@ -58,14 +60,12 @@
    `maind --platformd`. Скрипт ставит хуки `shairport-sync`: на старте воспроизведения
    quasar (Алиса) останавливается, на паузе/остановке — запускается снова.
 
----
-
 ## Станция Лайт 2: AirPlay 2 как Bluetooth-источник Алисы { #lite2 }
 
-!!! info "Проверено на Станции Лайт 2 (plum), прошивка 0.369.1.50"
-    shairport-sync 5.6.2 (своя сборка: AirPlay 2, MPRIS, soxr) + nqptp 1.2.9 + avahi 0.8
-    из Entware + [bt-proxy](bt-proxy.md). iPhone, iPad и Mac, вместе с настоящим
-    Bluetooth-телефоном; автозапуск — перезагрузкой. На других моделях не проверялось.
+**Проверено на Станции Лайт 2 (plum, прошивка 0.369.1.50):** `shairport-sync 5.6.2`
+(своя сборка: AirPlay 2, MPRIS, soxr) + `nqptp 1.2.9` + `avahi 0.8` из Entware +
+[bt-proxy](bt-proxy.md). iPhone, iPad и Mac, вместе с настоящим Bluetooth-телефоном;
+автозапуск — перезагрузкой. На других моделях не проверялось.
 
 Пакет `/data/shairport` не нужен, Алиса не выключается. Через [bt-proxy](bt-proxy.md) она видит
 AirPlay как подключённый Bluetooth-телефон «AirPlay» и управляет им штатно: сама останавливает
@@ -73,7 +73,7 @@ AirPlay как подключённый Bluetooth-телефон «AirPlay» и 
 «пауза», «продолжи», «тише» уходят в AirPlay. Звук AirPlay идёт через штатную цепочку Алисы
 (`default` → `Master` → dmix 48 кГц), так что её ответы звучат поверх музыки.
 
-### Установка
+### Установка { #lite2-install }
 
 Нужны root по SSH и [`yse`](../start/packages.md). С компьютера, одной командой:
 
@@ -82,16 +82,17 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
 ```
 
 [`install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh)
-ставит avahi из Entware, [bt-proxy](bt-proxy.md), готовую сборку shairport-sync + nqptp
-([`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz)),
-конфиги и автозапуск, отключает D-Bus-активацию `org.bluez`. `airplay_device_id` (MAC `wlan0`) и
-имя хоста для avahi (`YandexLite-gen2-<deviceid>`) вычисляет на колонке; имя можно задать
-явно: `AP_HOSTNAME=… sh install.sh …`. Откат — `sh install.sh <IP> --uninstall --reboot`.
+ставит avahi из Entware, [bt-proxy](bt-proxy.md), готовую сборку shairport-sync + nqptp.
+Архив — [`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz).
+Скрипт ставит конфиги и автозапуск, отключает D-Bus-активацию `org.bluez`.
+Значение `airplay_device_id` (MAC `wlan0`) и имя хоста для avahi (`YandexLite-gen2-<deviceid>`)
+вычисляются на колонке; имя можно задать явно: `AP_HOSTNAME=… sh install.sh …`.
+Откат — `sh install.sh <IP> --uninstall --reboot`.
 
-??? note "Собрать и поставить вручную"
+??? example "Собрать и поставить вручную"
     1. Соберите shairport-sync и nqptp в Docker —
        [`contrib/airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile).
-       Кросс-сборка под armhf в Debian buster: glibc 2.28 не новее системной (2.30), поэтому
+       Кросс-сборка под `armhf` в Debian buster: glibc 2.28 не новее системной (2.30), поэтому
        бинарники работают на штатной libc и штатной `libasound`; ffmpeg (только AAC/ALAC) и
        libplist — статически, ещё 9 библиотек — в `lib/` рядом (2,4 МБ вместе с бинарниками).
        Готовый архив собран им же:
@@ -108,8 +109,8 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
        [`contrib/airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)
        — в `/data/opt/airplay/`; в `shairport-sync.conf` — `airplay_device_id`, MAC `wlan0` без
        двоеточий.
-    4. `/opt/etc/avahi/avahi-daemon.conf` — имя хоста, которое объявляет `maind`
-       ([почему](../internals/gotchas.md#avahi)):
+    4. `/opt/etc/avahi/avahi-daemon.conf` — имя хоста, которое объявляет `maind`.
+       Причина описана в [разделе про avahi](../internals/gotchas.md#avahi):
 
         ```ini
         [server]
@@ -149,24 +150,114 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
   dmix с системной 1.2.1.2 (`unable to create IPC shm instance`). Подложить ему системную
   `libasound` нельзя — ей нужна `GLIBC_2.29`, у Entware 2.27.
 
-### Ограничения
+### Ограничения { #lite2-limits }
 
 - Что источник исполняет «дальше» и «назад», зависит от него: команды уходят в shairport по
   MPRIS, а оттуда по каналу событий AirPlay 2.
 - Громкость с iPhone и Алисы проверялась командами «тише»; двигает ли Алиса ползунок на
   iPhone, не проверялось.
 - Есть YAM-плагин [Station-airplay](https://github.com/Yandex-Station-Universal-Repo/Station-airplay)
-  с часами и подсветкой, но на Лайт 2 он работает в режиме «только AirPlay»: подготовка
-  хоста выключает Алису.
+  с часами и подсветкой. С версии 1.4.4 он заявляет общий с Алисой звук на Лайт 2, Лайт,
+  Станции 2, Мини, Мини 2, Мини 3 и Мини 3 Про: на Лайт 2 плагин по умолчанию забирает часы
+  и подсветку, а ключ `--shared-audio` включает общий режим без своего интерфейса. В вики
+  это не проверялось; плагин работает под демоном `yamd`, то есть под [старой версией
+  YAM](yam.md).
 
----
+## Станция 2: AirPlay 2 одним набором { #station-2-bundle }
 
-## Идеи со Станции 2 { #station-2 }
+**Проверено на Станции 2 (yandexmidi, прошивка 0.369.1.50 от 21.10.2026):**
+`shairport-sync 5.6.2` (AirPlay 2) и `nqptp 1.2.9`, собраны из исходников. Схема: своя шина
+D-Bus, avahi с именем хоста колонки, распорядитель звука — [почему именно
+так](#station-2).
 
-!!! warning "Проверено на Станции 2 (`yandex,station-midi`), на Мини 3 не проверялось"
-    Ниже — не замена рецепту, а три приёма из [репозитория про Станцию 2](https://github.com/derangedabbot/yandex-station-2-airplay),
-    где AirPlay 2 собирается из исходников. Подробный разбор — `docs/03-airplay.md` там же.
-    Пути к демонам, порты и способ запуска у каждой модели свои: сверяйте, прежде чем копировать.
+Скрипты — [`contrib/station2-media`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station2-media).
+Что в них сделано иначе:
+
+- **Один каталог `/data/local/opt/ap2`.** Всё собрано под musl, а `patchelf` прописывает
+  бинарникам интерпретатор `/data/local/opt/ap2/lib/ld-musl-aarch64.so.1` и `RUNPATH`
+  `$ORIGIN/../lib`: они запускаются напрямую, без обёртки с загрузчиком и без
+  `LD_LIBRARY_PATH`, который ломал бы 32-битные программы Яндекса.
+- **Одна громкость с Алисой.** Звук AirPlay идёт через `softvol` на регуляторе Алисы
+  `Master Playback Volume`, а `shairport-sync` двигает этот же регулятор
+  (`mixer_control_name = "Master"`): сенсорная панель, голос и ползунок iPhone меняют одну
+  громкость.
+- **Установка за короткое окно ADB.** По ADB уходит только SSH (меньше 1 МБ), остальное — по SSH.
+  На Станции 2 загрузка 15 МБ по ADB шла 100 с и обрывалась вместе с окном.
+- **Сторож обновлений** `/etc/init.d/S96otaguard` на корневой ФС: переживает сброс колонки,
+  подробности — ниже.
+
+### Сборка
+
+Docker на Linux или macOS (Apple Silicon — `colima start --arch aarch64 --vm-type vz`):
+
+```sh
+cd contrib/station2-media/build
+docker run --rm --platform linux/arm64 -v "$PWD:/work" -v "$PWD/out:/out" \
+  alpine:3.24 sh /work/ap2-build.sh
+```
+
+Внутри: минимальный статический ffmpeg (только `aac` и `alac`), `nqptp`, `shairport-sync` с
+`--with-airplay-2`, avahi, dbus, dropbear и alsa-utils из пакетов Alpine, замыкание библиотек
+и `patchelf`. Результат — `build/out/ap2/{bin,lib}`, около 14 МБ. Версии `shairport-sync` и
+`nqptp` должны совпадать по интерфейсу памяти (`smi11` у обоих).
+
+### Установка { #station-2-install }
+
+Нужен доступ root по ADB — [шаг 1](../start/root.md).
+Установщик запускают сразу, как только открылся порт `5555`:
+
+```sh
+cd contrib/station2-media
+./install.sh <IP колонки>              # SSH по ADB, затем всё остальное по SSH
+./install.sh <IP колонки> --ssh-only   # повторно, когда SSH уже есть
+```
+
+Что делает:
+
+- ключ `~/.ssh/yandex_station2` и dropbear на `2222`, вход только по ключу;
+- [`yandex-noupdate.sh`](../start/ssh.md#kill-ota) и сторож обновлений, оригиналы файлов —
+  рядом со скриптом, в `backup/ota`;
+- набор в `/data/local/opt/ap2`, автозапуск `/etc/init.d/S97ap2`;
+- имя хоста для avahi берёт из mDNS колонки (`hostname` у неё другой).
+
+На колонке: `/data/local/opt/ap2/ap2.sh start|stop|restart|status`.
+
+### Громкость
+
+- Регулятор `Master Playback Volume` (моно, 0–255) Алиса двигает через `set_volume.sh` →
+  `amixer set Master N%`. Системный `softvol` создаёт его **без шкалы в дБ**, поэтому
+  `ap2.sh start` один раз открывает свой `softvol` на этом регуляторе с пустым выходом
+  (`pcm.ap2prime`): шкала появляется и держится до перезагрузки.
+- Шкала выхода — 36 дБ. На системных 51 дБ четверть ползунка — почти тишина, а вся слышимая
+  громкость сжата в верхнюю половину.
+- `shairport-sync` идёт с `chrt -r 30`: без реального времени звук делит процессор с демонами
+  Яндекса.
+
+### Обновления
+
+`yandex-noupdate.sh` подменяет ключ, заглушает `device_ota_update.sh` и убирает `updatesd`. На
+Станции 2 есть ещё одно звено: `device_ota_update.sh` вызывает `/usr/bin/apply_packed_ota`,
+который кладёт образ в `/bkupgrade/ota/yandex_io_ota.swu`, ставит
+`fw_setenv boot_to_recovery 1` и перезагружает колонку в recovery. `S96otaguard` раз в 2 минуты
+возвращает заглушки (эталоны — в `/etc/otaguard`), гасит `updatesd`, удаляет скачанные образы
+и сбрасывает `boot_to_recovery`. Разрешить штатное обновление: `touch /data/local/allow_ota`.
+
+### Ограничения { #station-2-limits }
+
+- Пока играет AirPlay, медиа-демон Алисы остановлен: её плеер и голос молчат, после сессии
+  возвращаются через пару секунд.
+- После каждой сессии приёмник перезапускается, чтобы отпустить ALSA, — на несколько секунд
+  колонка пропадает из списка AirPlay.
+- В «Доме» колонка добавляется как AirPlay-динамик, но плеера и кнопок на её плитке нет:
+  «Дом» при открытии плитки к колонке не обращается, а протокол MediaRemote, на котором
+  работает этот плеер, в `shairport-sync` не реализован.
+
+## Станция 2: почему это сделано именно так { #station-2 }
+
+Три приёма, на которых держится набор выше. Разобраны в
+[репозитории про Станцию 2](https://github.com/derangedabbot/yandex-station-2-airplay),
+где AirPlay 2 собирается из исходников. Проверены на Станции 2; пути к демонам, порты и
+способ запуска у каждой модели свои — сверяйте, прежде чем переносить на другую.
 
 ### Обратное управление: пауза, «дальше», «назад»
 
@@ -205,7 +296,8 @@ Content-Type: application/x-apple-binary-plist
 `maind --mediad` держит `pcmC0D0p` постоянно, поэтому приёмник получает `EBUSY`: AirPlay
 «подключился», звука нет. Определять «играет» по владению ALSA **нельзя** — устройством владеет
 медиа-демон, признак всегда ложный, и круг замыкается: скрипт ждёт приёмник, приёмник ждёт скрипт.
-Признак — **ESTABLISHED-соединение на порт приёмника** (`/proc/net/tcp`, `/proc/net/tcp6`, состояние `01`).
+Признак — **ESTABLISHED-соединение на порт приёмника**
+(`/proc/net/tcp`, `/proc/net/tcp6`, состояние `01`).
 
 Порт зависит от версии: до 5.6 AirPlay 2 всегда слушал 7000 (`1B58`) и не смотрел на `port` из
 конфига, в 5.6+ берётся значение из `shairport-sync.conf` (у нас `5000`, `1388`). Проверять оба,
@@ -224,95 +316,13 @@ Content-Type: application/x-apple-binary-plist
   звуковой карты.
 - **Свой `ALSA_CONFIG_PATH`.** Системный `alsa.conf` тянет 32-битные плагины, и musl-бинарник
   падает с `Exec format error`.
-- **mDNS рядом с `maind`** — раздел [«Свой mDNS (avahi) рядом с maind»](../internals/gotchas.md#avahi).
+- **mDNS рядом с `maind`** — [свой avahi рядом с maind](../internals/gotchas.md#avahi).
   На Станции 2 хватило того, что avahi получает ровно то имя хоста, которое публикует `maind`.
 
----
+## Откат { #rollback }
 
-## Станция 2: AirPlay 2 одним набором { #station-2-bundle }
-
-!!! info "Проверено на Станции 2 (`yandexmidi`, прошивка `0.369.1.50.*` от 21.10.2026)"
-    `shairport-sync 5.6.2` (AirPlay 2) и `nqptp 1.2.9`, собраны из исходников. Схема та же, что
-    [выше](#station-2): своя шина D-Bus, avahi с именем хоста колонки, распорядитель звука.
-
-Скрипты — [`contrib/station2-media`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station2-media).
-Что в них сделано иначе:
-
-- **Один каталог `/data/local/opt/ap2`.** Всё собрано под musl, а `patchelf` прописывает
-  бинарникам интерпретатор `/data/local/opt/ap2/lib/ld-musl-aarch64.so.1` и `RUNPATH`
-  `$ORIGIN/../lib`: они запускаются напрямую, без обёртки с загрузчиком и без
-  `LD_LIBRARY_PATH`, который ломал бы 32-битные программы Яндекса.
-- **Одна громкость с Алисой.** Звук AirPlay идёт через `softvol` на регуляторе Алисы
-  `Master Playback Volume`, а `shairport-sync` двигает этот же регулятор
-  (`mixer_control_name = "Master"`): сенсорная панель, голос и ползунок iPhone меняют одну
-  громкость.
-- **Установка за короткое окно ADB.** По ADB уходит только SSH (меньше 1 МБ), остальное — по SSH.
-  На Станции 2 загрузка 15 МБ по ADB шла 100 с и обрывалась вместе с окном.
-- **Сторож обновлений** `/etc/init.d/S96otaguard` на корневой ФС: переживает сброс колонки,
-  подробности — ниже.
-
-### Сборка
-
-Docker на Linux или macOS (Apple Silicon — `colima start --arch aarch64 --vm-type vz`):
-
-```sh
-cd contrib/station2-media/build
-docker run --rm --platform linux/arm64 -v "$PWD:/work" -v "$PWD/out:/out" \
-  alpine:3.24 sh /work/ap2-build.sh
-```
-
-Внутри: минимальный статический ffmpeg (только `aac` и `alac`), `nqptp`, `shairport-sync` с
-`--with-airplay-2`, avahi, dbus, dropbear и alsa-utils из пакетов Alpine, замыкание библиотек
-и `patchelf`. Результат — `build/out/ap2/{bin,lib}`, около 14 МБ. Версии `shairport-sync` и
-`nqptp` должны совпадать по интерфейсу памяти (`smi11` у обоих).
-
-### Установка
-
-Нужен root ADB ([шаг 1](../start/root.md)). Установщик запускают сразу, как только открылся
-порт `5555`:
-
-```sh
-cd contrib/station2-media
-./install.sh <IP колонки>              # SSH по ADB, затем всё остальное по SSH
-./install.sh <IP колонки> --ssh-only   # повторно, когда SSH уже есть
-```
-
-Что делает:
-
-- ключ `~/.ssh/yandex_station2` и dropbear на `2222`, вход только по ключу;
-- [`yandex-noupdate.sh`](../start/ssh.md#kill-ota) и сторож обновлений, оригиналы файлов —
-  рядом со скриптом, в `backup/ota`;
-- набор в `/data/local/opt/ap2`, автозапуск `/etc/init.d/S97ap2`;
-- имя хоста для avahi берёт из mDNS колонки (`hostname` у неё другой).
-
-На колонке: `/data/local/opt/ap2/ap2.sh start|stop|restart|status`.
-
-### Громкость
-
-- Регулятор `Master Playback Volume` (моно, 0–255) Алиса двигает через `set_volume.sh` →
-  `amixer set Master N%`. Системный `softvol` создаёт его **без шкалы в дБ**, поэтому
-  `ap2.sh start` один раз открывает свой `softvol` на этом регуляторе с пустым выходом
-  (`pcm.ap2prime`): шкала появляется и держится до перезагрузки.
-- Шкала выхода — 36 дБ. На системных 51 дБ четверть ползунка — почти тишина, а вся слышимая
-  громкость сжата в верхнюю половину.
-- `shairport-sync` идёт с `chrt -r 30`: без реального времени звук делит процессор с демонами
-  Яндекса.
-
-### Обновления
-
-`yandex-noupdate.sh` подменяет ключ, заглушает `device_ota_update.sh` и убирает `updatesd`. На
-Станции 2 есть ещё одно звено: `device_ota_update.sh` вызывает `/usr/bin/apply_packed_ota`,
-который кладёт образ в `/bkupgrade/ota/yandex_io_ota.swu`, ставит
-`fw_setenv boot_to_recovery 1` и перезагружает колонку в recovery. `S96otaguard` раз в 2 минуты
-возвращает заглушки (эталоны — в `/etc/otaguard`), гасит `updatesd`, удаляет скачанные образы
-и сбрасывает `boot_to_recovery`. Разрешить штатное обновление: `touch /data/local/allow_ota`.
-
-### Ограничения
-
-- Пока играет AirPlay, медиа-демон Алисы остановлен: её плеер и голос молчат, после сессии
-  возвращаются через пару секунд.
-- После каждой сессии приёмник перезапускается, чтобы отпустить ALSA, — на несколько секунд
-  колонка пропадает из списка AirPlay.
-- В «Доме» колонка добавляется как AirPlay-динамик, но плеера и кнопок на её плитке нет:
-  «Дом» при открытии плитки к колонке не обращается, а протокол MediaRemote, на котором
-  работает этот плеер, в `shairport-sync` не реализован.
+| Что ставили | Как убрать |
+|---|---|
+| [Починку готового пакета](#fix) | `./contrib/yandex-station-airplay-fix.sh <IP>:5555 --uninstall` — хуки снимаются, возвращается оригинальный `airplayd` |
+| [Набор для Лайт 2](#lite2) | тем же установщиком: `curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/main/contrib/airplay-lite2/install.sh \| sh -s -- <IP> --uninstall --reboot` |
+| [Набор для Станции 2](#station-2-bundle) | `./install.sh <IP> --uninstall --reboot` из клона репозитория, каталог `contrib/station2-media`; сторож обновлений `/etc/init.d/S96otaguard` удаляется отдельно, а штатные обновления возвращает `sh /data/opt/yandex-noupdate.sh restore` |

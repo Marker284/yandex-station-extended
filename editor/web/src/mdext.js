@@ -267,7 +267,9 @@ export function wikiMarkdown(md) {
     const t = tokens[idx];
     const info = t.info.trim();
     const lang = (/^[\w+#-]+/.exec(info) || [''])[0];
-    const title = /title="([^"]*)"/.exec(info);
+    // схемы Mermaid рисует сайт; в превью они остаются текстом с подписью
+    const title = /title="([^"]*)"/.exec(info)
+      || (lang === 'mermaid' ? [, 'Схема Mermaid — рисуется на сайте'] : null);
     const line = t.attrGet('data-line');
     const end = t.attrGet('data-end');
     const map = line ? ` data-line="${line}"${end ? ` data-end="${end}"` : ''}` : '';

@@ -1,6 +1,6 @@
-# Архитектура прошивки (quasar)
+# Архитектура прошивки Quasar
 
-`quasar` — программный стек Яндекса на Amlogic-Станциях с Buildroot (Лайт, Мини, Мини 2,
+Quasar — программный стек Яндекса на Amlogic-Станциях с Buildroot (Лайт, Мини, Мини 2,
 Мини 3, Миди, Станция 2, Стрит, Умный хаб). Всё ниже снято со Станции Лайт, прошивка 3.21.
 
 ## Загрузка
@@ -15,18 +15,19 @@ S45tas58xx  S49chrony  S49teeinit  S50hci0  S51bluetoothd  S52bluealsa  S53bluea
 S54default-bluez-agent  S60touch_buttons_settings  S70unbound  S98pstore-clear  S99quasar
 ```
 
-На консоли UART вместо `getty` — `getty_rabbit_hole` (вход закрыт, см.
+На консоли UART вместо стандартного `getty` запущен `getty_rabbit_hole` (вход закрыт, см.
 [UART](../start/recovery.md#serial)).
 
 ## Запуск quasar
 
 `S99quasar` → `/system/vendor/quasar/onboot.sh start`:
 
-1. `echo 1 > /proc/sys/vm/overcommit_memory`;
-2. чистит остатки OTA в `/bkupgrade/`;
-3. `LD_LIBRARY_PATH=/system/vendor/quasar:/system/vendor/quasar/libs`, `GST_PLUGIN_PATH=/system/vendor/quasar/libs`;
-4. `activate_adb.sh check` — поднимает `adbd`, если есть маркеры ADB в `/data/quasar/`;
-5. `run.sh`: `ulimit -n 10240`, `ulimit -s 1024` и
+1. включает overcommit памяти (`echo 1 > /proc/sys/vm/overcommit_memory`);
+2. очищает остатки OTA в `/bkupgrade/`;
+3. задаёт пути библиотек: `LD_LIBRARY_PATH=/system/vendor/quasar:/system/vendor/quasar/libs`
+   и `GST_PLUGIN_PATH=/system/vendor/quasar/libs`;
+4. скриптом `activate_adb.sh check` поднимает `adbd`, если найдены маркеры в `/data/quasar/`;
+5. скриптом `run.sh` задаёт лимиты `ulimit -n 10240`, `ulimit -s 1024` и запускает
    `quasar_launcher2 /system/vendor/quasar/launch.json`.
 
 ## `maind`
@@ -38,7 +39,7 @@ S54default-bluez-agent  S60touch_buttons_settings  S70unbound  S98pstore-clear  
 |---|---|
 | `--platformd` | основной процесс; в том числе читает кнопки (`/dev/input/event1`) |
 | `--mediad` | плеер: ответы Алисы и музыка, вывод в ALSA |
-| `--telemetry` | телеметрия |
+| `--telemetry` | [телеметрия](telemetry.md): что собирает и куда отправляет |
 | `--fluent-bitd` | логи |
 | `--updatesd` | обновления (OTA); убирается при [отключении обновлений](../start/ssh.md#kill-ota) |
 | `--updater_gateway` | шлюз обновлятора через unix-сокет `/tmp/updater.sock` |
@@ -46,45 +47,42 @@ S54default-bluez-agent  S60touch_buttons_settings  S70unbound  S98pstore-clear  
 Симлинки на `maind` в том же каталоге: `led_util`, `tcp_alsa_writer`,
 `keymaster_proxy_app`, `quasar_client`.
 
-Кроме ролей, в `main` зашит диспетчер диагностических команд — их больше, чем оборачивает
-[`q`](#q): помимо перечисленных есть ещё `--nettest`, `--build-timestamp` и
+Кроме ролей, в `maind` зашит диспетчер диагностических команд. Их больше, чем оборачивает
+скрипт [`q`](#q): помимо перечисленных поддерживаются `--nettest`, `--build-timestamp` и
 `--device-localization`.
 
-!!! warning "`--getprop` синтезирует значения"
-    Обработчик `--getprop` отдаёт Android-style свойства с **захардкоженным**
-    `ro.product.cpu.abi=arm64-v8a`. Это не отражает реальную архитектуру: сам `maind` — **ARM32**
-    (ELF32, armhf), userspace тоже 32-битный. Не ориентируйтесь на этот вывод при сборке бинарников.
+!!! warning "Команда `--getprop` отдаёт неверную архитектуру"
+    Обработчик `--getprop` отдаёт Android-свойства с фиксированным значением
+    `ro.product.cpu.abi=arm64-v8a`. Это не отражает реальную архитектуру: сам процесс `maind` —
+    32-битный (`ELF32`, `armhf`), userspace тоже 32-битный. Не ориентируйтесь на этот вывод
+    при сборке бинарников.
 
 ## Звук
 
 Все плееры пишут в ALSA `default` (`/etc/asound.conf`):
 
-```text
-default ─► softvol "Master" ─► plug ─► dmix_spk ─► hw:0,0  (TDM-B → усилитель)
+```mermaid
+flowchart LR
+    default --> softvol["softvol Master"] --> plug --> dmix_spk --> hw["hw:0,0<br>(TDM-B → усилитель)"]
 ```
 
-`Master` — программный регулятор, его двигают кнопки и голосовые команды громкости
-(`set_volume.sh N` = `amixer set Master N%`). Захват — `multi_capture`: 4 канала
-микрофонов (`hw:0,1`, PDM) + 2 канала петли с выхода усилителя (`hw:0,0`, опорный сигнал
-для эхоподавления).
+Регулятор `Master` — программный, его изменяют кнопки и голосовые команды громкости
+(`set_volume.sh N` эквивалентно `amixer set Master N%`).
+Захват звука выполняется через `multi_capture`: 4 канала микрофонов (`hw:0,1`, PDM) и 2 канала
+петли с выхода усилителя (`hw:0,0`, опорный сигнал для эхоподавления).
 
 ### `maind --gst-launch` { #gst-launch }
 
-Встроенный GStreamer, проигрывает любой пайплайн:
-
-```sh
-cd /system/vendor/quasar
-LD_LIBRARY_PATH=/system/vendor/quasar:libs ./maind --gst-launch \
-  "filesrc location=/path/file.mp3 ! decodebin ! audioconvert ! audioresample ! alsasink"
-```
-
-У команды есть ключи `--next` и `--clock` (назначение не изучали).
+Встроенный GStreamer: тем же бинарником проигрывается любой пайплайн, от файла до
+интернет-потока. Команды и примеры — в рецепте [Свои звуки](../recipes/sounds.md).
 
 ## Модели на борту
 
-- `spotter_models/`: `activation`, `command`, `counteractivation`, `spotterRecognizer`, `vad`;
-- `vqe_models/`: `noise_reducer`;
-- `matter/`: `http`, `paa`.
+| Каталог | Назначение моделей |
+|---|---|
+| `spotter_models/` | activation, command, counteractivation, spotterRecognizer, vad |
+| `vqe_models/` | noise_reducer |
+| `matter/` | http, paa |
 
 ## Где что лежит
 
@@ -100,5 +98,10 @@ LD_LIBRARY_PATH=/system/vendor/quasar:libs ./maind --gst-launch \
 
 ## Хелпер `q`
 
-`/system/vendor/quasar/q`: `start`, `stop`, `restart`, `version`, `device-id`, `wifi-info`,
-`glagol-connections`, `full-info`, `backend-dev`, `backend-prod`, `cli`, `getprop`.
+Скрипт `/system/vendor/quasar/q` оборачивает вызовы `maind` и системные утилиты:
+
+```text
+q <команда>
+команды: start, stop, restart, version, device-id, wifi-info,
+         glagol-connections, full-info, backend-dev, backend-prod, cli, getprop
+```

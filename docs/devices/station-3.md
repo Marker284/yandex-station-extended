@@ -18,9 +18,9 @@ Buildroot 2023.11.1), но **другая плата**: ~2 ГБ ОЗУ, коль
 U-Boot `01.01.250823.213609`. Совпадает с заводским User-Agent
 `orion/0.13.1.36.3322101745.20250823.factory-13`.
 
-## Платформа в двух словах
+## Платформа в двух словах { #platform }
 
-| | |
+| Что | Значение |
 |---|---|
 | SoC | **Amlogic A5** (`amlogic, a5`, `Hardware: Amlogic`) |
 | CPU | 4× **Cortex-A55** (`0xd05`, variant `0x2`), **100 МГц … 2.016 ГГц** |
@@ -39,7 +39,29 @@ U-Boot `01.01.250823.213609`. Совпадает с заводским User-Agen
 | Радио | **Unisoc** (`vlsicomm` + `aml_sdio` + `sdio_bt`), BT-пульт (`input_btrcu`); в образе есть и драйвер Amlogic `w2l` |
 | Безопасность | SELinux `enforcing`, JTAG `disable`, `rh_unlock=0`, verified boot `green`, OP-TEE + keymaster (`/dev/keymaster_svc`) |
 
-## Чем принципиально отличается от Миди
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | работает (на заводской `factory-13`) | [подмена DNS](../start/root.md) |
+| USB Host (OTG) | не проверялось | — |
+| AirPlay | не проверялось | — |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | не проверялось | — |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | не проверялось | — |
+| YAM | не проверялось | — |
+| Своя LLM | не проверялось | — |
+
+## Получение root { #root }
+
+Штатный [DNS-метод](../start/root.md) на `orion` **работает**: сброс к заводским
+настройкам, DNS на сервер разблокировки — и сетевой ADB поднимается, как на других
+Amlogic-моделях (проверено на заводской `factory-13` от 23.08.2025). Ограничения
+по использованию своего сервера обновлений описаны [ниже](#tls).
+
+## Чем отличается { #differences }
 
 - Тот же **A5 / 5.4 / Buildroot 2023.11.1 / eMMC**, другая DT: `a5_orion_pvt`,
   не `a5_cucumber_dvt2`.
@@ -56,7 +78,54 @@ U-Boot `01.01.250823.213609`. Совпадает с заводским User-Agen
 - quasar: `quasar_launcher2` + `maind --platformd/--mediad/--loggerd/--telemetry/--fluent-bitd`,
   плюс `begemot` и `bulbik` (кольцо Алисы через `ledfb-ring`).
 
-## Шина I2C и периферия (4 шины)
+## Свой сервер обновлений и сертификаты { #tls }
+
+А вот **свой** TLS-сервер обновлений вместо готового сервера колонка не принимает:
+и самоподписанный сертификат, и легально выпущенный Let's Encrypt дают
+`tlsv1 alert unknown ca` (48) — прошивка доверяет урезанному набору корневых CA.
+Подмена без TLS работает только для `scbh.yandex.net` (отдаём настоящий `204`).
+Разведка и дампы — [issue #24][issue24].
+
+Одно другому не противоречит: готовый сервер разблокировки отвечает сертификатом от CA,
+который есть в бандле прошивки, а свой сервер обновлений на компьютере — нет. Поэтому для своего
+сервера нужен сертификат от CA из бандла; на **Лайт 2 / Мини 3** (после 21.10.2026) этот корень
+дописывают в бандл из factory mode — для `orion` такой путь не проверялся.
+
+[issue24]: https://github.com/Marker284/yandex-station-extended/issues/24
+
+## Разделы флеша { #partitions }
+
+Как на Миди: узлы `/dev/<имя>`, MTD нет, `root=PARTLABEL=system`.
+`mmcblk0` ≈ 7.1 ГБ; boot-копии `mmcblk0boot0/1`, есть `mmcblk0rpmb`.
+
+| Раздел | Устройство | Размер | Что внутри |
+|---|---|---|---|
+| bootloader | `mmcblk0p1` `/dev/bootloader` | 4M | U-Boot; копии `bootloader0/1` |
+| reserved | `mmcblk0p2` `/dev/reserved` | 64M | |
+| cache | `mmcblk0p3` `/dev/cache` | — | узел есть |
+| env | `mmcblk0p4` `/dev/env` | 8M | U-Boot env |
+| misc | `mmcblk0p5` `/dev/misc` | 4M | |
+| tee | `mmcblk0p6` `/dev/tee` | 48M | ext4, `/tee` (ro) |
+| aml_sysrecovery | `mmcblk0p7` `/dev/aml_sysrecovery` | 1.5G | |
+| boot | `mmcblk0p8` `/dev/boot` | 64M | ядро |
+| recovery | `mmcblk0p9` `/dev/recovery` | 192M | |
+| system | `mmcblk0p10` `/dev/system` | 1G | rootfs ext4, `/` **ro** |
+| ota | `mmcblk0p11` `/dev/ota` | 1.5G | ext4, `/ota` (rw) |
+| data | `mmcblk0p12` `/dev/data` | ~2.6G | ext4, `/data` (rw) |
+
+Монтируется: `/` ro, `/tee` ro, `/ota` и `/data` rw.
+
+Размеры подтверждает DT-узел `partitions` (`parts=8`): `boot` 64M, `recovery`
+192M, `system` 1G, `tee` 48M, `misc` 4M, `ota` 1.5G, `aml_sysrecovery` 1.5G,
+`data` — остаток диска. Поле `mask`: `1` — обычный раздел, `2` — сохраняется при
+обновлении (`ota`), `4` — `data`. Фиксированные `bootloader`/`reserved`/`env`/
+`cache` в этот узел не входят — их создаёт прошивальщик Amlogic до таблицы.
+
+!!! warning "Личные данные"
+    Не публикуйте дампы `data`, `ota`, `env`, `reserved`, `tee`.
+    В cmdline есть `androidboot.serialno`; в `/proc/cpuinfo` — поле `Serial`.
+
+## Шина I2C и периферия { #i2c }
 
 | Шина:адрес | Чип | Назначение |
 |---|---|---|
@@ -87,7 +156,8 @@ U-Boot `01.01.250823.213609`. Совпадает с заводским User-Agen
 `/boot/yandex-orion-i2c_top-overlay.dtb` (после остановки AO-CPU через
 `/dev/ree2aocpu`), поэтому `/dev/i2c-0` появляется не сразу на старте.
 
-## Индикация { #leds }
+<a id="leds"></a>
+## Индикация { #led }
 
 Все узлы в `/sys/class/leds/` (на снимке **210** штук), префикс `orion:`:
 
@@ -118,7 +188,7 @@ Framebuffers (`yandex,ledfb` / Gowin):
 
 Драйверы: `leds_yandex_aw21036`, `quasar_led_ring`, `gowin_led_device`.
 
-## Звук
+## Звук { #audio }
 
 ALSA card0 `AML-AUGESOUND`:
 
@@ -154,7 +224,7 @@ ALSA card0 `AML-AUGESOUND`:
 
 VAD: `vad_keypad`, устройство `/dev/vad`.
 
-## Вход
+## Вход { #input }
 
 - `aw933xx` (`AW93312`) — сенсорные кнопки: `KEY_VOICECOMMAND` (582),
   `KEY_VOLUMEUP` (115), `KEY_VOLUMEDOWN` (114).
@@ -177,46 +247,14 @@ DT-узел `zigbee` (`compatible = yandex,zigbee-control`) держит тол�
 Умный дом в целом (`iot.providers` в `quasar.cfg`): включены **Zigbee**,
 **Matter** (`matter/paa` CA-store, свой OTA-склад) и **WiFi**.
 
-## Разделы eMMC { #partitions }
-
-Как на Миди: узлы `/dev/<имя>`, MTD нет, `root=PARTLABEL=system`.
-`mmcblk0` ≈ 7.1 ГБ; boot-копии `mmcblk0boot0/1`, есть `mmcblk0rpmb`.
-
-| Раздел | Устройство | Размер | Что внутри |
-|---|---|---|---|
-| bootloader | `mmcblk0p1` `/dev/bootloader` | 4M | U-Boot; копии `bootloader0/1` |
-| reserved | `mmcblk0p2` `/dev/reserved` | 64M | |
-| cache | `mmcblk0p3` `/dev/cache` | — | узел есть |
-| env | `mmcblk0p4` `/dev/env` | 8M | U-Boot env |
-| misc | `mmcblk0p5` `/dev/misc` | 4M | |
-| tee | `mmcblk0p6` `/dev/tee` | 48M | ext4, `/tee` (ro) |
-| aml_sysrecovery | `mmcblk0p7` `/dev/aml_sysrecovery` | 1.5G | |
-| boot | `mmcblk0p8` `/dev/boot` | 64M | ядро |
-| recovery | `mmcblk0p9` `/dev/recovery` | 192M | |
-| system | `mmcblk0p10` `/dev/system` | 1G | rootfs ext4, `/` **ro** |
-| ota | `mmcblk0p11` `/dev/ota` | 1.5G | ext4, `/ota` (rw) |
-| data | `mmcblk0p12` `/dev/data` | ~2.6G | ext4, `/data` (rw) |
-
-Монтируется: `/` ro, `/tee` ro, `/ota` и `/data` rw.
-
-Размеры подтверждает DT-узел `partitions` (`parts=8`): `boot` 64M, `recovery`
-192M, `system` 1G, `tee` 48M, `misc` 4M, `ota` 1.5G, `aml_sysrecovery` 1.5G,
-`data` — остаток диска. Поле `mask`: `1` — обычный раздел, `2` — сохраняется при
-обновлении (`ota`), `4` — `data`. Фиксированные `bootloader`/`reserved`/`env`/
-`cache` в этот узел не входят — их создаёт прошивальщик Amlogic до таблицы.
-
-!!! warning "Личные данные"
-    Не публикуйте дампы `data`, `ota`, `env`, `reserved`, `tee`.
-    В cmdline есть `androidboot.serialno`; в `/proc/cpuinfo` — поле `Serial`.
-
-## DVFS
+## DVFS { #dvfs }
 
 Те же точки, что у Миди A5 (подтверждено `cpu_opp_table0` в DT): 100, 250, 500,
 667, 1000, 1200, 1404, 1500, 1608, 1704, 1800, 1920, **2016** МГц. Напряжение
 держится **0.769 В** до 1404 МГц, затем растёт до **1.009 В** на 2016 МГц. CPU —
 `arm,cortex-a55`. Термозона `soc_thermal`.
 
-## Ядро и модули
+## Ядро и модули { #kernel }
 
 Загружены (снимок): `aml_sdio`, `sdio_bt`, `vlsicomm`, `optee`/`optee_armtz`,
 `key_aw933xx`, `ltr308als01`, `dtbocfg`, `gowin_led_device`, `zigbee_control`,
@@ -282,7 +320,7 @@ virtual + контекст-буферы), а **не** feature-DB с полем `
 поэтому точное число NN-ядер из нод не вылезает; косвенно о мощности говорят
 `enableNN=255`, `pdevCoreCount=21` и `nanoqFreq ≈ 839 МГц`.
 
-## Идентификация (сеть)
+## Идентификация (сеть) { #network }
 
 mDNS (`_yandexio._tcp.local`):
 
@@ -303,7 +341,7 @@ networkd 9917, net_clock 11125, multiroomd 11124, updatesd 9889, brickd 9898,
 config 9882, audioinit 9883. После root — ещё SSH `:22` (и ADB `:5555`, если
 включён).
 
-## glagol (порт 1961)
+## glagol (порт 1961) { #glagol }
 
 Токен — стандартный публичный flow (`oauth.mobile.yandex.net` →
 `quasar.yandex.net/glagol/token`, `platform=orion`). Колонка принимает TLS при
@@ -311,7 +349,7 @@ config 9882, audioinit 9883. После root — ещё SSH `:22` (и ADB `:5555
 (`softwareVersion`, `ping`, `getVersion`, `status`, `allStates`, `getState`,
 `get_status`) на `orion` ответа не дают — набор другой, не описан.
 
-## Сетевые обращения при активации
+## Сетевые обращения при активации { #network-activation }
 
 Сброс → BLE + «Дом с Алисой» → аккаунт (tcpdump по MAC колонки):
 
@@ -332,39 +370,20 @@ ssh (`22`/`2222`) закрыты.
 (метрика), `startup.mobile.yandex.net`, `scbh.yandex.net/generate_204`
 (проверка связи), `quasar.s3.yandex.net` + `*.svc.cdn.yandex.net` (OTA/звуки).
 На случай отказа DNS прописан жёсткий **`DnsFallbackMap`:
-`quasar.yandex.net → 213.180.193.230`** — это стоит учитывать при DNS-методе.
+`quasar.yandex.net → 213.180.193.230`** — учитывайте это при DNS-методе.
 OTA-демон `updatesd` применяет пакет через `device_ota_update.sh`, проверяя
 подпись `ota_script.pub`; каталог обновлений — `/bkupgrade`, имена `*.img`.
 
-## Свой стенд и сертификаты { #tls }
-
-Штатный [DNS-метод](../start/root.md) на `orion` **работает**: сброс к заводским
-настройкам, DNS на сервер разблокировки — и сетевой ADB поднимается, как на других
-Amlogic-моделях (проверено на заводской `factory-13` от 23.08.2025).
-
-А вот **свой** TLS-стенд вместо готового сервера колонка не принимает: и самоподписанный
-сертификат, и легально выпущенный Let's Encrypt дают `tlsv1 alert unknown ca` (48)
-— прошивка доверяет урезанному набору корневых CA. Подмена без TLS работает только для
-`scbh.yandex.net` (отдаём настоящий `204`). Разведка и дампы — [issue #24][issue24].
-
-Одно другому не противоречит: готовый сервер разблокировки отвечает сертификатом от CA,
-который есть в бандле прошивки, а свой стенд — нет. Поэтому для своего стенда нужен
-сертификат от CA из бандла; на **Лайт 2 / Мини 3** (после 21.10.2026) этот корень
-дописывают в бандл из factory mode — для `orion` такой путь не проверялся.
-
-[issue24]: https://github.com/Marker284/yandex-station-extended/issues/24
-
-## Что ещё проверить
+## Что ещё проверить { #todo }
 
 - Физическая раскладка микрофонов (отверстия корпуса vs 6 каналов PDM
   `raw_mic_0..5`) и безопасная частота захвата параллельно с Алисой.
 - Формат кадра `/dev/fb0` (48 bpp) и `/dev/fb1` (21×12).
-- Модель Zigbee-чипа (UART известен — `/dev/ttyS2`, см. [Zigbee](#zigbee)).
+- Модель Zigbee-чипа. Порт UART известен — `/dev/ttyS2`, подробности в разделе [Zigbee](#zigbee).
 - Сохраняются ли правки `/etc` после OTA (корень ro, своё — в `/data`).
 - Профиль YAM для кольца Orion (36 LED, `orion:` + `ledfb-ring`); из коробки
   в YAM профиля нет.
 
----
 
 Железо снято с рутованной Станции 3 по SSH, корпус не вскрывали.
 Кто что добавил — на странице [Участники](../contributors.md).

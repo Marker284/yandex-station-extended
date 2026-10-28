@@ -10,16 +10,16 @@ build-профиль `yandexstation_2_tv/127`. Железо и ОС совпад
 Всё ниже проверено на **`YNDX-00052`, прошивка `5000000896`**: дамп разделов, `live.dts`,
 `lsmod`, `kallsyms`, `getprop`, U-Boot `env`, `quasar.cfg`. Догадки помечены явно.
 
-!!! warning "Путаница кодовых имён (важно)"
+!!! warning "Идентификатор yandexstation_2 относится к Макс, а не к Станции 2"
     `yandexstation_2` — это **Станция Макс**, а не розничная [«Станция 2»](station-2.md).
-    Дополнительно: **`YNDX-00052` (Макс с Zigbee) и `YNDX-0008` (Макс) — один и тот же
-    `yandexstation_2`** с одинаковым fingerprint. В приложении и в `quasar.cfg` ревизия с
-    Zigbee тоже определяется как `YNDX-0008`, поэтому различить их по ПО нельзя — только
-    по SKU на корпусе и по наличию узла `zigbee` в device-tree.
+    `YNDX-00052` (Макс с Zigbee) и `YNDX-0008` (обычный Макс) имеют одинаковый
+    идентификатор `yandexstation_2` и одинаковый fingerprint. В приложении и в `quasar.cfg`
+    ревизия с Zigbee тоже определяется как `YNDX-0008`. Различить их программно нельзя —
+    только по SKU на корпусе и по наличию узла `zigbee` в device-tree.
 
 ## Платформа в двух словах { #platform }
 
-| | |
+| Что | Значение |
 |---|---|
 | Внутр. имя | `yandexstation_2` (`yandexstation_2_tv/127`), SKU `YNDX-00052` |
 | ОС | **YaOS_X** (`ro.yndx.build.os`), поколение 3 (`ro.yndx.build.generation`) на **Android 9** (SDK 28) |
@@ -42,17 +42,223 @@ build-профиль `yandexstation_2_tv/127`. Железо и ОС совпад
 
 <a id="gpu-model"></a>
 
-!!! note "Модель GPU из дампа не следует"
-    Узел `/bifrost`, драйвер `mali_kbase` и таблица DVFS показывают только то, что это
-    Mali архитектуры Bifrost. У **S905X2** (g12a) по документации Amlogic распаян
-    **Mali-G31 MP2** — G52 стоит в S922X (g12b). В первой редакции этой страницы было
-    написано «Mali-G52»; по приведённым данным это не подтверждается. Точную модель
-    снимают на живом устройстве:
+**Модель GPU:** узел `/bifrost`, драйвер `mali_kbase` и таблица DVFS показывают только то,
+что это Mali архитектуры Bifrost. У S905X2 (g12a) по документации Amlogic распаян
+Mali-G31 MP2 (G52 ставится в S922X / g12b). По дампу точная модель не подтверждается,
+её снимают командами на живом устройстве:
+
+```sh
+cat /sys/module/mali_kbase/drivers/platform:mali/*/gpuinfo
+dmesg | grep -i 'GPU identified'
+```
+
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | частично (ADB до перезагрузки, постоянного root и SSH нет) | [ADB Max](../start/adb-max.md) |
+| AirPlay | не проверялось | — |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | не проверялось | — |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | не проверялось | — |
+| YAM | не проверялось | — |
+| Своя LLM | не проверялось | — |
+
+<a id="access"></a>
+## Получение root { #root }
+
+- **Root «из коробки» нет:** AVB 1.1 + dm-verity `enforcing` + SELinux `enforcing`,
+  `ro.secure=1`, `ro.adb.secure=1`, `ro.boot.vbmeta.device_state=locked`,
+  `ro.boot.rh_unlock=0`.
+- **`ro.boot.flash.locked` на этой платформе нет.** Состояние блокировки смотреть по
+  `ro.boot.vbmeta.device_state` (`locked`) и `ro.boot.verifiedbootstate` (`green`).
+- **Отладочный путь заложен в U-Boot env, а не в fastboot.** Из скрипта `storeboot`:
 
     ```sh
-    cat /sys/module/mali_kbase/drivers/platform:mali/*/gpuinfo
-    dmesg | grep -i 'GPU identified'
+    if test "${rabbit_hole_debug}" = 1; then setenv rh_unlock 1; else setenv rh_unlock 0; fi
+    setenv bootargs ${bootargs} androidboot.rh_unlock=${rh_unlock}
+    adb_en_l=0
+    if test ${rh_unlock} = 1; then adb_en_l=1; fi
+    if test ${otg_force_device} = 1; then adb_en_l=1; fi
+    if test ${adb_en_l} = 1; then setenv bootargs ${bootargs} androidboot.adb_enable=1; fi
     ```
+
+    То есть `rabbit_hole_debug=1` → `rh_unlock=1` **и** принудительный ADB;
+    `otg_force_device=1` включает ADB независимо. Режим SELinux тоже задаётся из env
+    (`androidboot.selinux=${EnableSelinux}`). В заводском env `rabbit_hole_debug=0`,
+    `lock=10001000`, `upgrade_step=2`. Сложность не в отсутствии механизма, а в записи в
+    раздел `env` при подписанном загрузчике и ключах eFUSE — способ записи не найден.
+- **Заводской сетевой режим:** `set_factory_env` переводит `bootcmd` в `factoryboot`,
+  который поднимает DHCP и грузится по сети.
+- Загрузчик — U-Boot `2015.01-g7ebc07b-dirty`, ожидаемая базовая версия
+  `01.01.180822.145544` (`ro.build.expect.bootloader`). Раздел `bootloader` и оба
+  аппаратных `mmcblk0boot0`/`boot1` побайтово идентичны (один SHA-256).
+- Раздел `sysrecovery` (`p20`, 1.5 ГБ) содержит целиком заводской пакет **Amlogic USB
+  Burning Tool** (`IMAGE_PACK_MAGIC = 0x27b51956`): `DDR.USB`, `UBOOT.USB`,
+  `aml_sdc_burn.ini`, `*.PARTITION`. То есть восстановление через USB Burning Tool для
+  этой платы подтверждено, а заводской образ извлекается прямо из устройства.
+
+## Чем отличается { #differences }
+
+- **Это YaOS (Android TV), а не Buildroot.** Стек quasar — Android-приложения:
+  `com.yandex.io.sdk` лежит в `/system/priv-app/ServicesIosdk/ServicesIosdk.apk`,
+  `com.yandex.tv.alice` — в `/vendor/app/YandexTvAlice/YandexTvAlice.apk`. Рабочий каталог
+  конфигов — `/data/data/com.yandex.io.sdk/files/system/` (там же `quasar.cfg`, `led.cfg`,
+  `ledpatterns/`, `frontal_animation/`, `zigbee/gateway.ybl`). Приёмы из
+  [«Как это устроено»](../internals/architecture.md) (maind/aliced, init.d) неприменимы.
+- **A/B-слотов на этой ревизии нет.** В U-Boot `env` логика слотов есть
+  (`get_valid_slot`, при `avb2=0` корень берётся с `mmcblk0p23`/`p24` для `_a`/`_b`), но
+  физически на диске только `mmcblk0p1…p21` — разделы слотов не нарезаны, устройство
+  одно-слотовое, грузится с `p18`.
+- **Батареи нет, но Android считает иначе.** `dtbo`-оверлей добавляет в `/` узлы
+  `dummy-battery` и `dummy-charger` (`amlogic, dummy-battery`/`-charger`), а загрузчик
+  передаёт `ro.boot.fake_battery=42` — иначе `healthd`/`BatteryService` выключают колонку.
+- **Идентификация платы по EEPROM.** Модуль `quasar_pcba_ids.ko` (DT-узел `pcba_ids`,
+  `compatible = "pcba-ids"`) читает шесть EEPROM `24c01` и unifykeys. Имена плат из DT:
+  `som`, `bp`, `led_display`, `led_ring`, `mics`, `dc_ethernet` — по одному EEPROM на
+  субплату. Похоже, именно так прошивка различает ревизии (не проверялось).
+
+## Разделы флеша { #partitions }
+
+Имена разделов задаёт **device-tree**, узел `/partitions` (`parts = 18`, порядок — по
+ссылкам `part-0`…`part-17`, а не по порядку узлов в тексте DTS). Сверка этих размеров с
+`/proc/partitions` даёт однозначную карту:
+
+```text
+раздел            блоков (1 КБ)   размер    имя (by-name)
+mmcblk0             15267840      14.56 ГБ  (вся user-area)
+mmcblk0p1               4096          4 МБ  bootloader
+mmcblk0p2              65536         64 МБ  reserved
+mmcblk0p3            1146880       1120 МБ  cache
+mmcblk0p4               8192          8 МБ  env
+mmcblk0p5               8192          8 МБ  logo
+mmcblk0p6              24576         24 МБ  recovery
+mmcblk0p7               8192          8 МБ  misc
+mmcblk0p8               8192          8 МБ  dtbo
+mmcblk0p9               8192          8 МБ  cri_data
+mmcblk0p10             16384         16 МБ  param
+mmcblk0p11             16384         16 МБ  boot
+mmcblk0p12             16384         16 МБ  rsv
+mmcblk0p13             16384         16 МБ  metadata
+mmcblk0p14              2048          2 МБ  vbmeta
+mmcblk0p15             32768         32 МБ  tee
+mmcblk0p16            524288        512 МБ  vendor
+mmcblk0p17            131072        128 МБ  odm
+mmcblk0p18           1515520       1480 МБ  system      (dm-verity -> dm-0 = /)
+mmcblk0p19            131072        128 МБ  product
+mmcblk0p20           1572864       1536 МБ  sysrecovery
+mmcblk0p21           9822208       9.37 ГБ  data
+
+mmcblk0boot0 / mmcblk0boot1 — по 4096 (4 МБ);  mmcblk0rpmb — 4096
+zram0 — 262144 (256 МБ);  dm-0 — 1491524 (/);  dm-1 — 515932 (/vendor)
+```
+
+Привязка держится на четырёх независимых якорях: `p18` = `system` (прямо из
+`dm=`/`root=/dev/dm-0` в cmdline), а `dtbo` = `p8`, `vbmeta` = `p14`,
+`sysrecovery` = `p20` — по образам разделов. Остальные имена из DT ложатся на размеры без
+расхождений.
+
+Единственное отклонение от порядка DT: **`cache` вынесен в начало** (`p3`), хотя в DT он
+стоит `part-15` — его, как `bootloader`, `reserved` и `env`, создаёт прошивальщик Amlogic
+до разделов из таблицы. Разделы `cri_data`, `param` и `cache` помечены в DT `mask = 0x2`
+(не перезаписываются при обновлении), `data` — `mask = 0x4`, остальные — `0x1`.
+
+!!! note "Имена разделов без root считываются из sysfs"
+    На Android это **`/dev/block/by-name/`** (на этой плате —
+    `/dev/block/platform/soc/ffe07000.mmc/by-name/`), а не `/dev/disk/by-name/`, как на
+    десктопном Linux. Под `uid=2000(shell)` каталог `/dev/block/` не листается. Без
+    root работают два обходных пути:
+
+    ```sh
+    cat /sys/block/mmcblk0/mmcblk0p*/uevent | grep PARTNAME
+    cat /proc/device-tree/partitions/*/pname
+    ```
+
+`df -h`: `/` 1.4 ГБ (занято 1.2 ГБ, 89 %), `/vendor` 488 МБ (dm-verity, 71 %),
+`/odm` 124 МБ, `/product` 122 МБ, **`/data` 9.1 ГБ** (занято 1.6 ГБ), `/cache` 1.0 ГБ,
+`/metadata` 11 МБ, `/mnt/vendor/param` 11 МБ, `/mnt/vendor/tee` 27 МБ, `/tmp` 128 МБ
+(tmpfs), `/tmp/untrusted` 70 МБ.
+
+На странице обычной Макс указано `/data` 1.9 ГБ. На этом экземпляре раздел
+`mmcblk0p21` — 9 822 208 блоков, и `df` показывает 9.1 ГБ. Похоже, 1.9 ГБ относится
+к другой конфигурации флеша; при сверке моделей это стоит перепроверять.
+
+## Шина I2C и периферия { #i2c }
+
+Живой скан `/sys/bus/i2c/devices` (не вывод по списку драйверов): две шины, `i2c-0` —
+`ffd1f000.i2c`.
+
+| Шина:адрес | Чип | Назначение |
+|---|---|---|
+| `0-0008` | **ES8156** | стерео-ЦАП (линейный выход) |
+| `0-0030` | `meson-g12a` | узел SoC (имя драйвера в sysfs) |
+| `0-003c` | **IS31FL3236** (`is31fl3236,gva`) | LED-драйвер №1 — диоды кольца 1…12 |
+| `0-003f` | **IS31FL3236** (`is31fl3236,gva`) | LED-драйвер №2 — диоды кольца 13…24 |
+| `0-0051`, `0-0052`, `0-0054`…`0-0057` | **24c01** ×6 | EEPROM субплат (`som`, `bp`, `led_display`, `led_ring`, `mics`, `dc_ethernet`) |
+| `0-0053` | **LTR-308ALS-01** | датчик освещённости (автояркость) |
+| `2-002a` | **SY6045S** | УМЗЧ класса D №1 |
+| `2-002b` | **SY6045S** | УМЗЧ класса D №2 |
+| `2-0040` | **ES7210** (`es7210_2ch`) | 4-канальный АЦП микрофонного массива |
+| `2-0051` | **PCF8563** | RTC |
+
+SPI: `spi32766.0` → `spi:led_screen` (фронтальная матрица).
+
+!!! warning "В сборку включены драйверы для нераспаянных чипов"
+    В `lsmod` и в `/vendor/lib/modules/` есть `snd-soc-tas5825m`, `snd-soc-pcm1774`,
+    `snd-soc-tlv320adc3101`, а также Wi-Fi-модули Realtek `88x2es` (RTL8822) и UNISOC
+    `sprdwl_ng`/`uwe5621_bsp_sdio`. **Соответствующих устройств на шинах нет:** в I2C-скане
+    отсутствуют адреса TAS5825M, PCM1774 и TLV320ADC3101, а из радио реально работает
+    только Intel (`iwlwifi` на PCIe `fc700000`, 88 758 прерываний); `88x2es` в сборке есть,
+    но не загружен, `sprd*`/`uwe5621` в `lsmod` отсутствуют вовсе. Это один образ прошивки
+    на несколько ревизий плат — по составу модулей нельзя судить о распаянных чипах.
+
+<a id="leds"></a>
+## Индикация { #led }
+
+Оба выведены как обычные Linux-фреймбуферы:
+
+| Устройство | `name` | `virtual_size` | `bits_per_pixel` | `stride` | Кадр |
+|---|---|---|---|---|---|
+| `/dev/graphics/fb4` | `YNDX LED screen` | `25,16` | 24 | 75 | 1200 Б |
+| `/dev/graphics/fb5` | `YNDX LED ring` | `24,1` | 24 | 72 | 72 Б |
+
+Кольцо дополнительно доступно поканально:
+`/sys/class/leds/station2:{red,green,blue}:ring{1..24}`, причём диоды 1…12 висят на
+`0-0x3c`, а 13…24 — на `0-0x3f`.
+
+Модули: `gowin_led_device` (FPGA-мост, он же держит `lp_uart` для Zigbee),
+`quasar_led_screen`, `quasar_led_ring`, `leds-is31fl32xx`. Яркость по умолчанию приходит
+из загрузчика: `ro.boot.led_ring_brightness=255`, `ro.boot.led_screen_brightness=100`.
+
+GIF-анимации фронтального экрана и паттерны кольца лежат в
+`/data/data/com.yandex.io.sdk/files/system/` — `frontal_animation/25x16/*.gif` и
+`ledpatterns/*.led` (есть и `zigbee_identification.led` — подсветка при привязке
+Zigbee-устройства).
+
+## Звук { #audio }
+
+Одна звуковая карта + loopback:
+
+```text
+0 [AMLAUGESOUND]: AML-AUGESOUND - AML-AUGESOUND
+1 [Loopback    ]: Loopback - Loopback 1
+```
+
+`/proc/asound/devices`: воспроизведение `0-0`, `0-2`, `0-3`; запись `0-0`, `0-1`.
+Тракт по факту: ЦАП **ES8156** → 2× **SY6045S**, микрофоны — **ES7210** (4 канала).
+Детектор джека — отдельное устройство ввода `AML-AUGESOUND Headphones` (`event3`).
+Акустические профили и эквалайзер — в `sound_presets/` внутри каталога `io.sdk`.
+
+## Вход { #input }
+
+| Узел | Имя | Назначение |
+|---|---|---|
+| `event0` | `gpio_keypad` | физические кнопки (в т.ч. отключение микрофонов) |
+| `event1` | `cec_input` | команды пульта ТВ по HDMI-CEC |
+| `event2` | `rotary-volume` | поворотное кольцо громкости |
+| `event3` | `AML-AUGESOUND Headphones` | детектор кабеля 3.5 мм |
 
 ## Zigbee: как он устроен { #zigbee }
 
@@ -116,166 +322,6 @@ EFR32** в роли NCP — конкретная модель по дампу н
 Провайдеры умного дома в `quasar.cfg` (`iot.providers`): `Zigbee: true`, `Matter: true`,
 `WiFi: true`.
 
-## Чем принципиально отличается { #differences }
-
-- **Это YaOS (Android TV), а не Buildroot.** Стек quasar — Android-приложения:
-  `com.yandex.io.sdk` лежит в `/system/priv-app/ServicesIosdk/ServicesIosdk.apk`,
-  `com.yandex.tv.alice` — в `/vendor/app/YandexTvAlice/YandexTvAlice.apk`. Рабочий каталог
-  конфигов — `/data/data/com.yandex.io.sdk/files/system/` (там же `quasar.cfg`, `led.cfg`,
-  `ledpatterns/`, `frontal_animation/`, `zigbee/gateway.ybl`). Приёмы из
-  [«Как это устроено»](../internals/architecture.md) (maind/aliced, init.d) неприменимы.
-- **A/B-слотов на этой ревизии нет.** В U-Boot `env` логика слотов есть
-  (`get_valid_slot`, при `avb2=0` корень берётся с `mmcblk0p23`/`p24` для `_a`/`_b`), но
-  физически на диске только `mmcblk0p1…p21` — разделы слотов не нарезаны, устройство
-  одно-слотовое, грузится с `p18`.
-- **Батареи нет, но Android считает иначе.** `dtbo`-оверлей добавляет в `/` узлы
-  `dummy-battery` и `dummy-charger` (`amlogic, dummy-battery`/`-charger`), а загрузчик
-  передаёт `ro.boot.fake_battery=42` — иначе `healthd`/`BatteryService` выключают колонку.
-- **Идентификация платы по EEPROM.** Модуль `quasar_pcba_ids.ko` (DT-узел `pcba_ids`,
-  `compatible = "pcba-ids"`) читает шесть EEPROM `24c01` и unifykeys. Имена плат из DT:
-  `som`, `bp`, `led_display`, `led_ring`, `mics`, `dc_ethernet` — по одному EEPROM на
-  субплату. Похоже, именно так прошивка различает ревизии (не проверялось).
-
-## Разметка (Android, eMMC) { #partitions }
-
-Имена разделов задаёт **device-tree**, узел `/partitions` (`parts = 18`, порядок — по
-ссылкам `part-0`…`part-17`, а не по порядку узлов в тексте DTS). Сверка этих размеров с
-`/proc/partitions` даёт однозначную карту:
-
-```text
-раздел            блоков (1 КБ)   размер    имя (by-name)
-mmcblk0             15267840      14.56 ГБ  (вся user-area)
-mmcblk0p1               4096          4 МБ  bootloader
-mmcblk0p2              65536         64 МБ  reserved
-mmcblk0p3            1146880       1120 МБ  cache
-mmcblk0p4               8192          8 МБ  env
-mmcblk0p5               8192          8 МБ  logo
-mmcblk0p6              24576         24 МБ  recovery
-mmcblk0p7               8192          8 МБ  misc
-mmcblk0p8               8192          8 МБ  dtbo
-mmcblk0p9               8192          8 МБ  cri_data
-mmcblk0p10             16384         16 МБ  param
-mmcblk0p11             16384         16 МБ  boot
-mmcblk0p12             16384         16 МБ  rsv
-mmcblk0p13             16384         16 МБ  metadata
-mmcblk0p14              2048          2 МБ  vbmeta
-mmcblk0p15             32768         32 МБ  tee
-mmcblk0p16            524288        512 МБ  vendor
-mmcblk0p17            131072        128 МБ  odm
-mmcblk0p18           1515520       1480 МБ  system      (dm-verity -> dm-0 = /)
-mmcblk0p19            131072        128 МБ  product
-mmcblk0p20           1572864       1536 МБ  sysrecovery
-mmcblk0p21           9822208       9.37 ГБ  data
-
-mmcblk0boot0 / mmcblk0boot1 — по 4096 (4 МБ);  mmcblk0rpmb — 4096
-zram0 — 262144 (256 МБ);  dm-0 — 1491524 (/);  dm-1 — 515932 (/vendor)
-```
-
-Привязка держится на четырёх независимых якорях: `p18` = `system` (прямо из
-`dm=`/`root=/dev/dm-0` в cmdline), а `dtbo` = `p8`, `vbmeta` = `p14`,
-`sysrecovery` = `p20` — по образам разделов. Остальные имена из DT ложатся на размеры без
-расхождений.
-
-Единственное отклонение от порядка DT: **`cache` вынесен в начало** (`p3`), хотя в DT он
-стоит `part-15` — его, как `bootloader`, `reserved` и `env`, создаёт прошивальщик Amlogic
-до разделов из таблицы. Разделы `cri_data`, `param` и `cache` помечены в DT `mask = 0x2`
-(не перезаписываются при обновлении), `data` — `mask = 0x4`, остальные — `0x1`.
-
-!!! note "Как снять имена разделов на живом устройстве"
-    На Android это **`/dev/block/by-name/`** (на этой плате —
-    `/dev/block/platform/soc/ffe07000.mmc/by-name/`), а не `/dev/disk/by-name/`, как на
-    десктопном Linux. Но под `uid=2000(shell)` каталог `/dev/block/` не листается. Без
-    root работают два обходных пути:
-
-    ```sh
-    cat /sys/block/mmcblk0/mmcblk0p*/uevent | grep PARTNAME
-    cat /proc/device-tree/partitions/*/pname
-    ```
-
-`df -h`: `/` 1.4 ГБ (занято 1.2 ГБ, 89 %), `/vendor` 488 МБ (dm-verity, 71 %),
-`/odm` 124 МБ, `/product` 122 МБ, **`/data` 9.1 ГБ** (занято 1.6 ГБ), `/cache` 1.0 ГБ,
-`/metadata` 11 МБ, `/mnt/vendor/param` 11 МБ, `/mnt/vendor/tee` 27 МБ, `/tmp` 128 МБ
-(tmpfs), `/tmp/untrusted` 70 МБ.
-
-!!! note "`/data` здесь 9.1 ГБ"
-    На странице обычной Макс указано `/data` 1.9 ГБ. На этом экземпляре раздел
-    `mmcblk0p21` — 9 822 208 блоков, и `df` показывает 9.1 ГБ. Похоже, 1.9 ГБ относится к
-    другой конфигурации флеша; при сверке моделей это стоит перепроверять.
-
-## Шина I2C { #i2c }
-
-Живой скан `/sys/bus/i2c/devices` (не вывод по списку драйверов): две шины, `i2c-0` —
-`ffd1f000.i2c`.
-
-| Шина:адрес | Чип | Назначение |
-|---|---|---|
-| `0-0x08` | **ES8156** | стерео-ЦАП (линейный выход) |
-| `0-0x30` | `meson-g12a` | узел SoC (имя драйвера в sysfs) |
-| `0-0x3c` | **IS31FL3236** (`is31fl3236,gva`) | LED-драйвер №1 — диоды кольца 1…12 |
-| `0-0x3f` | **IS31FL3236** (`is31fl3236,gva`) | LED-драйвер №2 — диоды кольца 13…24 |
-| `0-0x51`, `0-0x52`, `0-0x54`…`0-0x57` | **24c01** ×6 | EEPROM субплат (`som`, `bp`, `led_display`, `led_ring`, `mics`, `dc_ethernet`) |
-| `0-0x53` | **LTR-308ALS-01** | датчик освещённости (автояркость) |
-| `2-0x2a` | **SY6045S** | УМЗЧ класса D №1 |
-| `2-0x2b` | **SY6045S** | УМЗЧ класса D №2 |
-| `2-0x40` | **ES7210** (`es7210_2ch`) | 4-канальный АЦП микрофонного массива |
-| `2-0x51` | **PCF8563** | RTC |
-
-SPI: `spi32766.0` → `spi:led_screen` (фронтальная матрица).
-
-!!! warning "Драйвер в сборке ≠ чип на плате"
-    В `lsmod` и в `/vendor/lib/modules/` есть `snd-soc-tas5825m`, `snd-soc-pcm1774`,
-    `snd-soc-tlv320adc3101`, а также Wi-Fi-модули Realtek `88x2es` (RTL8822) и UNISOC
-    `sprdwl_ng`/`uwe5621_bsp_sdio`. **Соответствующих устройств на шинах нет:** в I2C-скане
-    отсутствуют адреса TAS5825M, PCM1774 и TLV320ADC3101, а из радио реально работает
-    только Intel (`iwlwifi` на PCIe `fc700000`, 88 758 прерываний); `88x2es` в сборке есть,
-    но не загружен, `sprd*`/`uwe5621` в `lsmod` отсутствуют вовсе. Это один образ прошивки
-    на несколько ревизий плат — по составу модулей нельзя судить о распаянных чипах.
-
-## Индикация: LED-экран и кольцо { #leds }
-
-Оба выведены как обычные Linux-фреймбуферы:
-
-| Устройство | `name` | `virtual_size` | `bits_per_pixel` | `stride` | Кадр |
-|---|---|---|---|---|---|
-| `/dev/graphics/fb4` | `YNDX LED screen` | `25,16` | 24 | 75 | 1200 Б |
-| `/dev/graphics/fb5` | `YNDX LED ring` | `24,1` | 24 | 72 | 72 Б |
-
-Кольцо дополнительно доступно поканально:
-`/sys/class/leds/station2:{red,green,blue}:ring{1..24}`, причём диоды 1…12 висят на
-`0-0x3c`, а 13…24 — на `0-0x3f`.
-
-Модули: `gowin_led_device` (FPGA-мост, он же держит `lp_uart` для Zigbee),
-`quasar_led_screen`, `quasar_led_ring`, `leds-is31fl32xx`. Яркость по умолчанию приходит
-из загрузчика: `ro.boot.led_ring_brightness=255`, `ro.boot.led_screen_brightness=100`.
-
-GIF-анимации фронтального экрана и паттерны кольца лежат в
-`/data/data/com.yandex.io.sdk/files/system/` — `frontal_animation/25x16/*.gif` и
-`ledpatterns/*.led` (есть и `zigbee_identification.led` — подсветка при привязке
-Zigbee-устройства).
-
-## Звук { #audio }
-
-Одна звуковая карта + loopback:
-
-```text
-0 [AMLAUGESOUND]: AML-AUGESOUND - AML-AUGESOUND
-1 [Loopback    ]: Loopback - Loopback 1
-```
-
-`/proc/asound/devices`: воспроизведение `0-0`, `0-2`, `0-3`; запись `0-0`, `0-1`.
-Тракт по факту: ЦАП **ES8156** → 2× **SY6045S**, микрофоны — **ES7210** (4 канала).
-Детектор джека — отдельное устройство ввода `AML-AUGESOUND Headphones` (`event3`).
-Акустические профили и эквалайзер — в `sound_presets/` внутри каталога `io.sdk`.
-
-## Устройства ввода { #input }
-
-| Узел | Имя | Назначение |
-|---|---|---|
-| `event0` | `gpio_keypad` | физические кнопки (в т.ч. отключение микрофонов) |
-| `event1` | `cec_input` | команды пульта ТВ по HDMI-CEC |
-| `event2` | `rotary-volume` | поворотное кольцо громкости |
-| `event3` | `AML-AUGESOUND Headphones` | детектор кабеля 3.5 мм |
-
 ## Ключи: unifykeys { #unifykeys }
 
 `/sys/class/unifykeys` — 21 ключ. Полезно для понимания, что лежит в eFUSE/secure-хранилище
@@ -291,39 +337,6 @@ hdcp14_rx key_blob secret_key(secure) eth_exphy_para localization
 
 U-Boot читает `deviceid`, `mac` и `localization` через `keyman` и подставляет их в
 `bootargs` (скрипт `cmdline_keys`).
-
-## Доступ { #access }
-
-- **Root «из коробки» нет:** AVB 1.1 + dm-verity `enforcing` + SELinux `enforcing`,
-  `ro.secure=1`, `ro.adb.secure=1`, `ro.boot.vbmeta.device_state=locked`,
-  `ro.boot.rh_unlock=0`.
-- **`ro.boot.flash.locked` на этой платформе нет.** Состояние блокировки смотреть по
-  `ro.boot.vbmeta.device_state` (`locked`) и `ro.boot.verifiedbootstate` (`green`).
-- **Отладочный путь заложен в U-Boot env, а не в fastboot.** Из скрипта `storeboot`:
-
-    ```sh
-    if test "${rabbit_hole_debug}" = 1; then setenv rh_unlock 1; else setenv rh_unlock 0; fi
-    setenv bootargs ${bootargs} androidboot.rh_unlock=${rh_unlock}
-    adb_en_l=0
-    if test ${rh_unlock} = 1; then adb_en_l=1; fi
-    if test ${otg_force_device} = 1; then adb_en_l=1; fi
-    if test ${adb_en_l} = 1; then setenv bootargs ${bootargs} androidboot.adb_enable=1; fi
-    ```
-
-    То есть `rabbit_hole_debug=1` → `rh_unlock=1` **и** принудительный ADB;
-    `otg_force_device=1` включает ADB независимо. Режим SELinux тоже задаётся из env
-    (`androidboot.selinux=${EnableSelinux}`). В заводском env `rabbit_hole_debug=0`,
-    `lock=10001000`, `upgrade_step=2`. Сложность не в отсутствии механизма, а в записи в
-    раздел `env` при подписанном загрузчике и ключах eFUSE — способ записи не найден.
-- **Заводской сетевой режим:** `set_factory_env` переводит `bootcmd` в `factoryboot`,
-  который поднимает DHCP и грузится по сети.
-- Загрузчик — U-Boot `2015.01-g7ebc07b-dirty`, ожидаемая базовая версия
-  `01.01.180822.145544` (`ro.build.expect.bootloader`). Раздел `bootloader` и оба
-  аппаратных `mmcblk0boot0`/`boot1` побайтово идентичны (один SHA-256).
-- Раздел `sysrecovery` (`p20`, 1.5 ГБ) содержит целиком заводской пакет **Amlogic USB
-  Burning Tool** (`IMAGE_PACK_MAGIC = 0x27b51956`): `DDR.USB`, `UBOOT.USB`,
-  `aml_sdc_burn.ini`, `*.PARTITION`. То есть восстановление через USB Burning Tool для
-  этой платы подтверждено, а заводской образ извлекается прямо из устройства.
 
 ## ПО: YaOS / Яндекс ТВ { #software }
 
@@ -346,11 +359,10 @@ U-Boot читает `deviceid`, `mac` и `localization` через `keyman` и �
 Перехват клавиш задан в `/vendor/build.prop`: `yndx.intercept.tv.key=com.yandex.tv.home`,
 `yndx.intercept.settings.key=com.yandex.tv.setupwizard`.
 
-!!! note "Расхождение со страницей обычной Макс"
-    На этом экземпляре (build `5000000896`) **нет** `com.yandex.browser.tv` и
-    `ru.yandex.games`, которые перечислены на странице Макс. Зато есть
-    `com.yandex.tv.ytplayer`, `com.yandex.devices.*` и `com.yandex.tv.daydream`. Список
-    приложений стоит считать привязанным к конкретной сборке, а не к модели.
+На этом экземпляре (сборка `5000000896`) отсутствуют пакеты `com.yandex.browser.tv` и
+`ru.yandex.games`, перечисленные на странице обычной Макс, но есть `com.yandex.tv.ytplayer`,
+`com.yandex.devices.*` и `com.yandex.tv.daydream`. Набор установленных приложений
+привязан к конкретной сборке прошивки, а не к модели устройства.
 
 ## Что ещё проверить { #todo }
 
@@ -363,8 +375,6 @@ U-Boot читает `deviceid`, `mac` и `localization` через `keyman` и �
 - Назначение `atbm8881_fe` на колонке без антенного входа.
 - Реально ли различаются `YNDX-00052` и `YNDX-0008` по данным EEPROM (`pcba_ids`).
 - Возможность записи в раздел `env` — единственный найденный путь к `rabbit_hole_debug`.
-
----
 
 *Данные сняты с одного экземпляра `YNDX-00052` на прошивке `5000000896`. Серийные номера,
 `device-id` и MAC не публикуются, приватные ключи устройства — тоже.*

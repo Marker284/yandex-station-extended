@@ -7,17 +7,29 @@ Lua-скрипты и бинарники и даёт им доступ к жел
 
 [BetterYAM](https://github.com/Yandex-Station-Universal-Repo/BetterYAM/) —
 форк YAM с отдельным демоном под каждую модель. Поддерживаются Станция Мини (1-го
-поколения) и Станция Лайт. Подробнее — [ниже](#betteryam).
+поколения), Станция Лайт и Станция Мини 3 — [чем он отличается](#betteryam).
 
-Оба проекта — сторонние и быстро меняются. Здесь описано состояние на YAM **0.1.17** и
-BetterYAM **0.1.22** (октябрь 2026). Если что-то разошлось, смотрите `docs/` в их репозиториях.
+**Проверено на:** Станция Лайт (`yandexmicro`) и Станция Мини 2 с YAM 0.1.19,
+Станция Мини (1-го поколения) с BetterYAM 0.1.22, октябрь 2026. Оба проекта сторонние и
+быстро меняются. Если что-то разошлось, смотрите `docs/` в их репозиториях.
+
+!!! warning "YAM переписан: следующая версия несовместима с тем, что ниже"
+    Релиз 0.1.19 от 27 октября 2026 года помечен автором как EOL. В ветке разработки YAM
+    стал пакетным менеджером, который работает **на самой колонке**: десктопного CLI и
+    сетевого демона `yamd` там нет, пакеты имеют расширение `.yampkg`, а Lua, веб-панель
+    и поддержка старых `.yap` вынесены в отдельный пакет `yam-lua-runtime`. Старые пакеты
+    несовместимы.
+
+    Релиза у новой версии пока нет, поэтому короткие адреса `hackalice.me/install.sh`
+    и `install.ps1` закреплены за 0.1.19 — рабочей версией, которую и описывает эта
+    страница. Когда новая версия выйдет, страницу придётся переписать.
 
 !!! warning "Web UI и API без пароля"
     Панель на порту `8099` не спрашивает пароль. Любой в вашей сети может ставить пакеты, а
     с включёнными бинарниками — запускать на колонке свой код от root. Держите колонку только
     в доверенной сети и не пробрасывайте `8099` наружу.
 
-## Что нужно
+## Что понадобится { #requirements }
 
 - root и ADB на колонке — см. [Получение root](../start/index.md#root-by-model);
 - компьютер с `adb`: Windows 10/11 x64, Linux x86_64 или Mac на Apple Silicon;
@@ -26,7 +38,7 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
   (`armv7l`), YAM там не поставится. У BetterYAM есть сборка armv7 — но только для Станции
   Мини, см. [ниже](#betteryam).
 
-## Установка
+## Установка { #install }
 
 Короткие адреса `hackalice.me/install.sh` и `hackalice.me/install.ps1` скачивают и запускают
 актуальный установщик из репозитория YAM. Прямые адреса — в
@@ -36,19 +48,8 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
 
     Нужна Windows 10 или 11 **x64**: установщик скачивает CLI только под x86_64.
 
-    1. Поставьте `adb`. Проще всего через winget:
-
-        ```powershell
-        winget install Google.PlatformTools
-        ```
-
-        Или вручную: скачайте
-        [Platform Tools](https://developer.android.com/tools/releases/platform-tools),
-        распакуйте, например, в `C:\platform-tools` и добавьте эту папку в `Path`
-        («Параметры → Система → О системе → Дополнительные параметры системы →
-        Переменные среды»). Откройте **новое** окно PowerShell и проверьте `adb version`.
-        Установщик ищет `adb` в `Path`. Без него CLI поставится, но `yamd` на колонку
-        не попадёт.
+    1. Проверьте, что `adb` стоит и виден в `Path`: `adb version`. Если нет —
+        [поставьте](../start/adb.md), иначе CLI установится, а `yamd` на колонку не попадёт.
 
     2. Подключите колонку по ADB:
 
@@ -75,7 +76,8 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
         yam install nano
         ```
 
-        Веб-панель — `http://192.168.1.120:8099` в браузере.
+        Веб-панель открывается в браузере по адресу колонки на порту 8099
+        (например, `192.168.1.120:8099`).
 
     Конкретная версия и удаление CLI:
 
@@ -96,9 +98,7 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
     Нужен Linux x86_64 или Mac на Apple Silicon. Linux на ARM и Mac на Intel установщик
     не поддерживает.
 
-    1. Поставьте `adb`: `sudo apt install adb` (Debian/Ubuntu),
-       `brew install android-platform-tools` (macOS) или
-       [Platform Tools](https://developer.android.com/tools/releases/platform-tools).
+    1. Проверьте `adb version`; если утилиты нет — [поставьте](../start/adb.md).
     2. Подключите колонку: `adb connect <IP>:5555`, затем `adb devices`.
     3. Запустите установщик:
 
@@ -106,7 +106,8 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
         curl -fsSL https://hackalice.me/install.sh | sh
         ```
 
-    4. Проверьте `yam device` и откройте `http://<IP колонки>:8099`.
+    4. Проверьте команду `yam device` и откройте веб-панель на порту 8099
+       (`http://<IP>:8099` в браузере).
 
     CLI ставится в `~/.local/bin/yam`. Если команда не находится, добавьте папку в `PATH`:
     `export PATH="$HOME/.local/bin:$PATH"` в `~/.bashrc` или `~/.zshrc`.
@@ -120,13 +121,9 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
 
     У BetterYAM свой установщик — см. [BetterYAM](#betteryam).
 
-Что делает установщик:
-
-1. Находит колонки в `adb devices` с `aarch64`. Если их несколько — спрашивает номер, если
-   ни одной — спрашивает IP и подключается к `<IP>:5555`.
-2. Скачивает последний релиз и сверяет SHA-256 с `SHA256SUMS` из того же релиза.
-3. Ставит CLI на компьютер и запоминает адрес колонки (`YAM_URL=http://<IP>:8099`).
-4. Копирует `yamd` в `/data/quazar/yam/bin` (именно `quazar`, через `z`) и запускает его.
+Установщик сам находит колонку с `aarch64` в `adb devices` (если их несколько — спросит
+какую), сверяет SHA-256 релиза, ставит CLI на компьютер и копирует `yamd` в
+`/data/quazar/yam/bin` — каталог действительно пишется через `z`.
 
 ### Автозапуск после перезагрузки { #autostart }
 
@@ -134,8 +131,8 @@ BetterYAM **0.1.22** (октябрь 2026). Если что-то разошло�
 добавляет**: после перезагрузки колонки демон не поднимется. Можно повторить установку или
 добавить скрипт ниже. Пример на колонке не проверялся; на Мини 3 Про с прошивкой `.50`
 корень после перезагрузки откатывается, там такой способ не сработает — а на заводской
-factory-12 автозапуск из `/etc/init.d` работает
-(см. [её страницу](../devices/station-mini3-pro.md#factory-12)).
+factory-12 автозапуск из `/etc/init.d` работает.
+Разбор отличий — на [странице Мини 3 Про](../devices/station-mini3-pro.md#factory-12).
 
 У BetterYAM автозапуск ставит сам установщик — `/etc/init.d/S99zzbetteryam`. Он тоже
 переживает перезагрузку только там, где правки корневой ФС сохраняются.
@@ -160,7 +157,7 @@ chmod +x /etc/init.d/S99zyam
 sync; mount -o remount,ro /
 ```
 
-## Пакеты
+## Пакеты { #usage }
 
 `.yap` — ZIP или `tar.gz` с `plugin.toml` в корне. Бывают двух видов:
 
@@ -305,17 +302,24 @@ enabled = false
 за основу YAM, но у каждой модели свой демон (`betteryamd`) со своим API и Web UI. Пакеты
 `.yap`, Lua API и CLI совместимы с YAM. CLI называется `byam`, `yam` ставится как псевдоним.
 
-Сейчас в релизе 0.1.22 два демона: **Станция Мини (1-го поколения)**, сборка armv7, и
-**Станция Лайт** (`yandexmicro`), сборка aarch64. Модель установщик определяет по `uname -n`
-(например, `YandexStationMini_729E` → `YandexStationMini`) и сверяет с `manifest.json`
-релиза. Для Миди, Мини 3, Лайт 2 и других моделей демона пока нет, и установка завершается
-ошибкой.
+Сейчас есть три демона: **Станция Мини (1-го поколения)**, сборка armv7, **Станция Лайт**
+(`yandexmicro`) и **Станция Мини 3** (`yandexmini3`), сборки aarch64. Модель установщик
+определяет по `uname -n` (например, `YandexStationMini_729E` → `YandexStationMini`) и
+сверяет с `manifest.json` релиза; похожую модель он не подставляет. Для Миди, Лайт 2 и
+остальных демона пока нет, и установка завершается ошибкой.
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/Yandex-Station-Universal-Repo/BetterYAM/refs/heads/main/install.sh | sh
-```
+=== "Linux / macOS"
 
-Windows: `irm https://raw.githubusercontent.com/Yandex-Station-Universal-Repo/BetterYAM/refs/heads/main/install.ps1 | iex`.
+    ```sh
+    curl -fsSL https://raw.githubusercontent.com/Yandex-Station-Universal-Repo/BetterYAM/refs/heads/main/install.sh | sh
+    ```
+
+=== "Windows"
+
+    ```powershell
+    irm https://raw.githubusercontent.com/Yandex-Station-Universal-Repo/BetterYAM/refs/heads/main/install.ps1 | iex
+    ```
+
 Удаление — `sh -s -- --uninstall`, как у YAM. Демон ставится в `/data/quazar/betteryam` и
 слушает `8099` на LAN-адресе колонки. Автозапуск установщик прописывает сам
 (`/etc/init.d/S99zzbetteryam`), см. [выше](#autostart).
@@ -340,3 +344,28 @@ Windows: `irm https://raw.githubusercontent.com/Yandex-Station-Universal-Repo/Be
 [`yse`](../start/packages.md) ставит программы в Entware и запускается на самой колонке по
 SSH. YAM — менеджер плагинов с веб-панелью и API к железу колонки, управляется с компьютера.
 Реестр `.yap` у них общий. Ставить можно оба, они не мешают друг другу.
+
+## Откат { #rollback }
+
+Снять CLI с компьютера и демон с колонки:
+
+=== "Linux и macOS"
+
+    ```sh
+    curl -fsSL https://hackalice.me/install.sh | sh -s -- --uninstall
+    ```
+
+=== "Windows"
+
+    ```powershell
+    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Uninstall
+    ```
+
+В Windows установщик убирает только CLI, демон с колонки удаляется вручную:
+
+```sh
+kill $(cat /data/quazar/yam/yamd.pid); rm -rf /data/quazar/yam
+```
+
+Автозапуск, если ставили, — `rm /etc/init.d/S99zyam`. У BetterYAM каталог называется
+`/data/quazar/betteryam`, скрипт автозапуска — `S99zzbetteryam`.
