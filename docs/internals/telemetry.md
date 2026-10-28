@@ -21,7 +21,7 @@
     **отдельный** канал (uniproxy), который управляется согласием владельца (настройка
     «Помогать Алисе стать лучше» в Яндекс ID) — см. [Когда что включается](#when).
 
-## Конвейер
+## Конвейер { #pipeline }
 
 ```text
   источники внутри maind              агрегатор (maind --telemetry)        отправка в облако
@@ -50,12 +50,13 @@
   в 300 c; `pstorePath=/sys/fs/pstore`, пинги `quasar.yandex.ru`, список сервисов для watchdog.
 - **`metrica2d`** (порт 9904) и **`metricad`** (порт 9887) — gRPC-эндпоинты метрики
   (см. [Сеть и порты](network.md)).
-- **`--fluent-bitd`** — отгрузка текстовых логов на `clck.yandex.net:443` (`/quasar/write/json/batch`).
+- **`--fluent-bitd`** — отгрузка текстовых логов на `clck.yandex.net:443`
+  (`/quasar/write/json/batch`).
 
 Защита от переполнения и rate-limit: `throttled_callable`, `isEventTooBig`, `maxStorageSizeMb`,
 `maxEventsInBatch`. У самого процесса — `selfDestroyer` с лимитом RSS 64 МБ.
 
-## Куда отправляется (с устройства, подтверждено)
+## Куда отправляется (с устройства, подтверждено) { #endpoints }
 
 Хосты задаются в `quasar.cfg` (ключ `teleme3d`) и могут переопределяться startup-ответом раз в
 сутки. Реальные значения на прошивке `0.369`:
@@ -94,7 +95,8 @@ https://report.appmetrica.yandex.net/report?protocol_version=2&locale=ru_RU
 ### Что ещё видно на живом устройстве
 
 - **UUID два разных**: AppMetrica-UUID лежит в `${DATA}/quasar_metricad.json` вместе со списком
-  актуальных хостов (`"reports":[…report.appmetrica.yandex.net], "startups":[…startup.mobile.yandex.net]`),
+  актуальных хостов (`"reports":[…report.appmetrica.yandex.net]`,
+  `"startups":[…startup.mobile.yandex.net]`),
   а у clickdaemon свой UUID в `${DATA}/data/metrica/clickdaemon/metadata.json`.
 - **startup раз в сутки**: `Go for startup` → `Next startup round delayed for 86400 seconds`;
   именно он обновляет список report-хостов (`onStartupResult <uuid> urls:[…]`).
@@ -108,7 +110,7 @@ https://report.appmetrica.yandex.net/report?protocol_version=2&locale=ru_RU
     В `quasar.cfg` есть второй набор хостов для зарубежного рынка: `startup.appmetrica.yango.com`,
     `clck.yasmina.yango.com`, `scbh.yasmina.yango.com`. Выбирается по региону устройства.
 
-## Что собирается
+## Что собирается { #collected }
 
 Телеметрия идёт в двух protobuf-форматах; что именно слать — задано **белыми списками** в
 `quasar.cfg`.
@@ -116,7 +118,8 @@ https://report.appmetrica.yandex.net/report?protocol_version=2&locale=ru_RU
 **AppMetrica — `ReportMessage`** (~32 события, `teleme3d.appmetrica.events`). В основном
 сетевая и системная диагностика: `NetInterfaceUp`, `wifiConnect` / `wifiDisconnect` /
 `wifiReport`, `emptyIp` / `wrongIp` / `internetRecovery*`, `pings`, `connectionStats`,
-`systemMetrics`, `processStart`, `phraseSpottedWithoutInternet`, `directiveStarted/Handled/Completed`,
+`systemMetrics`, `processStart`, `phraseSpottedWithoutInternet`,
+`directiveStarted/Handled/Completed`,
 `ysk_error_network` / `ysk_error_timeout`. Поля proto: `Session → {SessionDesc → Location,
 CellularNetworkInfo; Event → Account, NetworkInfo → WifiAccessPoint}`, `Location`,
 `NetworkInterface`, `EnvironmentVariable`, `SimInfo`. Режим env-ключей — `black` (чёрный список).
@@ -127,7 +130,8 @@ CellularNetworkInfo; Event → Account, NetworkInfo → WifiAccessPoint}`, `Loca
 - **Алиса / запросы** — `aliceRequest`, `getNextRequest(Failed)`, `local_request`,
   `hybrid_request`, `http_request`, `localRecognitionData`, `local_analytics_info`.
 - **Аудио / музыка** — `audioClient*` (play/underrun/error/altUrl), `musicPlayer*`,
-  `YandexMusicPlay/SwitchTrackTimeout`, `AudioError`, `dsp_info`, `equalizerStats`, `audioDeviceStats`.
+  `YandexMusicPlay/SwitchTrackTimeout`, `AudioError`, `dsp_info`, `equalizerStats`,
+  `audioDeviceStats`.
 - **Биометрия (голосовой отпечаток)** — большой блок `bio*`: `bioEnrollment*`, `bioAddAccount*`,
   `bioRemoveAccount*`, `bioShareEnrolledPerson*`, `bioLibraryDiagnosticData`, `bioLogStorage`.
 - **Аккаунты / токены** — `addGuestUser*`, `clearGuestUser*`, `changeAccount*`, `deleteAccount*`,
@@ -178,7 +182,8 @@ backend-метрики — `SetraceReqId` / `SetraceClientReqId`.
 
 По [справке Яндекса][yq]: до активационного слова в облако **ничего не передаётся**; голосовой
 запрос уходит **после активации** и **может** использоваться для обучения Алисы, но только **в
-обезличенном виде**. Технически согласие проявляется в `account_config`, который приходит на колонку:
+обезличенном виде**. Технически согласие проявляется в `account_config`, который приходит
+на колонку:
 
 - `doNotUseUserLogs` — флаг «не использовать логи пользователя». При включённом согласии он
   `false` (логи использовать можно); выключишь галочку — станет `true` *(вывод: обратное значение)*.
@@ -208,7 +213,7 @@ backend-метрики — `SetraceReqId` / `SetraceClientReqId`.
 
 [yq]: https://alice.yandex.ru/support/ru/station/settings/query-history
 
-## Где лежит на устройстве
+## Где лежит на устройстве { #storage }
 
 | Путь | Что это |
 |---|---|
@@ -228,7 +233,7 @@ backend-метрики — `SetraceReqId` / `SetraceClientReqId`.
       (см. [Подводные камни](gotchas.md)). Нужны правки hosts/маршрутов или keylog.
     - До отправки всё лежит локально (таблица выше) — можно читать, не трогая сеть.
 
-## Как отключить
+## Как отключить { #disable }
 
 **Штатно (без рута), запись голоса:** Яндекс ID → [Доступы к данным](https://id.yandex.ru/personal/data-access)
 → **Алиса** → выключить **«Помогать Алисе стать лучше»**. Это убирает использование записей для
