@@ -3,8 +3,9 @@
 
 import { Api, ApiError } from './api.js';
 import { h, clear, icon, spinner, formatTime, plural, store } from './dom.js';
-import { createEditor, commands, setDoc, setLineMarks, revealQuote, gotoLine, topVisibleLine, insertBlock } from './cm.js';
-import { renderInto, elementForLine } from './preview.js';
+import { createEditor, commands, setDoc, setLineMarks, revealQuote, gotoLine, topVisibleLine, insertBlock, undo, redo } from './cm.js';
+import { renderInto, elementForLine, setIcons } from './preview.js';
+import { enableLiveEdit, markBlocks } from './live.js';
 import { lineStats, rebase } from './diff.js';
 import { scanChange, hasBlocking } from '../../shared/scan.js';
 import {
@@ -50,10 +51,12 @@ const S = {
   view: null,
   editor: null,
   preview: null,
+  live: null, // правка прямо в превью (live.js)
   findings: [],
   stats: { added: 0, removed: 0, changedLines: new Set() },
   submitted: false,
   sections: [],
+  hint: '',
 };
 
 const siteUrl = (path) => new URL(path ? pageUrlPath(path) : '', cfg.siteRoot).href;
@@ -545,9 +548,28 @@ let previewTimer = 0;
 let analyzeTimer = 0;
 let draftTimer = 0;
 
+/** Иконки вики для превью — файл собирает contrib/editor-icons.py. */
+async function loadIcons() {
+  try {
+    const res = await fetch(new URL('assets/editor/icons.json', cfg.siteRoot).href, { cache: 'force-cache' });
+    if (!res.ok) return;
+    setIcons(await res.json());
+    if (S.preview && !S.live?.isEditing()) drawPreview();
+  } catch {
+    /* без иконок превью просто покажет квадратики */
+  }
+}
+
+function drawPreview() {
+  renderInto(S.preview, S.editor.state.doc.toString(), { pagePath: S.path, siteRoot: cfg.siteRoot, pendingImages: S.images });
+  markBlocks(S.preview);
+}
+
 function updatePreview() {
   if (!S.preview || S.view === 'source') return;
-  renderInto(S.preview, S.editor.state.doc.toString(), { pagePath: S.path, siteRoot: cfg.siteRoot, pendingImages: S.images });
+  // пока печатают в самом превью, перерисовка увела бы каретку
+  if (S.live?.isEditing()) return;
+  drawPreview();
   syncPreview();
 }
 
@@ -567,6 +589,19 @@ function analyze() {
   const danger = new Set(S.findings.filter((f) => f.severity === 'block').map((f) => f.line));
   S.editor.dispatch({ effects: setLineMarks.of({ changed: S.stats.changedLines, danger }) });
   renderStatus();
+}
+
+let hintTimer = 0;
+
+/** Короткая подсказка в строке состояния — вместо баннера, который пришлось бы закрывать. */
+function hint(text) {
+  S.hint = text;
+  renderStatus();
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => {
+    S.hint = '';
+    renderStatus();
+  }, 4000);
 }
 
 function renderStatus() {
@@ -601,7 +636,7 @@ function renderStatus() {
     ),
     scan,
     h('span', { class: 'yse-spacer' }),
-    h('span', { class: 'yse-status-hint' }, 'Ctrl+B / I / K · Ctrl+S — черновик · Ctrl+Enter — отправить'),
+    h('span', { class: 'yse-status-hint' }, S.hint || 'Печатать можно в обеих панелях · Ctrl+B / I / K · Ctrl+S — черновик · Ctrl+Enter — отправить'),
   );
   const send = root.querySelector('.yse-send');
   if (send) send.disabled = !S.isNew && added === 0 && removed === 0 && S.images.size === 0;
@@ -615,7 +650,11 @@ pickImage.addEventListener('change', () => {
   pickImage.value = '';
 });
 
-async function addImages(files) {
+/**
+ * Добавляет картинки в правку. `at` — смещение в исходнике (картинку принесли
+ * в превью): тогда она встаёт отдельным блоком именно туда, а не к каретке слева.
+ */
+async function addImages(files, at = null) {
   for (const file of files) {
     if (file.size > MAX_IMAGE_BYTES) {
       banner('warn', `«${file.name}» больше 2 МБ — уменьшите картинку и вставьте снова.`);
@@ -640,6 +679,12 @@ async function addImages(files) {
     S.images.set(repoPath, { name, base64, url: URL.createObjectURL(file), size: file.size });
     const alt = baseName.replace(/-/g, ' ');
     const link = relativeLink(S.path, repoPath);
+    if (at !== null) {
+      const insert = `\n\n![${alt}](${link})`;
+      S.editor.dispatch({ changes: { from: at, insert } });
+      at += insert.length;
+      continue;
+    }
     const r = S.editor.state.selection.main;
     const line = S.editor.state.doc.lineAt(r.from);
     if (line.text.trim()) insertBlock(S.editor, `![${alt}](${link})`, alt);
@@ -649,7 +694,11 @@ async function addImages(files) {
     }
   }
   renderStatus();
-  updatePreview();
+  // картинку принесли в превью — перерисовать его, даже если каретка осталась там
+  if (at !== null) {
+    S.live?.reset();
+    drawPreview();
+  } else updatePreview();
 }
 
 function editorScreen(content) {
@@ -706,6 +755,13 @@ function editorScreen(content) {
     ),
   );
   S.preview = preview;
+  S.live = enableLiveEdit(preview, {
+    getView: () => S.editor,
+    rerender: () => drawPreview(),
+    notify: (text) => hint(text),
+    onImages: (files, at) => addImages(files, at),
+  });
+  S.live.setHistory(undo, redo);
   S.editor = createEditor(sourcePane, {
     doc: content,
     onChange: () => {
@@ -974,6 +1030,12 @@ function doneScreen(res, payload) {
           ),
           steps,
           h(
+            'p',
+            { class: 'yse-done__close' },
+            icon('check', 14),
+            'Страницу можно закрыть: правка уже на GitHub, проверки и ревью идут без неё.',
+          ),
+          h(
             'div',
             { class: 'yse-actions' },
             h('a', { class: 'yse-btn yse-btn--primary', href: back }, 'Вернуться на страницу'),
@@ -1035,6 +1097,8 @@ async function start() {
     ]);
   }
 }
+
+loadIcons();
 
 if (!api) {
   const path = params.get('path');

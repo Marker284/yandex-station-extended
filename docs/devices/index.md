@@ -27,25 +27,25 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 
 ## Матрица поддержки { #support-matrix }
 
-| Модель | Кодовое имя (DT) | SoC | Статус | Страница |
+| Модель | Кодовое имя (DT) | SoC | Как получить root | Страница |
 |---|---|---|---|---|
-| Станция Лайт | `Yandex Station Micro v1.2` | Amlogic AXG (A113) | ✅ подробно | [Лайт](station-lite.md) |
-| Станция Лайт 2 | `plum` | Amlogic AXG (A113X) | ✅ разобрана | [Лайт 2](station-lite2.md) |
-| Станция Мини 2 | `yandex,station-mini2` | Amlogic AXG | ✅ разобрана | [Мини 2](station-mini2.md) |
-| Станция Мини (1 пок) | `amlogic, axg` | Amlogic AXG | ✅ разобрана | [Мини](station-mini.md) |
-| Станция Миди | `yandex,cucumber-dvt2` | Amlogic A5 (A55) | ✅ разобрана | [Миди](station-midi.md) |
-| Станция 2 | `yandex,station-midi` ⚠️ | Amlogic AXG | ✅ разобрана | [Станция 2](station-2.md) |
-| Станция Стрит | `Yandex Station Mango DVT` | Amlogic A1 (A35, 32-бит) | ✅ разобрана | [Стрит](station-street.md) |
-| Станция Макс | `yandexstation_2` ⚠️ | Amlogic + Android 9 | ✅ разобрана | [Макс](station-max.md) |
-| Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | ✅ разобрана | [Макс с Zigbee](station-max-zigbee.md) |
-| Станция (1-го поколения) | `tulip-d1` | Allwinner R18 (sun50iw1) | ✅ разобрана | [Станция gen1](station-gen1.md) |
-| Умный хаб Яндекса (не колонка) | `yandex,saturn` | Amlogic AXG | ✅ разобран | [Умный хаб](yandex-hub.md) |
-| Станция Мини 3 | `yandex,station-mini3` (bergamot) | Amlogic AXG | ✅ разобрана | [Мини 3](station-mini3.md) |
-| Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | ✅ разобрана | [Мини 3 Про](station-mini3-pro.md) |
-| JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | ✅ разобрана | [JBL Link Music](jbl-link-music.md) |
-| Станция 3 | `yandex,orion-pvt` (orion) | Amlogic A5 (A55) | ✅ разобрана | [Станция 3](station-3.md) |
-| Станция Дуо Макс | ? | ? | ⏳ нужны данные | — |
-| Станция Про | ? | ? | ⏳ нужны данные | — |
+| Станция Лайт | `Yandex Station Micro v1.2` | Amlogic AXG (A113) | [подмена DNS](../start/root.md) | [Лайт](station-lite.md) |
+| Станция Лайт 2 | `plum` | Amlogic AXG (A113X) | [сертификат из factory](../start/retail-ca.md) | [Лайт 2](station-lite2.md) |
+| Станция Мини 2 | `yandex,station-mini2` | Amlogic AXG | [подмена DNS](../start/root.md) | [Мини 2](station-mini2.md) |
+| Станция Мини (1 пок) | `amlogic, axg` | Amlogic AXG | [свой образ по USB](../start/root-mini1-usb.md) | [Мини](station-mini.md) |
+| Станция Миди | `yandex,cucumber-dvt2` | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Миди](station-midi.md) |
+| Станция 2 | `yandex,station-midi` ⚠️ | Amlogic AXG | [подмена DNS](../start/root.md) | [Станция 2](station-2.md) |
+| Станция Стрит | `Yandex Station Mango DVT` | Amlogic A1 (A35, 32-бит) | [подмена DNS](../start/root.md) | [Стрит](station-street.md) |
+| Станция Макс | `yandexstation_2` ⚠️ | Amlogic + Android 9 | [ADB до перезагрузки](../start/adb-max.md) | [Макс](station-max.md) |
+| Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | [ADB до перезагрузки](../start/adb-max.md) | [Макс с Zigbee](station-max-zigbee.md) |
+| Станция (1-го поколения) | `tulip-d1` | Allwinner R18 (sun50iw1) | [AliceBridge](../start/root-android.md#station-1) | [Станция gen1](station-gen1.md) |
+| Умный хаб Яндекса (не колонка) | `yandex,saturn` | Amlogic AXG | [подмена DNS](../start/root.md) | [Умный хаб](yandex-hub.md) |
+| Станция Мини 3 | `yandex,station-mini3` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |
+| Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | только на заводской [factory-12](station-mini3-pro.md#factory-12) | [Мини 3 Про](station-mini3-pro.md) |
+| JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | [ADB по USB](../start/root-jbl-link-music.md) | [JBL Link Music](jbl-link-music.md) |
+| Станция 3 | `yandex,orion-pvt` (orion) | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Станция 3](station-3.md) |
+| Станция Дуо Макс | ? | ? | нужны данные | — |
+| Станция Про | ? | ? | нужны данные | — |
 
 ⚠️ **Кодовые имена Яндекса перекрещены**, ориентируйтесь на SoC/ОС:
 
@@ -53,15 +53,23 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 - розничная **Станция Миди** = кодовое имя **Cucumber** (`yandex,cucumber`, A5);
 - `yandexstation_2` (Android `ro.product.device`) = розничная **Станция Макс** — **не**
   «Станция 2»;
-- под `yandexstation_2` скрыты **два SKU**: `YNDX-0008` (Макс) и `YNDX-00052`
+- под `yandexstation_2` скрыты **два SKU**: YNDX-0008 (Макс) и YNDX-00052
   (Макс со встроенным Zigbee). Fingerprint у них одинаковый, по ПО не различаются —
   смотрите SKU на днище.
 
-!!! note
-    Прочерки — это приглашение дополнить. Минимальный набор для новой модели:
-    вывод `uname -a`, `cat /proc/device-tree/model`, `cat /proc/mtd`,
-    `cat /proc/cpuinfo`, список I2C (`/sys/bus/i2c/devices`), версия quasar
-    (`/system/vendor/quasar/VERSION`). Формат — см. [Как дополнять](../contributing.md).
+!!! note "Для новой модели хватит базовых логов"
+    Прочерки — это приглашение дополнить. Минимальный набор команд для сбора данных:
+
+    ```sh
+    uname -a
+    cat /proc/device-tree/model
+    cat /proc/mtd
+    cat /proc/cpuinfo
+    ls /sys/bus/i2c/devices
+    cat /system/vendor/quasar/VERSION
+    ```
+
+    Формат описания — в руководстве [Как дополнять](../contributing.md).
 
 ## Что считать «специфичным для модели»
 

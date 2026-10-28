@@ -12,18 +12,9 @@
 [Как это устроено](../internals/architecture.md) применимы (с поправкой на ядро 5.4 и новые
 пути).
 
-## Получение root { #root }
+## Платформа в двух словах { #platform }
 
-- **[DNS-метод](../start/root.md)** — как на большинстве моделей, на Миди проверен.
-- **[AliceBridge](../start/root-android.md)** — с Android-телефона, без компьютера: поддержка
-  Миди добавлена, получение root проверено. Совместимость с другими версиями прошивки пока
-  не проверялась.
-
-Дальше — [SSH и отключение обновлений](../start/ssh.md).
-
-## Платформа в двух словах
-
-| | |
+| Что | Значение |
 |---|---|
 | SoC | **Amlogic A5** (`amlogic, a5`) |
 | CPU | 4× **Cortex-A55** (`0xd05`), до **2.016 ГГц** (100 МГц … 2016 МГц), см. [DVFS](#dvfs) |
@@ -49,22 +40,90 @@
 | снимок 2 | `0.369.1.50.4794663100.20261021.160` | 21.10.2026 | `01.01.261021.115421` |
 | [factory-6](#factory-6) | `0.6.1.40.1928882720.20230914.factory-6` | 14.09.2023 | `01.01.230914.220025` |
 
-## Чем принципиально отличается
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | работает | [подмена DNS](../start/root.md) |
+| USB Host (OTG) | не проверялось | — |
+| AirPlay | не проверялось | — |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | не проверялось | — |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | работает | [Индикация](#led) |
+| YAM | работает (профиль midi) | [профиль midi](../recipes/yam.md) |
+| Своя LLM | не проверялось | — |
+
+## Получение root { #root }
+
+Основной способ — **[подмена DNS](../start/root.md)**, на Миди проверена. Дальше —
+[SSH и отключение обновлений](../start/ssh.md).
+
+Запасной путь без компьютера — [AliceBridge](../start/root-android.md) с Android-телефона:
+на Миди тоже проверен, но откатывает прошивку.
+
+## Чем отличается { #differences }
 
 - **Новый SoC — Amlogic A5** с ядрами **Cortex-A55** (`0xd05`) до **2 ГГц** и ядром
   **5.4** (у AXG-моделей — A53 `0xd03` @1.2 ГГц, ядро 4.9).
 - **Хранилище eMMC**, а не NAND+UBI: `/proc/mtd` пуст, UBI-томов нет.
 - **USB-C Power Delivery**: контроллер **HUSB238** (`0-0x08`) + модуль
   `ya_pd_controllers` — питание/согласование по USB-C PD.
-- **Zigbee-хаб**: отдельный радиочип **Telink** под управлением модуля `zigbee_control`
-  (см. [Zigbee](#zigbee)).
+- **Zigbee-хаб**: отдельный радиочип **Telink** под управлением модуля `zigbee_control`,
+  подробнее — в разделе [Zigbee](#zigbee).
 - **LED-часы**: помимо кольца и логотипа есть белые **сегменты циферблата** —
   отдельная подсистема индикации (см. ниже).
 - **NPU Vivante VIPNano-Q** (`galcore`) и **DSP HiFi4** — в SoC есть ускорители для
   нейросетей и обработки звука.
 - Усилители **FS2105** (вуфер + твитеры), микрофоны PDM, аппаратный `LOOPBACK-A` (AEC).
 
-## Шина I2C и периферия (4 шины)
+## Разделы флеша { #partitions }
+
+Драйвер разделов Amlogic создаёт устройства прямо в `/dev/<имя>`
+(`/dev/block/by-name` нет); `/dev/root → system`, `root=PARTLABEL=system`.
+
+| Раздел | Устройство | Размер | Что внутри |
+|---|---|---|---|
+| bootloader | `mmcblk0p1` | 4M | U-Boot; копии — `mmcblk0boot0/1` (`/dev/bootloader0/1`) |
+| reserved | `mmcblk0p2` | 64M | таблица разделов MPT, unifykeys, DTB |
+| cache | `mmcblk0p3` | — | узел `/dev/cache` есть, в `/proc/partitions` отсутствует |
+| env | `mmcblk0p4` | 8M | U-Boot env (64 КБ, CRC32) |
+| misc | `mmcblk0p5` | 4M | |
+| tee | `mmcblk0p6` | 48M | ext4, `/tee` (ro) — OP-TEE secure storage |
+| aml_sysrecovery | `mmcblk0p7` | 1.5G | |
+| boot | `mmcblk0p8` | 64M | ядро + DTB |
+| recovery | `mmcblk0p9` | 192M | |
+| system | `mmcblk0p10` | 1G | rootfs (ext4) |
+| ota | `mmcblk0p11` | 1.5G | ext4, `/ota` — `swupdate.*`, `data/wpa_supplicant.conf`, `data/quasar` |
+| data | `mmcblk0p12` | 2.8G | ext4, `/data` |
+
+!!! warning "В разделах ota, env и reserved содержатся личные данные"
+    Кроме `data`, личное лежит в **`ota`** (пароли Wi-Fi, состояние quasar — в том числе
+    в удалённых блоках), **`env`** (серийник, `cpu_id`), **`reserved`** (unifykeys:
+    `deviceid`, `key_blob`) и **`tee`**. Не публикуйте их дампы как есть.
+
+Что смонтировано на [factory-6](#factory-6) (`/proc/mounts`, `/etc/fstab`):
+
+| Точка | Раздел | ФС, режим |
+|---|---|---|
+| `/` | system | ext4, `ro` |
+| `/tee` | tee | ext4, `ro` |
+| `/ota` | ota | ext4, `rw,noatime` |
+| `/data` | data | ext4, `rw,noatime` |
+
+- `/` ядро монтирует в `ro`, а строка `::sysinit:/bin/mount -o remount,rw /` в
+  `/etc/inittab` закомментирована. Правки корня — через `mount -o remount,rw /`, после
+  перезагрузки они сохраняются — см. [factory-6](#factory-6).
+- `/data` — отдельный раздел (2.5 ГБ), а не `/bkupgrade/data`, как на
+  [Лайте](station-lite.md). `/bkupgrade` — ссылка на `/ota`.
+
+!!! danger "Запись в блочные устройства может стереть загрузчик"
+    Защиты от записи нет: у всех разделов `ro=0`, у самого eMMC и загрузочных областей
+    `mmcblk0boot0/1` (в них U-Boot) — `force_ro=0`. Не пишите в `/dev/<раздел>` напрямую —
+    ни `dd`, ни `cat >`.
+
+## Шина I2C и периферия { #i2c }
 
 | Шина:адрес | Чип | Назначение |
 |---|---|---|
@@ -85,7 +144,7 @@
 Привязка EEPROM к платам — из узла `pcba_ids` (`eeprom-names = "main", "top", "clock"`,
 плюс unifykey `assembly`); его читает модуль `quasar_pcba_ids`.
 
-## Индикация (LED-часы) { #led-clock }
+## Индикация { #led }
 
 У Миди самая сложная индикация в семействе — целый **циферблат** плюс кольцо и
 логотип. Все узлы в `/sys/class/leds/`:
@@ -110,12 +169,12 @@
 
 Сегменты циферблата во framebuffer не входят — только `/sys/class/leds/cucumber:white:clock-*`.
 
-!!! note "Нужно задокументировать"
+!!! note "Формат кадра дисплея и протокол анимаций пока не исследованы"
     Формат кадра для `/dev/fb0`/`/dev/fb1` (порядок байт RGB, как quasar рисует анимации
     и не перетирает ли он кадр) и протокол анимаций сегментов циферблата. Базовый доступ —
     запись яркости в `/sys/class/leds/cucumber:*`.
 
-## Звук
+## Звук { #audio }
 
 - ALSA card0 `AML-AUGESOUND`: `TDM-A-fs2105-speakers` (playback+capture),
   `PDM-dummy-mics` (микрофоны), `LOOPBACK-A` (AEC-reference).
@@ -129,7 +188,17 @@
   для пробуждения из сна.
 - В DT есть узел `dolby_fw` (1 МБ под прошивку Dolby).
 
-## Микрофоны { #mics }
+## Вход { #input }
+
+- `awinic_sar` — сенсорные кнопки (AW96105): `linux,keycodes` = `KEY_VOICECOMMAND`,
+  `KEY_VOLUMEUP`, `KEY_VOLUMEDOWN`.
+- `vad_keypad` — кнопки (VAD-клавиатура).
+- `mute` (`gpio-keys`) — аппаратное отключение микрофона, два узла:
+    - `mute-key` — кнопка, `KEY_MUTE`;
+    - `mute-switch` — переключатель с состоянием, `EV_SW` / `SW_MUTE_DEVICE`.
+- `input_btrcu` — Bluetooth-пульт.
+
+### Микрофоны { #mics }
 
 На крышке четыре отверстия микрофонов. Они стоят прямоугольником вокруг центра, между
 кнопками «−» и «+»: по ширине (слева направо) расстояние примерно в 1,5 раза больше, чем
@@ -163,7 +232,7 @@
 arecord -D hw:0,1 -f S32_LE -c 4 -r 96000 -t raw > /tmp/mics.raw   # S16_LE тоже работает
 ```
 
-!!! warning "Не меняйте частоту PDM"
+!!! warning "Изменение частоты PDM нарушает работу Алисы"
     PDM общий с захватом прошивки: `maind --platformd` держит `hw:0,2` (`LOOPBACK-A`,
     8 каналов, S16, 96000 Гц), в который приходят те же микрофоны. Если открыть `hw:0,1`
     на другой частоте, PDM перенастраивается под вас, и Алиса глохнет: на 16000 Гц её поток
@@ -173,16 +242,6 @@ arecord -D hw:0,1 -f S32_LE -c 4 -r 96000 -t raw > /tmp/mics.raw   # S16_LE то
     `hw_ptr` в `/proc/asound/card0/pcm2c/sub0/status` должен расти на ~96000 в секунду.
     Частота захвата прошивки видна в `/proc/asound/card0/pcm2c/sub0/hw_params`.
 
-## Вход
-
-- `awinic_sar` — сенсорные кнопки (AW96105): `linux,keycodes` = `KEY_VOICECOMMAND`,
-  `KEY_VOLUMEUP`, `KEY_VOLUMEDOWN`.
-- `vad_keypad` — кнопки (VAD-клавиатура).
-- `mute` (`gpio-keys`) — аппаратное отключение микрофона, два узла:
-    - `mute-key` — кнопка, `KEY_MUTE`;
-    - `mute-switch` — переключатель с состоянием, `EV_SW` / `SW_MUTE_DEVICE`.
-- `input_btrcu` — Bluetooth-пульт.
-
 ## Zigbee { #zigbee }
 
 - Радио — отдельный чип **Telink**: прошивка `/system/vendor/quasar/zigbee/gateway.ybl`
@@ -191,7 +250,7 @@ arecord -D hw:0,1 -f S32_LE -c 4 -r 96000 -t raw > /tmp/mics.raw   # S16_LE то
 - Узел DT `zigbee` (`yandex,zigbee-control`): `zb-reset-gpios` и `zb-boot-gpios` —
   Linux может сбросить радиочип и перевести его в бутлоадер, т.е. прошивка радио
   обновляется со стороны Станции.
-- Связь с SoC — по UART с RTS/CTS (см. [UART](#uart)).
+- Связь с SoC — по UART с RTS/CTS, подробнее в разделе [UART](#uart).
 - Рядом лежит каталог `/system/vendor/quasar/zigbee/http/` (`index.html` + bootstrap).
 
 ## UART { #uart }
@@ -201,51 +260,6 @@ arecord -D hw:0,1 -f S32_LE -c 4 -r 96000 -t raw > /tmp/mics.raw   # S16_LE то
 | `ttyS0` | `FE07A000` | отладочная консоль; в env U-Boot `console=ttyS0,921600`, но ядро стартует с пустым `console=`, а U-Boot — с `silent=1` |
 | `ttyS1` | `FE078000` | RTS/CTS, есть трафик — BT / Zigbee |
 | `ttyS2` | `FE07C000` | RTS/CTS, есть трафик — BT / Zigbee |
-
-## Разделы eMMC { #partitions }
-
-Драйвер разделов Amlogic создаёт устройства прямо в `/dev/<имя>`
-(`/dev/block/by-name` нет); `/dev/root → system`, `root=PARTLABEL=system`.
-
-| Раздел | Устройство | Размер | Что внутри |
-|---|---|---|---|
-| bootloader | `mmcblk0p1` | 4M | U-Boot; копии — `mmcblk0boot0/1` (`/dev/bootloader0/1`) |
-| reserved | `mmcblk0p2` | 64M | таблица разделов MPT, unifykeys, DTB |
-| cache | `mmcblk0p3` | — | узел `/dev/cache` есть, в `/proc/partitions` отсутствует |
-| env | `mmcblk0p4` | 8M | U-Boot env (64 КБ, CRC32) |
-| misc | `mmcblk0p5` | 4M | |
-| tee | `mmcblk0p6` | 48M | ext4, `/tee` (ro) — OP-TEE secure storage |
-| aml_sysrecovery | `mmcblk0p7` | 1.5G | |
-| boot | `mmcblk0p8` | 64M | ядро + DTB |
-| recovery | `mmcblk0p9` | 192M | |
-| system | `mmcblk0p10` | 1G | rootfs (ext4) |
-| ota | `mmcblk0p11` | 1.5G | ext4, `/ota` — `swupdate.*`, `data/wpa_supplicant.conf`, `data/quasar` |
-| data | `mmcblk0p12` | 2.8G | ext4, `/data` |
-
-Что смонтировано на [factory-6](#factory-6) (`/proc/mounts`, `/etc/fstab`):
-
-| Точка | Раздел | ФС, режим |
-|---|---|---|
-| `/` | system | ext4, `ro` |
-| `/tee` | tee | ext4, `ro` |
-| `/ota` | ota | ext4, `rw,noatime` |
-| `/data` | data | ext4, `rw,noatime` |
-
-- `/` ядро монтирует в `ro`, а строка `::sysinit:/bin/mount -o remount,rw /` в
-  `/etc/inittab` закомментирована. Правки корня — через `mount -o remount,rw /`, после
-  перезагрузки они сохраняются (см. [factory-6](#factory-6)).
-- `/data` — отдельный раздел (2.5 ГБ), а не `/bkupgrade/data`, как на
-  [Лайте](station-lite.md). `/bkupgrade` — ссылка на `/ota`.
-
-!!! danger "Разделы открыты на запись"
-    У всех разделов `ro=0`, у самого eMMC и загрузочных областей `mmcblk0boot0/1` (в них
-    U-Boot) — `force_ro=0`. Ничто не мешает `dd` затереть загрузчик: не пишите в блочные
-    устройства напрямую.
-
-!!! warning "Личные данные"
-    Кроме `data`, личное лежит в **`ota`** (пароли Wi-Fi, состояние quasar — в том числе
-    в удалённых блоках), **`env`** (серийник, `cpu_id`), **`reserved`** (unifykeys:
-    `deviceid`, `key_blob`) и **`tee`**. Не публикуйте их дампы как есть.
 
 ## Питание и температура { #dvfs }
 
@@ -260,7 +274,7 @@ CPU-регулятор `vddcpu0` — PWM, 0.689…1.049 В; governor `schedutil`
 Термозона `soc_thermal`: троттлинг с **85 °C**, второй порог **95 °C**,
 критическая **105 °C**; `sustainable-power` 1160 мВт.
 
-## Прочее железо по DT
+## Прочее железо по DT { #dt-hardware }
 
 - **Wi-Fi** (`aml_wifi`): SDIO 4 бит до 200 МГц, `power_on`/IRQ на GPIO, 32 кГц от PWM.
 - **BT** (`aml_bt`): GPIO `reset`, `btwakeup`, `hostwake`.
@@ -273,7 +287,7 @@ CPU-регулятор `vddcpu0` — PWM, 0.689…1.049 В; governor `schedutil`
 - **Есть в SoC, но выключено**: Ethernet (dwmac, внутренний PHY), ИК-приёмник
   (`meson-ir`), `ramdump_bl33z`.
 
-## Ядро и модули (отличия от AXG)
+## Ядро и модули (отличия от AXG) { #kernel-modules }
 
 Загружены: `aml_sdio`, `awinic_sar`, `dtbocfg` (DTB-оверлеи), `galcore` (NPU Vivante),
 `leds_aw2101x`, `leds_yandex_aw21036`, `ltr308als01`, `optee`/`optee_armtz` (TEE),
@@ -288,11 +302,13 @@ quasar-роли на снимке: `--platformd`, `--mediad`, `--loggerd` (на 
 
 ## Заводская прошивка factory-6 { #factory-6 }
 
-!!! info "Проверено на `0.6.1.40.1928882720.20230914.factory-6`"
-    Колонка с завода не обновлялась. Root — [DNS-методом](../start/root.md), дальше — шаги
-    [SSH и отключение обновлений](../start/ssh.md). Ниже — отличия от снимков `0.369`
-    выше на странице. Другие сборки, в том числе с той же меткой factory-6, не проверялись;
-    у [Мини 3](../start/retail-ca-mini3.md) есть своя `0.6.1.4.…factory-6`.
+**Проверено на:** Станция Миди, прошивка `0.6.1.40.1928882720.20230914.factory-6`,
+октябрь 2026.
+
+Колонка с завода не обновлялась. Root — [подменой DNS](../start/root.md), дальше — шаги
+[SSH и отключение обновлений](../start/ssh.md). Ниже — отличия от снимков `0.369` выше на
+странице. Другие сборки, в том числе с той же меткой factory-6, не проверялись; у
+[Мини 3](../start/retail-ca-mini3.md) есть своя `0.6.1.4.…factory-6`.
 
 | | `0.369` (снимки выше) | factory-6 |
 |---|---|---|
@@ -349,7 +365,7 @@ chattr +i /data/quasar_activate_adb_quasmodrom /data/quasar_activate_network_adb
   работу это не влияет: `adbd` уже запущен при загрузке.
 - Вернуть: `chattr -i` для тех же файлов.
 
-## Что ещё проверить
+## Что ещё проверить { #todo }
 
 - Формат кадра LED-framebuffer'ов и анимаций сегментов циферблата.
 - Zigbee: точная модель Telink и можно ли использовать его как полноценный
@@ -359,6 +375,5 @@ chattr +i /data/quasar_activate_adb_quasmodrom /data/quasar_activate_network_adb
   сохраняются, см. [factory-6](#factory-6).
 - Что стирает сброс к заводским настройкам: `/data` здесь — отдельный раздел eMMC.
 
----
-
-*Данные для этой страницы собрали **@egorsexy** и **[@chelik0002](https://github.com/chelik0002)** — спасибо за вклад! 🙌*
+*Данные для этой страницы собрали **@egorsexy** и
+**[@chelik0002](https://github.com/chelik0002)** — спасибо за вклад.*

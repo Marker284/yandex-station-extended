@@ -5,7 +5,7 @@ site_url: https://hackalice.me/
 repo_url: https://github.com/Marker284/yandex-station-extended
 repo_name: Marker284/yandex-station-extended
 edit_uri: edit/main/docs/
-copyright: Community wiki · материал для работы со своими устройствами · персональные данные и приватные ключи не публикуются
+copyright: ©2026 YSE contributors. All rights reserved.
 
 theme:
   name: material
@@ -53,7 +53,7 @@ theme:
 extra:
   # Веб-редактор (editor/): адрес Cloudflare Worker. Пусто — кнопки правки ведут на GitHub.
   editor:
-    api: ""
+    api: "https://yse-wiki-editor.push-to-claude-worker.workers.dev"
   social:
     - icon: fontawesome/brands/telegram
       link: https://t.me/hackalice
@@ -70,10 +70,22 @@ extra_css:
   - stylesheets/extra.css
   - stylesheets/editor-entry.css
 
+# битые ссылки и якоря — ошибка сборки, а не молчаливый INFO
+validation:
+  links:
+    not_found: warn
+    anchors: warn
+    absolute_links: info
+    unrecognized_links: info
+
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -123,14 +135,15 @@ nav:
   - Главная: index.md
   - Начало работы:
       - start/index.md
+      - Установка ADB на компьютер: start/adb.md
       - 1. Получение root:
-          - DNS-метод (большинство моделей): start/root.md
-          - Лайт 2 — retail CA из factory: start/retail-ca.md
-          - Мини 3 — retail CA и маркеры: start/retail-ca-mini3.md
-          - С Android (AliceBridge): start/root-android.md
+          - Большинство моделей — подмена DNS: start/root.md
+          - Лайт 2 (Plum) — сертификат из factory: start/retail-ca.md
+          - Мини 3 (Bergamot) — сертификат и маркеры: start/retail-ca-mini3.md
+          - Станции на Android — AliceBridge: start/root-android.md
+          - Станция Макс — доступ через ADB: start/adb-max.md
+          - Мини 1 (2019) — ADB по USB: start/root-mini1-usb.md
           - JBL Link Music — ADB по USB: start/root-jbl-link-music.md
-          - Мини 1 (2019) — root и ADB по USB: start/root-mini1-usb.md
-          - Станция Макс — ADB Max: start/adb-max.md
       - 2. SSH и обновления: start/ssh.md
       - 3. Пакеты yse: start/packages.md
       - 4. Если что-то сломалось: start/recovery.md
@@ -173,5 +186,6 @@ nav:
       - Директивы и capabilities: internals/directives.md
       - Подводные камни: internals/gotchas.md
       - Сборка софта: internals/toolchain.md
+  - Словарь: glossary.md
   - Как дополнять вики: contributing.md
   - Участники: contributors.md

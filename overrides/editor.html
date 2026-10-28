@@ -23,9 +23,19 @@
     <div class="yse-boot">
       <div class="yse-spinner" aria-hidden="true"></div>
       <p>Загружаем редактор…</p>
+      <p class="yse-boot__slow" hidden>Что-то долго. Если не загрузится, обновите страницу —
+        или правьте <a href="{{ config.repo_url }}">на GitHub</a>.</p>
       <noscript><p>Для редактора нужен JavaScript. Править можно и <a href="{{ config.repo_url }}">на GitHub</a>.</p></noscript>
     </div>
   </div>
+  <script>
+    // сборка редактора — около 600 КБ: на медленной связи спиннер висит долго и молча
+    setTimeout(function () {
+      var app = document.getElementById('yse-editor');
+      var slow = app && app.querySelector('.yse-boot__slow');
+      if (slow && !app.hasAttribute('data-booted')) slow.hidden = false;
+    }, 8000);
+  </script>
 {% endblock %}
 
 {% block footer %}{% endblock %}

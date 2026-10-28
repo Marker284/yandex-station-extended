@@ -13,11 +13,11 @@ describe('markdown вики', () => {
     expect(out).toContain('<div class="admonition warning"><p class="admonition-title">Только свои</p>');
     expect(out).toContain('<strong>жирный</strong>');
     expect(out).toContain('<div class="language-sh highlight"');
-    expect(out).toMatch(/<\/div>\n<p data-line="7">После.<\/p>/);
+    expect(out).toMatch(/<\/div>\n<p data-line="7"[^>]*>После\.<\/p>/);
   });
 
   it('admonition без заголовка и details', () => {
-    expect(md.render('!!! note ""\n    x')).toContain('<div class="admonition note">\n<p data-line="1">x</p>');
+    expect(md.render('!!! note ""\n    x')).toMatch(/<div class="admonition note">\n<p data-line="1"[^>]*>x<\/p>/);
     expect(md.render('!!! tip\n    x')).toContain('admonition-title">Tip<');
     const d = md.render('???+ failure "Сломалось"\n    x');
     expect(d).toContain('<details class="failure" open><summary>Сломалось</summary>');
@@ -28,12 +28,33 @@ describe('markdown вики', () => {
     expect(out).toMatch(/<div class="tabbed-set tabbed-alternate" data-tabs="\d+:2">/);
     expect(out.match(/<div class="tabbed-block">/g)).toHaveLength(2);
     expect(out).toContain('<label for="__tabbed_');
-    expect(out).toContain('<p data-line="6">b</p>');
+    expect(out).toMatch(/<p data-line="6"[^>]*>b<\/p>/);
     expect(out).toContain('конец');
   });
 
+  it('md_in_html: содержимое <div markdown> разбирается как Markdown', () => {
+    const out = md.render(
+      ['<div class="tg-banner" markdown>', '<div class="t" markdown>', '**Чат** в [tg](https://t.me/x).', '</div>', '</div>'].join('\n'),
+    );
+    expect(out).toContain('<strong>Чат</strong>');
+    expect(out).toContain('<a href="https://t.me/x">tg</a>');
+    expect(out).not.toContain('markdown>'); // служебный атрибут убран
+    expect(out).toContain('<div class="tg-banner">');
+    expect(out).toContain('</div>');
+  });
+
+  it('md_in_html: без атрибута markdown содержимое остаётся сырым', () => {
+    const out = md.render(['<div class="x">', '**не разметка**', '</div>'].join('\n'));
+    expect(out).toContain('**не разметка**');
+  });
+
+  it('md_in_html: закрывающий тег не на своей строке — блок остаётся сырым', () => {
+    const out = md.render(['<div class="x" markdown>', '**жирный** текст</div>'].join('\n'));
+    expect(out).toContain('**жирный**');
+  });
+
   it('attr_list, клавиши, иконки', () => {
-    expect(md.render('## Шаг { #root }')).toContain('<h2 id="root" data-line="0">Шаг</h2>');
+    expect(md.render('## Шаг { #root }')).toMatch(/<h2 id="root" data-line="0"[^>]*>Шаг<\/h2>/);
     expect(md.render('[Скачать](x.zip){ .md-button .md-button--primary }')).toContain('<a href="x.zip" class="md-button md-button--primary">Скачать</a>');
     expect(md.render('![a](a.png){ width="300" }')).toContain('width="300"');
     expect(md.render('++ctrl+c++')).toContain('<kbd class="key-ctrl">Ctrl</kbd><span>+</span><kbd class="key-c">C</kbd>');

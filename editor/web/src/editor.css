@@ -1034,6 +1034,31 @@ body:has(.yse-app) .md-footer {
     margin-top: 0;
   }
 
+  /* превью редактируемое: курсор-каретка, подсветка блока под курсором мыши */
+  .yse-preview[contenteditable] {
+    outline: none;
+    caret-color: var(--md-primary-fg-color);
+    cursor: text;
+    /* как на сайте: переводы строк из разметки markdown-it не должны быть видны
+       (Chrome для contenteditable="plaintext-only" навязывал white-space: pre-wrap) */
+    white-space: normal;
+  }
+
+  .yse-preview[contenteditable] [data-line]:hover {
+    box-shadow: -10px 0 0 0 var(--yse-active-line), 0 0 0 0 transparent;
+    background: var(--yse-active-line);
+    border-radius: 3px;
+  }
+
+  .yse-preview[contenteditable] :is(.admonition-title, .tabbed-labels, .filename, summary) {
+    cursor: default;
+  }
+
+  .yse-preview[contenteditable] :is(.admonition-title, .tabbed-labels, .filename, summary):hover {
+    background: none;
+  }
+
+  /* иконка :material-…: — пока SVG не подгрузился, на её месте серый квадратик */
   .yse-preview .yse-icon-shortcode {
     display: inline-block;
     width: 1.1em;
@@ -1041,6 +1066,18 @@ body:has(.yse-app) .md-footer {
     vertical-align: -0.15em;
     border-radius: 3px;
     background: var(--md-default-fg-color--lighter);
+  }
+
+  .yse-preview .yse-icon-shortcode.yse-icon-ready {
+    background: none;
+    border-radius: 0;
+  }
+
+  .yse-preview .yse-icon-shortcode svg {
+    width: 1.1em;
+    height: 1.1em;
+    fill: currentcolor;
+    vertical-align: top;
   }
 
   /* строки в CodeMirror */
@@ -1155,6 +1192,21 @@ body:has(.yse-app) .md-footer {
     margin-top: 10px;
     font-size: 15.5px;
     line-height: 1.65;
+  }
+
+  /* «страницу можно закрыть» под списком шагов */
+  .yse-done__close {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 0;
+    color: var(--md-default-fg-color--light);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .yse-done__close .yse-icon {
+    color: var(--yse-ok);
   }
 
   .yse-prcard {

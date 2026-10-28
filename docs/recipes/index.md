@@ -18,6 +18,6 @@
 | [Spotify Connect](spotify.md) | колонка как приёмник Spotify и «Алиса, поставь …» через Spotify | Станция 2 |
 | [ТВ-набор для Станции 1](station1-tv.md) | веб-пульт в браузере телефона, ТВ-лаунчер, YouTube (SmartTube) и VPN (v2rayNG) на HDMI | проверено на Станции 1, прошивка 2.369.5.46 |
 
-Готовые скрипты — в каталоге
-[`contrib/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib)
-([описание](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/README.md)).
+Готовые скрипты собраны в каталоге
+[`contrib/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib), их
+назначение описано в [его README](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/README.md).

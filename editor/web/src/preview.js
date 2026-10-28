@@ -14,7 +14,7 @@ DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
 
 export function renderMarkdown(src) {
   return DOMPurify.sanitize(md.render(src), {
-    ADD_ATTR: ['data-line', 'data-tabs', 'target', 'open', 'checked', 'for', 'name'],
+    ADD_ATTR: ['data-line', 'data-end', 'data-code', 'data-icon', 'data-tabs', 'target', 'open', 'checked', 'for', 'name'],
     ADD_TAGS: ['details', 'summary'],
     FORBID_TAGS: ['style', 'form', 'iframe', 'object', 'embed', 'script'],
   });
@@ -24,11 +24,26 @@ export function renderMarkdown(src) {
  * Рисует превью и чинит ссылки: относительные пути из Markdown → адреса сайта,
  * картинки, ещё не отправленные в репозиторий, → blob: из памяти.
  */
+// Иконки Material (:material-cog: и подобные): их SVG собирает contrib/editor-icons.py,
+// редактор подгружает файл при запуске. Пока его нет — на месте иконки серый квадратик.
+let icons = {};
+
+export function setIcons(map) {
+  icons = map || {};
+}
+
 export function renderInto(el, src, { pagePath, siteRoot, pendingImages }) {
   el.innerHTML = renderMarkdown(src);
+  for (const span of el.querySelectorAll('[data-icon]')) {
+    const svg = icons[span.dataset.icon];
+    if (!svg) continue;
+    span.innerHTML = svg;
+    span.classList.add('yse-icon-ready');
+  }
   const root = new URL(siteRoot, location.href);
   for (const img of el.querySelectorAll('img[src]')) {
     const s = img.getAttribute('src');
+    img.dataset.src = s; // путь как в Markdown — по нему картинка находится в исходнике
     if (/^(https?:|data:|blob:)/i.test(s)) continue;
     const repoPath = resolveRelative(pagePath, s.split('#')[0]);
     if (pendingImages?.has(repoPath)) img.src = pendingImages.get(repoPath).url;

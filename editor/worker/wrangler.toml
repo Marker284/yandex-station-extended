@@ -13,7 +13,7 @@ UPSTREAM_REPO = "yandex-station-extended"
 UPSTREAM_BRANCH = "main"
 SITE_URL = "https://hackalice.me"
 ALLOWED_ORIGINS = "https://hackalice.me,http://127.0.0.1:8000,http://localhost:8000"
-GITHUB_CLIENT_ID = ""  # Client ID из GitHub OAuth App
+GITHUB_CLIENT_ID = "Ov23lidXKPMpS6ruF7Zj"  # Client ID из GitHub OAuth App
 
 # Секреты (не в репозитории):
 #   npx wrangler secret put GITHUB_CLIENT_SECRET
