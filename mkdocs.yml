@@ -157,7 +157,7 @@ nav:
       - Обработанный микрофон: recipes/microphone.md
       - Fastfetch: recipes/fastfetch.md
       - Подсветка: recipes/led.md
-      - YAM и BetterYAM: recipes/yam.md
+      - YAM и BetterYAM: recipes/packagemanagers.md
       - Своя LLM вместо Алисы: recipes/llm.md
       - Колонка без Яндекса: recipes/standalone.md
       - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
