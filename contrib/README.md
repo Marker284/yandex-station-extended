@@ -95,6 +95,9 @@
   [Рецепт](https://hackalice.me/recipes/sounds/#native-tts), проверка пакетов и ошибок:
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
+* **[`station1-airplay.sh`](station1-airplay.sh)** — Станция 1: отдельный скрипт
+  AirPlay 2 для AliceBridge/Entware, автозапуск и откат.
+  [Рецепт и проверка](../docs/recipes/airplay.md#station-1).
 * **[`bt-proxy/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bt-proxy)** — исходники (Rust) и автозапуск `bt-proxy`: любой MPRIS-плеер виден Алисе как Bluetooth-телефон. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/bt-proxy/).
 * **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — установщик `install.sh` (одна команда с компьютера, откат `--uninstall`), Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
 * **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`) и Spotify
