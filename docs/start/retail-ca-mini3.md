@@ -4,12 +4,15 @@
 21 октября 2026 года, когда [DNS-метод](root.md) перестал работать. Колонка загружается в
 factory mode, в retail-разделе правится только CA-бандл, а в `/data` кладутся маркеры сетевого
 ADB и конфиг Wi-Fi. После normal-загрузки ADB с root поднимается сам, пока DNS указывает на
-стенд; постоянный вход — SSH из [шага 2](ssh.md): после возврата DNS настоящий Яндекс выключает
-ADB (см. [шаг 7](#adb-after-dns)).
+сервер обновлений. Постоянный вход — SSH из [шага 2](ssh.md). После возврата DNS настоящий
+Яндекс выключает ADB, как описано в [шаге 7](#adb-after-dns).
 
 Основа — [гайд для Лайт 2](retail-ca.md): порядок тот же, ниже — с поправками под Мини 3.
 
 После этого шага переходите к [шагу 2](ssh.md): SSH и отключение обновлений.
+
+**Проверено на:** Станция Мини 3 (bergamot) с factory-сборкой `0.6.1.4.…factory-6`
+от 11.11.2024, октябрь 2026.
 
 ## Чем Мини 3 отличается от Лайт 2
 
@@ -24,19 +27,19 @@ ADB (см. [шаг 7](#adb-after-dns)).
 | OTA | `S01swupdate` + `swupdate` | в `.50` нет ни `S01swupdate`, ни `swupdate`: применяет `device_ota_update.sh` → `apply_packed_ota`, подпись проверяется по `ota_script.pub` |
 | Wi-Fi | — | данные сети только в `/data/wpa_supplicant.conf`; без файла после перезагрузки колонка никуда не подключается |
 
-В factory корневая ФС живёт в памяти (`ramfs`) — правки в ней не сохраняются. В retail `/` —
-ubifs на mtd3, смонтирован `ro`, но dm-verity нет: `mount -o remount,rw /` и `sync` пишут на
-флеш, и правки переживают перезагрузку.
+В factory корневая файловая система живёт в памяти (`ramfs`) — правки в ней не сохраняются.
+В retail `/` — ubifs на mtd3, смонтирован `ro`, но dm-verity нет: `mount -o remount,rw /` и
+`sync` пишут на флеш, и правки переживают перезагрузку.
 
 ## Что понадобится
 
 - компьютер с `adb` в одной сети с колонкой;
-- стенд — локальный HTTPS-сервер, который отвечает на `get_sync_info` конфигом с `adbd`
-  (`remoteActivation`, `network`), а на `check_updates` — `{"hasUpdate":false}`. Его сертификат
-  должен строиться до корня `AAA Certificate Services` (утёкшая цепочка eMudhra:
-  лист ← `EM OV TLS CA - G3C` ← AAA). Так устроен, например, [eQuasar](retail-ca.md#1-equasar);
-  остальные запросы (в первую очередь `/register`) стенд должен проксировать в настоящий
-  Яндекс — для eQuasar нужна [строка `resolver`](#equasar-resolver);
+- свой сервер обновлений на компьютере — локальный HTTPS-сервер, который отвечает на
+  `get_sync_info` конфигом с `adbd` (`remoteActivation`, `network`), а на `check_updates` —
+  `{"hasUpdate":false}`. Его сертификат должен строиться до корня AAA Certificate Services
+  (цепочка eMudhra: лист ← `EM OV TLS CA - G3C` ← AAA). Так устроен, например,
+  [eQuasar](retail-ca.md#1-equasar); остальные запросы (в первую очередь `/register`) сервер
+  должен проксировать в настоящий Яндекс — для eQuasar нужна [строка resolver](#equasar-resolver);
 - DNS: подмена на роутере или хотспот с компьютера (общий доступ к интернету в Windows отдаёт
   колонке DNS = IP компьютера);
 - корень AAA:
@@ -56,15 +59,15 @@ cat /system/vendor/quasar/version_full
 (по проходу автора). Если видно `0.369.1.50…` — factory-образ обновлён вместе с retail, войти этим
 способом нельзя, дальше не идите.
 
-## 1. Стенд и вход в factory mode
+## 1. Сервер обновлений и вход в сервисный режим
 
-1. Поднимите стенд ([с `resolver`](#equasar-resolver)) и DNS (роутер или хотспот компьютера;
-   [пример для Keenetic](#dns-keenetic)).
+1. Поднимите свой сервер обновлений на компьютере с [настройкой resolver](#equasar-resolver).
+   Настройте DNS на роутере или через хотспот компьютера, см. [пример для Keenetic](#dns-keenetic).
 2. Обесточьте колонку, зажмите кнопку отключения микрофона, подайте питание и держите
    10–15 с, пока подсветка не замигает.
 3. В приложении «Дом с Алисой» добавьте колонку и дайте ей Wi-Fi с нужным DNS. Приложение
    может сообщить, что настроить не удалось, — это нормально.
-4. Убедитесь, что в логе стенда есть `POST /register` с кодом 200, а за ним `/get_sync_info`
+4. Убедитесь, что в логе сервера есть `POST /register` с кодом 200, а за ним `/get_sync_info`
    и `/check_updates`, и подключитесь по ADB:
 
 ```sh
@@ -74,43 +77,43 @@ adb shell id
 
 Ожидается `uid=0(root)`.
 
-!!! warning "Сброс стирает /data"
+На macOS, если `nc -z <IP_колонки> 5555` проходит, а `adb connect` пишет `No route to host`,
+adb блокирует защита «Локальная сеть» — см. [установку ADB](adb.md).
+
+!!! warning "Сброс кнопками стирает раздел /data"
     Вместе с ним исчезают старые маркеры и `/data/quasar/data/user_config.dat`. Всё нужное
     создаётся заново на шагах 4–5.
-
-!!! tip "macOS: `No route to host` при открытом порте"
-    Если `nc -z <IP_колонки> 5555` проходит, а `adb connect` пишет `No route to host`, adb
-    блокирует защита «Локальная сеть» — см. [установку ADB](../internals/toolchain.md#adb-install).
 
 ### eQuasar: resolver для `/register` { #equasar-resolver }
 
 Factory-прошивка сначала регистрируется: `POST /register` с кодом активации из приложения.
-eQuasar перехватывает только `get_sync_info` и `check_updates`, остальное проксирует через
-`proxy_pass https://$host…`, а для имени из переменной nginx нужен `resolver`. Без него
-`/register` получает 502 (в `error.log` — `no resolver defined to resolve quasar.yandex.net`),
+eQuasar перехватывает только `get_sync_info` и `check_updates`, остальное проксирует
+директивой `proxy_pass https://$host…`, а для имени из переменной nginx нужен `resolver`.
+Без него `/register` получает 502 (в журнале `error.log` —
+`no resolver defined to resolve quasar.yandex.net`),
 приложение пишет об ошибке (например, что не удалось подключить колонку по Bluetooth), колонка
 уходит из Wi-Fi и до `get_sync_info` не доходит.
 
 Добавьте строку в блок `server { listen 443 ssl; … }` файла
-`copymetoroot/etc/nginx/sites-enabled/quasar` и пересоберите стенд
+`copymetoroot/etc/nginx/sites-enabled/quasar` и пересоберите сервер обновлений
 (`docker compose up -d --build`):
 
 ```nginx
 resolver 77.88.8.8 8.8.8.8 ipv6=off valid=300s;
 ```
 
-Резолвер — публичный, не DNS роутера: тот отдаёт для `quasar.yandex.net` адрес стенда, и
+Резолвер — публичный, не DNS роутера: тот отдаёт для `quasar.yandex.net` адрес сервера, и
 запрос зациклится. С ним регистрация проходит, и Алиса говорит, что настройка завершена и
-осталось обновить прошивку. Обновления не будет: на `check_updates` отвечает стенд.
+осталось обновить прошивку. Обновления не будет: на `check_updates` отвечает локальный сервер.
 
 ### DNS на Keenetic { #dns-keenetic }
 
-В CLI роутера (веб-CLI `http://<IP_роутера>/a`; из Entware-shell — `ndmc -c "…"`):
+В CLI роутера (веб-интерфейс `<http://<IP_роутера>/a>`; из Entware-shell — `ndmc -c "…"`):
 
 ```text
-ip host quasar.yandex.net <IP_стенда>
-ip host quasar.yandex.ru <IP_стенда>
-ip host scbh.yandex.net <IP_стенда>
+ip host quasar.yandex.net <IP_сервера>
+ip host quasar.yandex.ru <IP_сервера>
+ip host scbh.yandex.net <IP_сервера>
 ip host strm.yandex.ru 127.0.0.1
 ip host rpc.alice.yandex.net 127.0.0.1
 ip host uniproxy.alice.yandex.net 127.0.0.1
@@ -120,7 +123,7 @@ ip host alice-ats-test.yandex.net 127.0.0.1
 ```
 
 Откат — после [шага 2](ssh.md), теми же строками с `no` и без адреса:
-`no ip host quasar.yandex.net` и т. д.
+`no ip host quasar.yandex.net` и так далее.
 
 ## 2. Разметка и монтирование retail
 
@@ -133,7 +136,7 @@ df -h /mnt/retail
 ```
 
 `ubiattach` не нужен — ubi0 поднимает ядро (`ubi.mtd=system` в cmdline). Если тома нет, тогда
-`ubiattach /dev/ubi_ctrl -m 3` и номер UBI из `ubinfo -a`.
+выполните `ubiattach /dev/ubi_ctrl -m 3` и возьмите номер UBI из `ubinfo -a`.
 
 Проверьте, что смонтирован именно retail:
 
@@ -143,7 +146,7 @@ cat /mnt/retail/system/vendor/quasar/version_full; echo
 
 ## 3. Замена CA
 
-В `.50` файл в `quasar/` — симлинк, поэтому сохраняйте и правьте цель, а не ссылку:
+В сборке `.50` файл в `quasar/` — симлинк, поэтому сохраняйте и правьте цель, а не ссылку:
 
 ```sh
 Q=/mnt/retail/system/vendor/quasar
@@ -208,17 +211,20 @@ cat ca.cur aaa-certificate-services.pem | cmp - retail-ca.pem && echo OK
 ```
 
 Если сертификатов не 123, размер вырос не на 1517 байт или `cmp` нашёл разницу — не
-перезагружайте колонку: восстановите `.orig` (см. [ниже](#restore)) или повторите склейку.
+перезагружайте колонку. Восстановите исходный файл по разделу [восстановление](#restore)
+или повторите склейку.
 
-!!! note "Не проверяйте грепом по имени"
-    В PEM имя субъекта закодировано в base64, поэтому `grep 'AAA Certificate Services'` даёт
-    ноль и на пропатченном файле. Считайте сертификаты, сверяйте хеш, а наличие корня ищите
-    по первой строке его base64, как выше.
+Не проверяйте бандл грепом по имени субъекта: в PEM оно закодировано в base64, поэтому
+`grep 'AAA Certificate Services'` даёт ноль и на пропатченном файле. Считайте сертификаты,
+сверяйте хеш, а наличие корня ищите по первой строке его base64, как показано выше.
 
-??? info "Сертификат AAA Certificate Services"
+??? note "Сертификат AAA Certificate Services"
     Тот же файл, что в `contrib/packages/aaa-certificate-services.pem` (и последний сертификат
-    в бандле для Лайт 2). SHA-256 отпечаток —
-    `D7:A7:A0:FB:5D:7E:27:31:D7:71:E9:48:4E:BC:DE:F7:1D:5F:0C:3E:0A:29:48:78:2B:C8:3E:E0:EA:69:9E:F4`.
+    в бандле для Лайт 2). SHA-256 отпечаток:
+
+    ```text
+    D7:A7:A0:FB:5D:7E:27:31:D7:71:E9:48:4E:BC:DE:F7:1D:5F:0C:3E:0A:29:48:78:2B:C8:3E:E0:EA:69:9E:F4
+    ```
 
     ```text
     -----BEGIN CERTIFICATE-----
@@ -268,7 +274,7 @@ cat /data/quasar/quasar_adb.log
 
 Должно быть `Activation file exists. Activate adb`.
 
-!!! warning "Пути важны"
+!!! warning "Маркеры вне каталога /data/quasar не сработают"
     В `adb_options.inc` маркеры — `/data/quasar/activate_adb_*` (через слэш). `onboot.sh` при
     каждой загрузке чистит `/data/quasar_activate_adb_*` (через подчёркивание, в корне `/data`) —
     это старая схема, такие файлы не помогают. Кладите только в `/data/quasar/`.
@@ -278,8 +284,9 @@ cat /data/quasar/quasar_adb.log
 Без этого после перезагрузки колонка никуда не подключится: данные сети приложение записывает
 только по завершённой настройке.
 
-Если `/register` прошёл (стенд с [`resolver`](#equasar-resolver)), файл уже есть — с вашей сетью,
-но с `update_config=1`. Проверьте его и поменяйте только этот параметр:
+Если `/register` прошёл успешно, файл уже создан с вашей сетью, но с `update_config=1`.
+Для eQuasar требуется [настройка resolver](#equasar-resolver). Проверьте файл и поменяйте
+только этот параметр:
 
 ```sh
 grep -E 'update_config|ssid|key_mgmt' /bkupgrade/data/wpa_supplicant.conf
@@ -341,8 +348,8 @@ ADB поднимается сам: маркеры → `activate_adb.sh check` �
 
 ### ADB после возврата DNS { #adb-after-dns }
 
-ADB держится, пока на `get_sync_info` отвечает стенд. Когда DNS возвращён, настоящий Яндекс
-присылает конфиг без `adbd`, и прошивка вызывает `activate_adb.sh … deactivate`: маркеры
+ADB держится, пока на `get_sync_info` отвечает сервер обновлений. Когда DNS возвращён, настоящий
+Яндекс присылает конфиг без `adbd`, и прошивка вызывает `activate_adb.sh … deactivate`: маркеры
 удаляются, adbd останавливается. В `/data/quasar/quasar_adb.log`:
 
 ```text
@@ -363,12 +370,11 @@ sh /system/vendor/quasar/activate_adb.sh --quasmodrom --network deactivate   # �
 ## 8. Закрепление: обновления и SSH
 
 Дальше — обычный **[шаг 2: SSH и отключение обновлений](ssh.md)**, сразу, пока есть ADB и DNS
-ещё указывает на стенд. Dropbear из `contrib/bin` (armhf) на Мини 3 подходит.
+ещё указывает на сервер обновлений. Dropbear из `contrib/bin` (armhf) на Мини 3 подходит.
 
-!!! tip "Если файлы копировались через Windows"
-    Busybox спотыкается о переводы строк CRLF (`set: illegal option`). Перед запуском
-    уберите их на колонке:
-    `tr -d '\r' < /data/opt/yandex-noupdate.sh > /data/opt/noupdate.sh`.
+Если файлы копировались через Windows, утилита busybox может спотыкаться о переводы строк
+CRLF (`set: illegal option`). Перед запуском уберите их на колонке:
+`tr -d '\r' < /data/opt/yandex-noupdate.sh > /data/opt/noupdate.sh`.
 
 ## 9. Страховка на случай перепрошивки разделов
 
@@ -412,44 +418,36 @@ umount /mnt/retail
 
 ## Если что-то не получилось
 
-??? failure "`grep 'AAA Certificate Services'` даёт 0"
-    Так и должно быть: в PEM имя закодировано. Считайте сертификаты и сверяйте хеш.
-
-??? failure "`ubiattach` пишет, что устройство уже подключено"
-    В factory на Мини 3 ubi0 уже поднят через `ubi.mtd=system`. Просто смонтируйте его том.
-
-??? failure "После перезагрузки колонка не подключается ни к одной сети"
-    Нет `/data/wpa_supplicant.conf` (или в нём `update_config=1`, и файл перезаписан). Пропишите
-    конфиг, `chmod 600`, перезагрузите.
-
-??? failure "Добавили сеть, а она исчезла"
-    `update_config=1` перезаписал файл. Ставьте `0` и добавляйте сети правкой файла, а не через
-    `wpa_cli` на работающей системе.
-
-??? failure "Точка доступа вещает WPA3, колонка не подключается"
-    Смотрите не свойства сети в Windows, а `wpa_cli -i wlan0 scan_results`: если во флагах
-    `[WPA2-PSK-CCMP]`, ставьте `key_mgmt=WPA-PSK`. SAE в wpa_supplicant 2.9 есть, но требует
-    поддержки 802.11w драйвером — на вендорных драйверах Amlogic её часто нет.
-
-??? failure "`/data/local/tmp` отсутствует"
-    В factory-образе такого пути нет. Используйте `/bkupgrade/data/local/tmp`.
-
-??? failure "Скрипт падает с `set: illegal option`"
-    Переводы строк CRLF: `tr -d '\r' < in > out`.
-
-??? failure "После сброса кнопками всё пропало"
-    Сброс чистит `/data`: маркеры, Wi-Fi, файлы SSH. `system` при этом остаётся вместе с
-    пропатченным CA, поэтому стенд снова даст ADB в factory, а `/data/opt` восстанавливается
-    шагами 4–5 и [шагом 2](ssh.md).
+- **`grep 'AAA Certificate Services'` даёт 0.** Так и должно быть: в PEM имя закодировано.
+  Считайте сертификаты и сверяйте хеш.
+- **`ubiattach` пишет, что устройство уже подключено.** В factory на Мини 3 ubi0 уже поднят
+  через `ubi.mtd=system`. Смонтируйте его том.
+- **После перезагрузки колонка не подключается ни к одной сети.** Нет `/data/wpa_supplicant.conf`
+  (или в нём `update_config=1`, и файл перезаписан). Пропишите конфиг, задайте `chmod 600`
+  и перезагрузите.
+- **Добавили сеть, а она исчезла.** Параметр `update_config=1` перезаписал файл. Укажите `0`
+  и добавляйте сети правкой файла, а не через `wpa_cli` на работающей системе.
+- **Точка доступа вещает WPA3, колонка не подключается.** Проверьте режим через
+  `wpa_cli -i wlan0 scan_results`: если во флагах `[WPA2-PSK-CCMP]`, укажите `key_mgmt=WPA-PSK`.
+  Стандарт SAE в wpa_supplicant 2.9 есть, но требует поддержки 802.11w драйвером — на вендорных
+  драйверах Amlogic её часто нет.
+- **Каталог `/data/local/tmp` отсутствует.** В factory-образе такого пути нет. Используйте
+  `/bkupgrade/data/local/tmp`.
+- **Скрипт падает с ошибкой `set: illegal option`.** Это вызвано переводами строк CRLF: выполните
+  `tr -d '\r' < in > out`.
+- **После сброса кнопками всё пропало.** Сброс очищает раздел `/data`: маркеры, настройки Wi-Fi
+  и ключи SSH. Раздел `system` при этом остаётся вместе с пропатченным CA, поэтому сервер
+  обновлений снова предоставит доступ к ADB в factory mode, а `/data/opt` восстанавливается по
+  шагам 4–5 и [шагу 2](ssh.md).
 
 ## Что в итоге
 
 - SSH на порту 2222 стартует сам из `/etc/init.d/S99zdropbear` — это постоянный вход.
-- ADB с root на каждой загрузке `.50`, пока DNS указывает на стенд: маркеры в `/data/quasar/`
-  плюс `adbd` в `/data/quasar/data/user_config.dat`. После возврата DNS Яндекс выключает ADB
-  ([шаг 7](#adb-after-dns)).
+- ADB с root на каждой загрузке `.50`, пока DNS указывает на сервер обновлений: маркеры
+  в `/data/quasar/` плюс `adbd` в `/data/quasar/data/user_config.dat`. После возврата DNS
+  Яндекс выключает ADB, как описано в [шаге 7](#adb-after-dns).
 - Обновления закрыты: подменённый `ota_script.pub`, заглушённый `device_ota_update.sh`, убранный
   `updatesd`.
 - Если OTA всё же прошьётся, `S99zdropbear` и пропатченный CA пропадут вместе с `system`, а
-  `/data` уцелеет. Если маркеры ещё на месте (DNS на стенде), ADB поднимется сам, и
-  `restore-system.sh` вернёт CA и SSH одной командой; если нет — заново с шага 1.
+  `/data` уцелеет. Если маркеры ещё на месте (DNS на сервере обновлений), ADB поднимется сам,
+  и `restore-system.sh` вернёт CA и SSH одной командой; если нет — заново с шага 1.

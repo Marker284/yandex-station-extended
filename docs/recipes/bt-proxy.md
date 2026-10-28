@@ -89,7 +89,9 @@ PropertiesChanged MediaPlayer1 Status: playing  ->  «Bluetooth player is playin
 (шина пускает только root). Имя, которое увидит Алиса, задаёт `ALIASES` в `S55zbtproxy`
 по суффиксу MPRIS-имени: `ShairportSync=AirPlay,spotifyd=Spotify`.
 
-**Откат:** удалить `/etc/init.d/S55zbtproxy`, вернуть `org.bluez.service.disabled` на место
+## Откат { #rollback }
+
+Удалить `/etc/init.d/S55zbtproxy`, вернуть `org.bluez.service.disabled` на место
 и перезагрузиться.
 
 ### Переменные `bt-proxy` { #env }
@@ -106,7 +108,7 @@ PropertiesChanged MediaPlayer1 Status: playing  ->  «Bluetooth player is playin
 
 ## Как подключить свой плеер { #player }
 
-Плееру не нужно знать ни про `bt-proxy`, ни про Алису — достаточно четырёх условий.
+Плееру не нужно знать ни про `bt-proxy`, ни про Алису — нужны четыре условия.
 
 1. **MPRIS** (`org.mpris.MediaPlayer2.<имя>`, интерфейс `org.mpris.MediaPlayer2.Player`):
 

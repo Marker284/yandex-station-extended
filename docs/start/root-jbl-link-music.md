@@ -26,7 +26,8 @@
 ## Что понадобится
 
 - кабель **Micro-USB с линиями данных** — кабель «только для зарядки» не подойдёт;
-- компьютер с `adb` ([Platform Tools](https://developer.android.com/tools/releases/platform-tools));
+- компьютер с утилитой `adb`, например из
+  пакета [Platform Tools](https://developer.android.com/tools/releases/platform-tools);
 - доступ к розетке колонки: питание придётся передёрнуть.
 
 ## 1. Подключите кабель
@@ -40,7 +41,15 @@
 Команда ждёт, пока колонка появится по USB, и сразу выполняет на ней payload:
 
 ```sh
-adb wait-for-usb-device shell "touch /tmp/lock_activated_adb && mkdir -p /data/quasar && touch /data/network_adb /data/quasar_activate_adb /data/quasar_activate_network_adb /data/quasar/activate_network_adb /data/quasar/activate_adb_quasmodrom && sync && id"
+adb wait-for-usb-device shell "\
+  touch /tmp/lock_activated_adb && \
+  mkdir -p /data/quasar && \
+  touch /data/network_adb \
+        /data/quasar_activate_adb \
+        /data/quasar_activate_network_adb \
+        /data/quasar/activate_network_adb \
+        /data/quasar/activate_adb_quasmodrom && \
+  sync && id"
 ```
 
 Команда одинакова для Linux, macOS, Windows (cmd и PowerShell). Что она делает:

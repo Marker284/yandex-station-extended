@@ -1,8 +1,9 @@
 # Директивы и capabilities
 
 Как бэкенд управляет колонкой. Сервер отвечает на запрос директивами: `AliceResponse` →
-`directive_sequencer` → capabilities (общая схема — в [«Голосовом тракте Алисы»](voice.md)).
-Снято со Станции Мини 2 (`yandexmini_2`, прошивка 0.369.1.46): по строкам бинаря
+`directive_sequencer` → capabilities. Общая схема приведена в
+[«Голосовом тракте Алисы»](voice.md).
+Снято со Станции Мини 2 (`yandexmini_2`, прошивка 0.369.1.46): по строкам бинарника
 `/system/vendor/quasar/maind`, логу `/data/quasar/daemons_logs/maind.log`
 (`directive_sequencer routeDirective … via <Capability>`), `quasar.cfg`, схемам
 [v3rt3p/quasar-protos](https://github.com/v3rt3p/quasar-protos) и серверу
