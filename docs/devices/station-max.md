@@ -10,15 +10,16 @@ build-профиль `yandexstation_2_tv/127`). Это флагман-медиа
 платформе; её особенности вынесены на отдельную страницу
 [«Станция Макс с Zigbee»](station-max-zigbee.md).
 
-!!! warning "Путаница кодовых имён (важно)"
-    `yandexstation_2` — это **Станция Макс**, а не розничная [«Станция 2»](station-2.md)!
-    Розничная «Станция 2» имеет device-tree-имя `yandex,station-midi` и работает на
-    Buildroot/AXG. То есть: `yandexstation_2` ↔ **Макс** (Android), `station-midi` ↔
-    **Станция 2** (Buildroot). Ориентируйтесь на ОС и SoC, а не на цифру «2».
+!!! warning "Идентификатор yandexstation_2 относится к Станции Макс"
+    `yandexstation_2` — это **Станция Макс**, а не розничная [«Станция 2»](station-2.md).
+    Розничная «Станция 2» имеет имя в device-tree `yandex,station-midi` и работает на
+    Buildroot/AXG. Таким образом: `yandexstation_2` соответствует модели **Макс** (Android),
+    а `station-midi` — модели **Станция 2** (Buildroot). Ориентируйтесь на ОС и SoC,
+    а не на цифру 2.
 
-## Платформа в двух словах
+## Платформа в двух словах { #platform }
 
-| | |
+| Что | Значение |
 |---|---|
 | Внутр. имя | `yandexstation_2` (`yandexstation_2_tv/127`) |
 | ОС | **YaOS_X** (Яндекс ТВ, поколение 3) на базе **Android 9** (SDK 28), AVB 1.1 |
@@ -37,7 +38,31 @@ build-профиль `yandexstation_2_tv/127`). Это флагман-медиа
 | Умный дом | **Zigbee** (`zigbee_control`) |
 | Радио | Realtek RTL8822 (`88x2es`) + Intel (`iwlwifi`/`iwlmvm`); BT Intel (`btusb`/`btintel`) |
 
-## Чем принципиально отличается
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | частично (ADB до перезагрузки, постоянного root и SSH нет) | [ADB Max](../start/adb-max.md) |
+| AirPlay | не проверялось | — |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | не проверялось | — |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | не проверялось | — |
+| YAM | не проверялось | — |
+| Своя LLM | не проверялось | — |
+
+## Получение root { #root }
+
+- **ADB по сети** работает (порт 5555, после серверной активации конфига), но **без root**.
+  Процесс выполняется от пользователя shell (`uid=2000`), режим SELinux — enforcing.
+  Каталог `/data/local/tmp` доступен для записи, а `/tmp` закрыт.
+- Полноценного рута «из коробки» нет: мешают AVB + dm-verity + SELinux + production adbd.
+  Правка rootfs (как на Buildroot-моделях) невозможна, но **расширенный доступ реализован
+  через сервисную утилиту в ADB** — см. [Станция Макс — ADB Max](../start/adb-max.md).
+  Она даёт повышенные права для выполнения команд в оперативной памяти без записи на диск.
+
+## Чем отличается { #differences }
 
 - **Это YaOS (Android TV), а не Buildroot.** Нет `/system/vendor/quasar/` (и нет
   `/vendor|/odm|/product/quasar`), в `/vendor/etc/init/` нет `maind/aliced/setupd`-rc —
@@ -54,7 +79,7 @@ build-профиль `yandexstation_2_tv/127`). Это флагман-медиа
   Mali GPU, HDMI, демукс и **ТВ-демодулятор ATBM8881** — устройство умеет видео/ТВ.
 - **LED-экран** (точечная матрица) через `quasar_led_screen` + Gowin FPGA.
 
-## Разметка (Android, eMMC)
+## Разделы флеша { #partitions }
 
 Разделы `/dev/block/`:
 ```text
@@ -67,20 +92,7 @@ tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
 используется. Размеры: `/odm` 124 МБ, `/product` 122 МБ, **`/vendor` 488 МБ** (dm-verity,
 72%), `/data` 1.9 ГБ (занято ~1.5 ГБ), `/cache` 1.0 ГБ, `/metadata` 11 МБ, + `zram0`.
 
-## ПО: YaOS / Яндекс ТВ
-
-Это платформа **Яндекс ТВ** (`ro.yndx.build.os=YaOS_X`, `generation=3`,
-`build.number=5000000896`). Набор приложений — как у ТВ-приставки:
-
-- **Медиа/ТВ:** `ru.kinopoisk.yandex.tv`, `com.yandex.tv.live`, `com.yandex.tv.input.efir`
-  (эфир/ТВ), `com.yandex.tv.videoplayer`, `com.yandex.tv.webplayer`, `com.yandex.tv.music`,
-  `com.yandex.browser.tv`, `ru.yandex.games`;
-- **Голос/quasar:** `com.yandex.tv.alice`, `com.yandex.io.sdk`,
-  `com.yandex.tv.services[.platform|.privileged]`;
-- **Оболочка:** `com.yandex.tv.home`, `com.yandex.tv.settings`, `com.yandex.tv.setupwizard`,
-  `com.yandex.tv.keyboard`, `ru.yandex.bleremotecontrol` (BLE-пульт).
-
-## Шина I2C
+## Шина I2C и периферия { #i2c }
 
 Имена чипов (из привязки к драйверам; на части адресов — только адрес из-за SELinux):
 
@@ -96,27 +108,31 @@ tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
 | `2-0x51` | **PCF8563** | RTC |
 | `2-0x18/0x4c/0x4d` | ЦАП/АЦП | (PCM1774 / TLV320ADC3101 и т.п.) |
 
-## Звук
+## Звук { #audio }
 
 Многоусилительный тракт: **2× SY6045S** + **TAS5825M** (Class-D), ЦАП **ES8156/PCM1774**,
 АЦП микрофонов **ES7210** (4 канала) + TLV320ADC3101, плюс `snd_aloop`. (Детали ALSA
 закрыты SELinux на не-root shell.)
 
-## Доступ
+## ПО: YaOS / Яндекс ТВ { #software }
 
-- **ADB по сети** работает (`:5555`, после серверной активации конфига), но **без root**
-  (`uid=2000(shell)`, SELinux enforcing). `/data/local/tmp` — для записи (`/tmp` закрыт).
-- Полноценного рута «из коробки» нет: мешают AVB + dm-verity + SELinux + production adbd.
-  Правка rootfs (как на Buildroot-моделях) невозможна, но **расширенный доступ реализован
-  через сервисную утилиту в ADB** — см. [Станция Макс — ADB Max](../start/adb-max.md).
-  Она даёт повышенные права для выполнения команд в оперативной памяти без записи на диск.
+Это платформа **Яндекс ТВ** (`ro.yndx.build.os=YaOS_X`, `generation=3`,
+`build.number=5000000896`). Набор приложений — как у ТВ-приставки:
 
-## Что ещё проверить
+- **Медиа/ТВ:** `ru.kinopoisk.yandex.tv`, `com.yandex.tv.live`, `com.yandex.tv.input.efir`
+  (эфир/ТВ), `com.yandex.tv.videoplayer`, `com.yandex.tv.webplayer`, `com.yandex.tv.music`,
+  `com.yandex.browser.tv`, `ru.yandex.games`;
+- **Голос/quasar:** `com.yandex.tv.alice`, `com.yandex.io.sdk`,
+  `com.yandex.tv.services[.platform|.privileged]`;
+- **Оболочка:** `com.yandex.tv.home`, `com.yandex.tv.settings`, `com.yandex.tv.setupwizard`,
+  `com.yandex.tv.keyboard`, `ru.yandex.bleremotecontrol` (BLE-пульт).
+
+## Что ещё проверить { #todo }
 
 - Возможность разблокировки загрузчика. Свойства `ro.boot.flash.locked` на платформе
   нет: состояние смотрят по `ro.boot.vbmeta.device_state` и `ro.boot.verifiedbootstate`,
   а отладочный путь заложен в U-Boot env — см.
-  [Макс с Zigbee → Доступ](station-max-zigbee.md#access).
+  [Макс с Zigbee → Получение root](station-max-zigbee.md#root).
 - Протокол LED-экрана (`quasar_led_screen` / Gowin).
 - Назначение ATBM8881 (эфирное ТВ / IPTV-демукс).
 
@@ -126,6 +142,4 @@ tee vbmeta vendor zram0 (+ dm-0, dm-1, loop0..7)
 [живой скан I2C](station-max-zigbee.md#i2c) и устройство
 [quasar-APK](station-max-zigbee.md#software).
 
----
-
-*Данные собрали **@ilyaleet** и **@rnsdr** (два взаимодополняющих отчёта) — спасибо! 🙌*
+*Данные собрали **@ilyaleet** и **@rnsdr** (два взаимодополняющих отчёта) — спасибо за вклад.*

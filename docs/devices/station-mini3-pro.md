@@ -10,14 +10,15 @@ factory-12 правки корня, наоборот, [сохраняются](#
 [Миди](station-midi.md): ядро 5.4, Buildroot 2023.11.1, quasar/`maind`. Хранилище при этом
 не eMMC, а NAND с UBI, как у AXG-моделей.
 
-!!! info "Страница в работе"
-    Способ получить root на текущих прошивках пока не описан — ниже железо и то, что
-    известно о закреплении доступа на прошивке `.50`. Есть данные —
-    [дополните](../contributing.md).
+На заводской сборке `factory-12` (2025 год) root берётся обычной
+[подменой DNS](../start/root.md) — что при этом отличается от текущих прошивок, описано
+[ниже](#factory-12). Для сборок `.50` способа пока нет: ниже разобрано железо и то, что
+известно о закреплении доступа. Если у вас есть проверенные данные —
+[дополните страницу](../contributing.md).
 
-## Платформа в двух словах
+## Платформа в двух словах { #platform }
 
-| | |
+| Что | Значение |
 |---|---|
 | SoC | **Amlogic A4** (`amlogic, a4`) |
 | CPU | 4× **Cortex-A53** (`0xd03`), до **2.016 ГГц** (100 МГц … 2016 МГц) |
@@ -32,7 +33,22 @@ factory-12 правки корня, наоборот, [сохраняются](#
 | Радио | **Unisoc** (`vlsicomm` + `aml_sdio` + `sdio_bt`), BT-пульт (`input_btrcu`) |
 | Безопасность | SELinux `enforcing`, JTAG выключен (`jtag=disable`), `rh_unlock=0` |
 
-## Флеш и разделы { #partitions }
+## Что работает { #features }
+
+| Что | Состояние | Где описано |
+|---|---|---|
+| Root и SSH | частично (только на заводской `factory-12`; на `.50` правки корня не переживают перезагрузку) | [сохранение доступа](#persistence) |
+| USB Host (OTG) | не проверялось | — |
+| AirPlay | работает на factory-12 | [AirPlay](#airplay) |
+| Spotify Connect | не проверялось | — |
+| Плеер как Bluetooth-источник | не проверялось | — |
+| Свои звуки | не проверялось | — |
+| Обработанный микрофон | не проверялось | — |
+| Подсветка | работает | [Индикация](#led) |
+| YAM | работает на factory-12 (профиль midi) | [автозапуск](../recipes/yam.md#autostart) |
+| Своя LLM | не проверялось | — |
+
+## Разделы флеша { #partitions }
 
 | MTD | Раздел | Размер | Что внутри |
 |---|---|---|---|
@@ -49,7 +65,7 @@ factory-12 правки корня, наоборот, [сохраняются](#
 `/` и `/data` — **разные UBI-устройства на разных разделах** (`ubi.mtd=system`,
 `ubi.mtd=data` в cmdline). Поэтому `/data` и переживает OTA, которое переписывает `system`.
 
-## Шина I2C и периферия
+## Шина I2C и периферия { #i2c }
 
 | Шина:адрес | Чип | Назначение |
 |---|---|---|
@@ -64,7 +80,7 @@ factory-12 правки корня, наоборот, [сохраняются](#
 | `3-0x51` | **PCF8563** | RTC |
 | `3-0x53` | **LTR-308** (ltr308als01) | датчик освещённости |
 
-## Индикация
+## Индикация { #led }
 
 Светодиоды — в `/sys/class/leds/pickle:*`:
 
@@ -76,12 +92,110 @@ factory-12 правки корня, наоборот, [сохраняются](#
 
 Драйверы: `leds_aw2101x`, `leds_yandex_aw21036`, `quasar_led_ring`.
 
-## Звук и вход
+### Подсветка { #led-pickle }
+
+Кольцо — 48 файлов `/sys/class/leds/pickle:{red,green,blue}:ring0…ring15`, яркость 0–255,
+по умолчанию триггер `ledfb-ring` (анимации Quasar). Запись в `brightness` отцепляет триггер;
+чтобы вернуть кольцо Алисе, запишите `ledfb-ring` в `trigger` каждой зоны.
+
+**YAM.** Профиля Pickle в YAM нет, а `custom` нумерует светодиоды с 1. Подходит профиль `midi`:
+он считает с 0 и при остановке плагина возвращает триггер `ledfb-ring`. Ему нужны имена
+`cucumber:*`, поэтому в `/data` делаются ссылки на каталоги светодиодов:
+
+```sh
+D=/data/quazar/yam/leds-pickle; mkdir -p $D
+for c in red green blue; do for i in $(seq 0 15); do
+    ln -sfn /sys/class/leds/pickle:$c:ring$i $D/cucumber:$c:ring$i
+done; done
+```
+
+и в `settings.toml` YAM, раздел `[led]`: `profile = "midi"`, `count = 16`,
+`sysfs_root = "/data/quazar/yam/leds-pickle"`. После перезапуска `yamd` появляются
+`led.ring.rgb` и `led.ring.16`, Lua-плагины рисуют через `alice.set(...)` с 16 цветами.
+
+**Что сейчас показывает Алиса.** В `/data/quasar/daemons_logs/maind.log` каждая смена анимации:
+
+```text
+device_state_handler_base.cpp:709 Play animations: oknix [idle.led], ring [/system/vendor/quasar/ledpatterns/ring/alice_listening.led], clock [clock] ...
+```
+
+Значения кольца: `idle.led` (ничего), `alice_listening.led`, `alice_thinking.led`,
+`alice_speaking.led`, `ring_spectrogram` (Алиса играет музыку), `…_out.led idle.led`
+(затухание и возврат). По этим строкам можно уступать кольцо Алисе: свой эффект ставится на
+паузу при любом значении, кроме `idle.led`.
+
+### LED-часы { #clock }
+
+36 белых сегментов на AW21036 (`2-0034`), `/sys/class/leds/pickle:white:clock*`, яркость
+0–255 (Алиса ставит 90), триггер `none`:
+
+| Сегменты | Что |
+|---|---|
+| `A0`…`G3` | 4 семисегментные цифры слева направо: A верх, B правый верхний, C правый нижний, D низ, E левый нижний, F левый верхний, G середина |
+| `H0`…`H3` | восьмой сегмент позиции |
+| `DH`, `DL` | верхняя и нижняя точки двоеточия |
+| `DM` | средний элемент разделителя |
+| `DEGREE` | значок градуса |
+| `pickle:sync:clock` | служебный |
+
+Раскладка совпадает с Лайт 2 (plum): YAM определяет часы как `Plum` и выводит время
+(`PUT /api/clock {"time":"12:34"}`) и сегменты без доработок. Но время Quasar пишет прямо в
+sysfs и **перерисовывает его на каждой смене минуты**, так что своё изображение держится до
+конца текущей минуты. Анимации часов — `/system/vendor/quasar/ledpatterns/clock/*.scled`:
+строка — кадр из 4×7 яркостей цифр, 4 служебных значений и длительности в мс.
+
+## Звук { #audio }
 
 - ALSA card0 `AML-AUGESOUND`: `TDM-A-acm8625-speaker` (воспроизведение), `PDM-dummy-mics`
   (микрофоны), `LOOPBACK-A` (опорный сигнал для эхоподавления), `VAD-dummy-vad`.
-- Вход: `aw933xx` (сенсорные кнопки), `vad_keypad`, `mute` (отключение микрофона),
+- ALSA `pcm.speakers` — общий `dmix` (`ipc_key 1024`) поверх `hw:0,0`, им пользуются и Алиса,
+  и сторонние приёмники.
+- Громкость Алисы — это `amixer set Master N%` (так делает `set_volume.sh`). Чужая запись в
+  `Master` меняет громкость, но Quasar о ней не знает: следующая кнопка считает от его уровня.
+- `native-volume` из пакета
+  [station-volume](https://github.com/Yandex-Station-Universal-Repo/station-volume)
+  на factory-12 **читает** громкость (`stereo_pair`, порт 9921), но `volume_set` через
+  `iohub_clients` (9910) Quasar не принимает: уровень не меняется.
+- **Петлевой канал** `LOOPBACK-A` (`hw:0,2`, 4 канала S16 48 кГц; 0 и 1 — левый и правый того,
+  что играет колонка) Алиса держит для эхоподавления, **пока микрофоны включены**, и отпускает,
+  когда они выключены.
+
+!!! danger "Занятый петлевой канал приводит к падению процесса Алисы"
+    Если включить микрофоны, пока `hw:0,2` занят чужим процессом, `maind --platformd` падает
+    («Skipping boot sequence after maind crash» в журнале) и перезапускается через ~2 с.
+    Порядок: выключить микрофоны → открыть канал; закрыть канал (дождаться `closed` в
+    `/proc/asound/card0/pcm2c/sub0/status`) → включить микрофоны.
+
+**Системные звуки** — `/system/vendor/quasar/sounds/`. Форматы на factory-12:
+
+| Файл | Формат |
+|---|---|
+| `boot.wav` | WAV PCM 44,1 кГц стерео |
+| `timer.wav` | **MP3** моно 44,1 кГц (расширение `.wav`) |
+| `notification_sound.mp3` | MP3 стерео 48 кГц |
+| `volume_sound.mp3` | MP3 моно 44,1 кГц, 0,1 с |
+| `bluetooth_turning_{on,off}_jingle.opus` | Ogg Opus 48 кГц стерео |
+
+Замена в том же формате подхватывается **сразу, без перезагрузки** (проверено на
+`volume_sound.mp3`).
+Звук загрузки не играет, пока есть `/data/quasar/data/no_boot_sound`; Алиса создаёт этот файл
+заново после синхронизации, если в облачном конфиге `"jingle": false`.
+
+## Вход { #input }
+
+- Устройства ввода: `aw933xx` (сенсорные кнопки), `vad_keypad`, `mute` (отключение микрофона),
   `input_btrcu` (BT-пульт).
+
+**Микрофон программно.** Кнопка микрофона — устройство ввода `mute` (gpio-keys,
+на проверенной колонке `/dev/input/event2`), переключатель `SW_MUTE_DEVICE`.
+Записанное в это устройство событие Quasar обрабатывает как нажатие
+(`Mute microphones` / `Unmute microphones` в журнале):
+
+```sh
+dev=$(awk '/^N: Name="mute"/ { f = 1 } f && /^H:/ { if (match($0, /event[0-9]+/)) print substr($0, RSTART, RLENGTH); exit }' /proc/bus/input/devices)
+z='\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000'
+printf "$z\005\000\016\000\001\000\000\000$z\000\000\000\000\000\000\000\000" > /dev/input/$dev   # 1 = выключить, \000 = включить
+```
 
 Модули ядра: `aml_sdio`, `dtbocfg`, `key_aw933xx`, `leds_aw2101x`, `leds_yandex_aw21036`,
 `ltr308als01`, `optee`/`optee_armtz`, `qma6100p`, `quasar_led_ring`, `quasar_pcba_ids`,
@@ -135,11 +249,12 @@ Root ADB, настроенный так, пережил обновление н�
 - `syncd` читает локальный `user_config.dat`, передаёт `system_config.adbd` в `AdbService`, и
   тот подтверждает активацию сетевого ADB.
 
-!!! warning "Путь маркеров"
-    Только `/data/quasar/activate_*` (через слэш). Файлы `/data/quasar_activate_*` (через
-    подчёркивание) — старая схема: их удаляет и `onboot.sh`, и OTA.
+!!! warning "Маркеры с подчёркиванием удаляются при загрузке и OTA"
+    Используйте только путь `/data/quasar/activate_*` (через слэш). Файлы
+    `/data/quasar_activate_*` (через подчёркивание) относятся к старой схеме: их удаляют
+    и `onboot.sh`, и процесс OTA.
 
-## SSH
+## SSH { #ssh }
 
 Автозапуск из корневой ФС здесь не сохраняется, поэтому Dropbear, ключ и скрипт запуска
 лежат в `/data` (например, `/data/alice-ssh`), а запускать его нужно после каждого включения —
@@ -150,7 +265,7 @@ adb connect <IP_колонки>:5555
 adb shell sh /data/alice-ssh/start-ssh.sh
 ```
 
-??? example "Пример `start-ssh.sh` (по образцу [шага 2](../start/ssh.md#dropbear))"
+??? example "Скрипт start-ssh.sh для запуска Dropbear из data"
     ```sh
     #!/bin/sh
     # Dropbear on :2222 from /data (rootfs changes do not survive a reboot here).
@@ -180,9 +295,9 @@ done
 
 ## Прошивка factory-12: что отличается от `.50` { #factory-12 }
 
-!!! info "Проверено на `0.12.1.22.3114898626.20250530.factory-12`"
-    Колонка получила root через DNS-метод и осталась на этой сборке (обновления закрыты
-    `yandex-noupdate.sh`). Ниже — отличия от того, что описано на этой странице для `.50`.
+На сборке `0.12.1.22.3114898626.20250530.factory-12` колонка получила root через DNS-метод
+и осталась на ней (обновления закрыты скриптом `yandex-noupdate.sh`). Ниже приведены отличия
+от прошивки `.50`:
 
 | | `.50` (выше на странице) | factory-12 |
 |---|---|---|
@@ -226,107 +341,9 @@ fi
 перезагрузкой с настоящим DNS: ADB поднимается, `adb connect` даёт root. SSH от DNS не
 зависит в любом случае.
 
-!!! note "Алиса с настоящим бэкендом"
-    CA-бандл factory-12 (`/system/vendor/quasar/ca-certificates.crt`) доверяет настоящему
-    `quasar.yandex.net`: `curl --cacert` с этим бандлом проходит проверку сертификата. Алиса
-    после возврата DNS работает как обычно.
-
-## Подсветка { #led-pickle }
-
-Кольцо — 48 файлов `/sys/class/leds/pickle:{red,green,blue}:ring0…ring15`, яркость 0–255,
-по умолчанию триггер `ledfb-ring` (анимации Quasar). Запись в `brightness` отцепляет триггер;
-чтобы вернуть кольцо Алисе, запишите `ledfb-ring` в `trigger` каждой зоны.
-
-**YAM.** Профиля Pickle в YAM нет, а `custom` нумерует светодиоды с 1. Подходит профиль `midi`:
-он считает с 0 и при остановке плагина возвращает триггер `ledfb-ring`. Ему нужны имена
-`cucumber:*`, поэтому в `/data` делаются ссылки на каталоги светодиодов:
-
-```sh
-D=/data/quazar/yam/leds-pickle; mkdir -p $D
-for c in red green blue; do for i in $(seq 0 15); do
-    ln -sfn /sys/class/leds/pickle:$c:ring$i $D/cucumber:$c:ring$i
-done; done
-```
-
-и в `settings.toml` YAM, раздел `[led]`: `profile = "midi"`, `count = 16`,
-`sysfs_root = "/data/quazar/yam/leds-pickle"`. После перезапуска `yamd` появляются
-`led.ring.rgb` и `led.ring.16`, Lua-плагины рисуют через `alice.set(...)` с 16 цветами.
-
-**Что сейчас показывает Алиса.** В `/data/quasar/daemons_logs/maind.log` каждая смена анимации:
-
-```text
-device_state_handler_base.cpp:709 Play animations: oknix [idle.led], ring [/system/vendor/quasar/ledpatterns/ring/alice_listening.led], clock [clock] ...
-```
-
-Значения кольца: `idle.led` (ничего), `alice_listening.led`, `alice_thinking.led`,
-`alice_speaking.led`, `ring_spectrogram` (Алиса играет музыку), `…_out.led idle.led`
-(затухание и возврат). По этим строкам можно уступать кольцо Алисе: свой эффект ставится на
-паузу при любом значении, кроме `idle.led`.
-
-## LED-часы { #clock }
-
-36 белых сегментов на AW21036 (`2-0034`), `/sys/class/leds/pickle:white:clock*`, яркость
-0–255 (Алиса ставит 90), триггер `none`:
-
-| Сегменты | Что |
-|---|---|
-| `A0`…`G3` | 4 семисегментные цифры слева направо: A верх, B правый верхний, C правый нижний, D низ, E левый нижний, F левый верхний, G середина |
-| `H0`…`H3` | восьмой сегмент позиции |
-| `DH`, `DL` | верхняя и нижняя точки двоеточия |
-| `DM` | средний элемент разделителя |
-| `DEGREE` | значок градуса |
-| `pickle:sync:clock` | служебный |
-
-Раскладка совпадает с Лайт 2 (plum): YAM определяет часы как `Plum` и выводит время
-(`PUT /api/clock {"time":"12:34"}`) и сегменты без доработок. Но время Quasar пишет прямо в
-sysfs и **перерисовывает его на каждой смене минуты**, так что своё изображение держится до
-конца текущей минуты. Анимации часов — `/system/vendor/quasar/ledpatterns/clock/*.scled`:
-строка — кадр из 4×7 яркостей цифр, 4 служебных значений и длительности в мс.
-
-## Звук { #audio }
-
-- ALSA `pcm.speakers` — общий `dmix` (`ipc_key 1024`) поверх `hw:0,0`, им пользуются и Алиса,
-  и сторонние приёмники.
-- Громкость Алисы — это `amixer set Master N%` (так делает `set_volume.sh`). Чужая запись в
-  `Master` меняет громкость, но Quasar о ней не знает: следующая кнопка считает от его уровня.
-- `native-volume` из пакета
-  [station-volume](https://github.com/Yandex-Station-Universal-Repo/station-volume)
-  на factory-12 **читает** громкость (`stereo_pair`, порт 9921), но `volume_set` через
-  `iohub_clients` (9910) Quasar не принимает: уровень не меняется.
-- **Петлевой канал** `LOOPBACK-A` (`hw:0,2`, 4 канала S16 48 кГц; 0 и 1 — левый и правый того,
-  что играет колонка) Алиса держит для эхоподавления, **пока микрофоны включены**, и отпускает,
-  когда они выключены.
-
-!!! danger "Петлевой канал и падение Алисы"
-    Если включить микрофоны, пока `hw:0,2` занят чужим процессом, `maind --platformd` падает
-    («Skipping boot sequence after maind crash» в журнале) и перезапускается через ~2 с.
-    Порядок: выключить микрофоны → открыть канал; закрыть канал (дождаться `closed` в
-    `/proc/asound/card0/pcm2c/sub0/status`) → включить микрофоны.
-
-**Микрофон программно.** Кнопка микрофона — устройство ввода `mute` (gpio-keys,
-на проверенной колонке `/dev/input/event2`), переключатель `SW_MUTE_DEVICE`. Записанное
-в это устройство событие Quasar обрабатывает как нажатие (`Mute microphones` / `Unmute microphones` в журнале):
-
-```sh
-dev=$(awk '/^N: Name="mute"/ { f = 1 } f && /^H:/ { if (match($0, /event[0-9]+/)) print substr($0, RSTART, RLENGTH); exit }' /proc/bus/input/devices)
-z='\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000'
-printf "$z\005\000\016\000\001\000\000\000$z\000\000\000\000\000\000\000\000" > /dev/input/$dev   # 1 = выключить, \000 = включить
-```
-
-**Системные звуки** — `/system/vendor/quasar/sounds/`. Форматы на factory-12:
-
-| Файл | Формат |
-|---|---|
-| `boot.wav` | WAV PCM 44,1 кГц стерео |
-| `timer.wav` | **MP3** моно 44,1 кГц (расширение `.wav`) |
-| `notification_sound.mp3` | MP3 стерео 48 кГц |
-| `volume_sound.mp3` | MP3 моно 44,1 кГц, 0,1 с |
-| `bluetooth_turning_{on,off}_jingle.opus` | Ogg Opus 48 кГц стерео |
-
-Замена в том же формате подхватывается **сразу, без перезагрузки** (проверено на
-`volume_sound.mp3`).
-Звук загрузки не играет, пока есть `/data/quasar/data/no_boot_sound`; Алиса создаёт этот файл
-заново после синхронизации, если в облачном конфиге `"jingle": false`.
+CA-бандл factory-12 (`/system/vendor/quasar/ca-certificates.crt`) доверяет настоящему
+серверу `quasar.yandex.net`: утилита `curl --cacert` с этим бандлом проходит проверку
+сертификата. После возврата DNS Алиса работает в штатном режиме.
 
 ## AirPlay { #airplay }
 
@@ -337,7 +354,7 @@ yapkg работает на factory-12 (профиль `yandexmini_3_pro`, AArch
 - `allow_plugin_binaries = true` в настройках YAM;
 - модель для YAM — `data/device.toml` с `model = "yandexmini_3_pro"` (сам YAM Pickle не узнаёт).
 
-!!! warning "YAM после 26.10.2026 путает модель"
+!!! warning "YAM определяет Pickle как первое поколение Мини"
     `recognized_model()` ищет подстроку, и `yandexmini_3_pro` превращается в `yandexmini`
     (Мини 1) — даже из `device.toml`. AirPlay помечается несовместимым и останавливается. Обход
     в своей сборке плагина: при `yandexmini` проверять `/proc/device-tree/model` на `Pickle`
@@ -376,7 +393,7 @@ yapkg работает на factory-12 (профиль `yandexmini_3_pro`, AArch
 `nanddump` пишет `uncorrectable bitflip` в конце каждого блока — загрузчик Amlogic записан в
 своей разметке ECC, для его восстановления такая копия может не подойти.
 
-## Что ещё проверить
+## Что ещё проверить { #todo }
 
 - Способ получить root на текущих прошивках.
 - Почему на `.50` не сохраняются правки корневой ФС (SELinux в режиме `enforcing`, overlay или

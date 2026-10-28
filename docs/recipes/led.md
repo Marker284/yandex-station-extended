@@ -10,7 +10,7 @@
 | Станция 2 | панель из 88 светодиодов через framebuffer `/dev/fb0` (`89×1`) | [страница модели](../devices/station-2.md#led) |
 | Мини 3 | кольцо через framebuffer `/dev/fb0` | [страница модели](../devices/station-mini3.md), [`contrib/ring.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/ring.sh) |
 
-## Станция Лайт: sysfs
+## Станция Лайт: sysfs { #lite-led }
 
 Зоны — `/sys/class/leds/micro:{red,green,blue}:ring{1,2,3}`, яркость 0–255:
 
