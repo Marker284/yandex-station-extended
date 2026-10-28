@@ -12,7 +12,7 @@
 | [Fastfetch](fastfetch.md) | информер с логотипом Алисы | все `aarch64` |
 | [Подсветка](led.md) | управление кольцом, возврат штатных анимаций, формат `.led` | Лайт, Лайт 2, Мини 2, Мини 3 |
 | [YAM и BetterYAM](yam.md) | плагины `.yap` с веб-панелью и Lua API к подсветке, кнопкам, датчикам, голосовым командам | `aarch64`; BetterYAM — Мини |
-| [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)), свой бэкенд ([quasard](llm.md#quasard)) или [голосовой режим сайта ChatGPT](llm.md#chatgpt-web) | Quasar Bridge — Станция 2, Quasar 3.21; quasard — ~1.56 и 3.x; ChatGPT — Лайт 2 / Plum |
+| [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)), свой бэкенд ([quasard](llm.md#quasard)) или [ChatGPT Voice: нативно или через ПК](llm.md#chatgpt-web) | Quasar Bridge — Станция 2, Quasar 3.21; quasard — ~1.56 и 3.x; ChatGPT — Лайт 2 / Plum |
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |
 | [Отключение обновлений](station1-disable-updates.md) | остановка цикла обязательного OTA, из-за которого Алиса отвечает с ошибками | проверено на Станции 1, прошивка 2.369.5.46 |
 | [Spotify Connect](spotify.md) | колонка как приёмник Spotify и «Алиса, поставь …» через Spotify | Станция 2 |
