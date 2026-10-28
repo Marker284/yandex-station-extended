@@ -76,6 +76,9 @@
   Требует явных адреса, каталога и `--write`; отказывает при подключённом system UBI.
   Не очищает `/data` и не восстанавливает отдельные конфиги. См. [восстановление](../docs/start/recovery.md).
 * **[`yandex-station-privacy.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-privacy.sh)** — отключение отправки логов и телеметрии (`telemetryd`, `fluent-bitd`).
+* **[`station1-privacy.sh`](station1-privacy.sh)** — Станция 1: обратимая блокировка
+  известных узлов метрик без удаления Алисы.
+  [Рецепт и ограничения](../docs/recipes/station1-privacy.md).
 
 ### Доступ и ADB:
 * **[`install-s97adb.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-s97adb.sh)** —
