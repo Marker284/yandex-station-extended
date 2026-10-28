@@ -16,7 +16,7 @@
 [Открыть чат](https://t.me/hackalice){ .md-button .md-button--primary .tg-banner__button }
 </div>
 
-## С чего начать
+## С чего начать { #start }
 
 1. **[Получение root](start/index.md#root-by-model)** — у каждой модели свой способ,
    без разборки (~15 минут).
@@ -24,7 +24,7 @@
 3. **[Пакеты `yse`](start/packages.md)** — `htop`, `tmux`, `nano`, `python` и тысячи других.
 4. **[Если что-то сломалось](start/recovery.md)** — диагностика и откат.
 
-## Разделы
+## Разделы { #sections }
 
 <div class="grid cards" markdown>
 
@@ -47,20 +47,23 @@
 
 </div>
 
-## Модели
+## Модели { #models }
 
-| Модель | Root и доступ |
-|---|:---:|
-| Мини, Мини 2, Миди, Станция 2, Стрит, Умный хаб | ✅ проверено |
-| Лайт (1-го поколения) | ✅ проверено; сборки после 21.10.2026 — [свой стенд](start/root.md#local-stand) с откатом на `.46` |
-| Мини 3 (bergamot) | ✅ [retail CA и маркеры из factory](start/retail-ca-mini3.md) |
-| Лайт 2 (Plum) | ✅ [retail CA из factory](start/retail-ca.md) |
-| Станция 1-го поколения | ✅ [AliceBridge](start/root-android.md#station-1) |
-| Станция Макс (YNDX-0008) | ✅ [ADB Max](start/adb-max.md) |
-| Станция 3 (orion) | ✅ [DNS-метод](start/root.md) (свой стенд — [только с CA из бандла](devices/station-3.md#tls)) |
-| JBL Link Music (с Алисой) | ✅ [ADB по USB на старте](start/root-jbl-link-music.md) |
+| Модель | Способ получения root |
+|---|---|
+| Мини 2, Миди, Станция 2, Стрит, Умный хаб | [подмена DNS](start/root.md) |
+| Лайт (1-го поколения) | [подмена DNS](start/root.md); на сборках после 21.10.2026 — [свой сервер обновлений](start/root.md#local-stand) с откатом прошивки на `.46` |
+| Лайт 2 (Plum) | [сертификат из factory-образа](start/retail-ca.md) |
+| Мини 3 (bergamot) | [сертификат и маркеры из factory](start/retail-ca-mini3.md) |
+| Мини 1 (2019, YNDX-0004) | [свой образ по USB](start/root-mini1-usb.md) — без сброса и смены DNS |
+| Станция 3 (orion) | [подмена DNS](start/root.md); свой сертификат колонка [не примет](devices/station-3.md#tls) |
+| Станция 1-го поколения | [AliceBridge](start/root-android.md#station-1) с Android-телефона |
+| Станция Макс (YNDX-0008) | [доступ по ADB](start/adb-max.md): права действуют до перезагрузки |
+| JBL Link Music (с Алисой) | [ADB по USB на старте](start/root-jbl-link-music.md) |
+| Мини 3 Про (pickle) | только на заводской [factory-12](devices/station-mini3-pro.md#factory-12) — [подмена DNS](start/root.md) |
 
-Подробнее — в [каталоге устройств](devices/index.md#support-matrix).
+Все способы проверены на живых колонках. Подробности по каждой модели — в
+[каталоге устройств](devices/index.md#support-matrix).
 
 <div class="tg-banner gh-banner" markdown>
 <span class="tg-banner__icon">:fontawesome-solid-star:</span>
