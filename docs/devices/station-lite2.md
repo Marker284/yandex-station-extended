@@ -35,7 +35,7 @@
 | Свои звуки | работает | [озвучивание текста](../recipes/sounds.md#native-tts) |
 | Обработанный микрофон | работает | [VQE-выход на ПК](../recipes/microphone.md) |
 | Подсветка | работает | [временное управление](../recipes/led.md#plum-led) |
-| YAM | работает | [профиль plum](../recipes/yam.md) |
+| YAM | работает | [профиль plum](../recipes/packagemanagers.md) |
 | Своя LLM | работает (нативно или через Linux-ПК) | [ChatGPT Voice / Alisa Voice](../recipes/llm.md#chatgpt-web) |
 
 ## Получение root { #root }
