@@ -747,20 +747,7 @@ public final class StationRemote {
     }
 
     void vpn(String link) throws Exception {
-      // Repair only an over-escaped REALITY spider path, preserving other URI components.
-      if (link.startsWith("vless://")) {
-        java.util.regex.Matcher m =
-            java.util.regex.Pattern.compile("([?&]spx=)([^&#]*)").matcher(link);
-        if (m.find()) {
-          String raw = m.group(2), v = URLDecoder.decode(raw, "UTF-8");
-          for (int i = 0; i < 3 && v.startsWith("%"); i++) v = URLDecoder.decode(v, "UTF-8");
-          if (v.startsWith("/"))
-            link =
-                link.substring(0, m.start(2))
-                    + URLEncoder.encode(v, "UTF-8")
-                    + link.substring(m.end(2));
-        }
-      }
+      link = VlessLink.normalize(link);
       String url =
           "v2rayng://"
               + (link.startsWith("http") ? "install-sub" : "install-config")
@@ -773,6 +760,15 @@ public final class StationRemote {
           .getMethod("setData", uri)
           .invoke(intent, uri.getMethod("parse", String.class).invoke(null, url));
       launch(intent);
+      if (!link.startsWith("http")) clock.schedule(new Runnable() {
+        public void run() {
+          try {
+            Object main = component("com.v2ray.ang", "com.v2ray.ang.ui.MainActivity");
+            intentClass.getMethod("addFlags", int.class).invoke(main, 0x00008000);
+            launch(main);
+          } catch (Exception ignored) { }
+        }
+      }, 2, TimeUnit.SECONDS);
     }
   }
 

@@ -17,7 +17,7 @@ CLASSES.mkdir(exist_ok=True)
 for old in CLASSES.glob('*.class'): old.unlink()
 DIST.mkdir(exist_ok=True)
 
-subprocess.run([java_tool('javac'), '--release', '7', '-Xlint:-options', '-encoding', 'UTF-8', '-d', str(CLASSES), str(SRC/'StationRemote.java')], check=True)
+subprocess.run([java_tool('javac'), '--release', '7', '-Xlint:-options', '-encoding', 'UTF-8', '-d', str(CLASSES), str(SRC/'StationRemote.java'), str(SRC/'VlessLink.java')], check=True)
 with zipfile.ZipFile(TOOLS/'classes.jar', 'w', zipfile.ZIP_DEFLATED) as jar:
     for f in sorted(CLASSES.glob('*.class')):
         jar.write(f, f.name)
