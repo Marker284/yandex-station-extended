@@ -69,7 +69,10 @@
 ### Безопасность и блокировка обновлений:
 * **[`yandex-noupdate.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-noupdate.sh)** — полная блокировка OTA-обновлений, вырезание `updatesd` и подмена публичного ключа.
 * **[`station1-freeze-updatesd.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/station1-freeze-updatesd.sh)** — Станция 1 (Android, root через AliceBridge): фоновая заморозка `maind --updatesd` сигналом `SIGSTOP`, без правок `/system`. [Рецепт](https://hackalice.me/recipes/station1-disable-updates/).
-* **[`station1-tv/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-tv)** — Станция 1: веб-пульт (`lighttpd` + CGI на `sh`, порт 8080) и установщик `install.ps1`, который ставит его вместе с Couchy Launcher, SmartTube и v2rayNG 1.9.45. [Рецепт](https://hackalice.me/recipes/station1-tv/).
+* **[`station1-tv/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-tv)** —
+  Станция 1: веб-пульт с паролем и WebSocket, один `install.sh` для терминала AliceBridge.
+  Устанавливает пульт, недостающие Couchy, SmartTube и v2rayNG 1.9.45; исходники Java,
+  шаблоны и сборка находятся рядом. [Рецепт](https://hackalice.me/recipes/station1-tv/).
 * **[`killswitch.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/killswitch.sh)** — аварийный киллсвич для мгновенной изоляции колонки от облачных серверов Яндекса.
 * **[`rollback.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/rollback.sh)** —
   непроверенная запись собственных дампов Мини 2 через root ADB в среде восстановления.

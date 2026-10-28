@@ -1,0 +1,1742 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101310" />
+    <title>Станция · Пульт</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101310;
+        --surface: #191d19;
+        --raised: #242a24;
+        --line: #313831;
+        --ink: #f4f6ef;
+        --muted: #929e92;
+        --accent: #d2f58a;
+        --accent-ink: #20320d;
+        --red: #ff9d94;
+        --radius: 24px;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100svh;
+        background-image: radial-gradient(
+          ellipse at 12% 0%,
+          #28372355,
+          transparent 50%
+        );
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+        color: inherit;
+        border: 0;
+        touch-action: manipulation;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible,
+      select:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+      }
+      button svg {
+        width: 24px;
+        height: 24px;
+        pointer-events: none;
+      }
+      svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex-shrink: 0;
+      }
+      .hidden,
+      [hidden] {
+        display: none !important;
+      }
+      .shell {
+        max-width: 1040px;
+        margin: auto;
+        padding: 34px 32px 22px;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 32px;
+      }
+      .brand {
+        display: flex;
+        gap: 13px;
+        align-items: center;
+      }
+      .station-logo {
+        width: 42px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: #25301f;
+        border: 1px solid #405337;
+        border-radius: 15px;
+      }
+      .station-logo svg {
+        width: 28px;
+        height: 30px;
+      }
+      .eyebrow {
+        font-size: 10px;
+        letter-spacing: 2.1px;
+        color: var(--muted);
+        font-weight: 650;
+        text-transform: uppercase;
+      }
+      .brand h1 {
+        font-size: 23px;
+        letter-spacing: -0.7px;
+        margin: 4px 0 0;
+        font-weight: 650;
+      }
+      .connection {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        padding: 10px 13px;
+        border-radius: 30px;
+        background: #19201877;
+        white-space: nowrap;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #808780;
+      }
+      .online .dot {
+        background: var(--accent);
+        box-shadow: 0 0 11px #d2f58a50;
+      }
+      .online #status-label {
+        color: var(--ink);
+      }
+      #latency {
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 330px;
+        gap: 24px;
+        align-items: start;
+      }
+      .page {
+        min-width: 0;
+      }
+      .panel {
+        background: linear-gradient(135deg, #1e241d, #191d19);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 25px;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 24px;
+      }
+      .section-head h2 {
+        font-size: 17px;
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+      }
+      .tag {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--muted);
+      }
+      .icon-button {
+        display: grid;
+        place-items: center;
+        background: var(--raised);
+        width: 43px;
+        height: 43px;
+        border-radius: 15px;
+        transition:
+          background 0.12s,
+          transform 0.12s;
+      }
+      .icon-button:hover,
+      .key:hover {
+        background: #313a2e;
+      }
+      .icon-button:active,
+      .key:active,
+      .pressed {
+        transform: scale(0.95);
+        background: #3a4633 !important;
+      }
+      .dpad {
+        width: 278px;
+        height: 278px;
+        position: relative;
+        margin: 18px auto 28px;
+        border-radius: 50%;
+        background: #111610;
+        box-shadow:
+          inset 0 1px 1px #ffffff09,
+          0 0 0 1px #ffffff05;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 0;
+        padding: 9px;
+      }
+      .dpad::before {
+        content: "";
+        position: absolute;
+        inset: 9px;
+        border: 1px solid #30392c;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .dpad button {
+        background: transparent;
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        border-radius: 30px;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        transition:
+          background 0.08s,
+          transform 0.08s;
+      }
+      .dpad svg {
+        width: 29px;
+        height: 29px;
+        stroke-width: 2;
+      }
+      .dpad [data-key="up"] {
+        grid-area: 1/2;
+      }
+      .dpad [data-key="left"] {
+        grid-area: 2/1;
+      }
+      .dpad [data-key="right"] {
+        grid-area: 2/3;
+      }
+      .dpad [data-key="down"] {
+        grid-area: 3/2;
+      }
+      .dpad .ok {
+        grid-area: 2/2;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-size: 19px;
+        font-weight: 700;
+        box-shadow: 0 5px 22px #9bbb5620;
+      }
+      .dpad .ok:hover {
+        background: #e2ffaf;
+      }
+      .dpad .ok.pressed {
+        background: #c3e97c !important;
+      }
+      .remote-tools {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+      }
+      .remote-tools > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .remote-tools .icon-button {
+        width: 60px;
+        height: 49px;
+        background: #282f26;
+        border: 1px solid #374032;
+        border-radius: 17px;
+      }
+      .tool-caption {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .volume {
+        display: grid;
+        grid-template-columns: 64px 1fr 64px;
+        align-items: center;
+        background: #121711;
+        border: 1px solid #30392c;
+        border-radius: 19px;
+        margin-top: 26px;
+        height: 62px;
+      }
+      .volume button {
+        height: 100%;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        border-radius: 18px;
+        touch-action: none;
+      }
+      .volume .mute {
+        height: 39px;
+        justify-self: center;
+        width: 46px;
+        border-radius: 12px;
+      }
+      .volume .volume-name {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .text-box {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        padding: 11px 11px 11px 17px;
+        margin-top: 18px;
+        background: #181d17;
+        border: 1px solid var(--line);
+        border-radius: 19px;
+      }
+      .text-box textarea {
+        resize: none;
+        min-height: 39px;
+        height: 39px;
+        max-height: 105px;
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        background: transparent;
+        color: var(--ink);
+        padding: 8px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        outline-offset: 0;
+        user-select: text;
+      }
+      .text-box button {
+        width: 39px;
+        height: 39px;
+        border-radius: 13px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+      .text-hint {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 9px 3px 0;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .text-hint label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+      }
+      .text-hint input {
+        accent-color: var(--accent);
+      }
+      .apps-panel {
+        padding: 23px;
+      }
+      .apps-panel .section-head {
+        margin-bottom: 17px;
+      }
+      .app-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .app {
+        padding: 17px 14px;
+        background: #252c23;
+        border: 1px solid #343e30;
+        border-radius: 18px;
+        text-align: left;
+        transition:
+          background 0.15s,
+          transform 0.1s;
+        min-height: 104px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 14px;
+      }
+      .app:hover {
+        background: #313c2b;
+      }
+      .app:active {
+        transform: scale(0.96);
+      }
+      .app .app-icon {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+      }
+      .app .app-icon svg {
+        width: 27px;
+        height: 27px;
+      }
+      .app-label {
+        font-size: 13px;
+        font-weight: 550;
+      }
+      .app.alice .app-icon {
+        color: #c2a4ff;
+      }
+      .app.youtube .app-icon {
+        color: #ff9181;
+      }
+      .app.vpn .app-icon {
+        color: #a3c9ff;
+      }
+      .app.wifi .app-icon {
+        color: var(--accent);
+      }
+      .app.settings .app-icon {
+        color: #d6ccad;
+      }
+      .app.launcher .app-icon {
+        color: #c4d5bc;
+      }
+      .aside-note {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 18px 5px 0;
+        display: flex;
+        gap: 10px;
+      }
+      .aside-note svg {
+        width: 17px;
+        height: 17px;
+        margin-top: 2px;
+      }
+      .desktop-aside .aside-note {
+        max-width: 270px;
+      }
+      .nav {
+        display: flex;
+        gap: 5px;
+        border: 1px solid #343d30;
+        background: #20261de8;
+        backdrop-filter: blur(14px);
+        border-radius: 21px;
+        padding: 6px;
+        width: 330px;
+        margin: 28px auto 0;
+      }
+      .nav button {
+        flex: 1;
+        padding: 12px 6px;
+        border-radius: 15px;
+        background: transparent;
+        color: var(--muted);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .nav button svg {
+        width: 18px;
+        height: 18px;
+      }
+      .nav button.selected {
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-weight: 650;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin: 22px 3px 0;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        color: #74816f;
+      }
+      .footer a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .wide-page {
+        grid-column: 1/-1;
+        max-width: 670px;
+        width: 100%;
+        margin: auto;
+      }
+      .wide-page h2 {
+        font-size: 24px;
+        letter-spacing: -0.7px;
+        margin: 0 0 6px;
+      }
+      .subtext {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0 0 24px;
+      }
+      .settings-section {
+        padding: 23px 0;
+        border-top: 1px solid var(--line);
+      }
+      .settings-section h3 {
+        font-size: 15px;
+        font-weight: 550;
+        margin: 0 0 9px;
+      }
+      .settings-section p {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0 0 13px;
+      }
+      .field {
+        width: 100%;
+        background: #11170f;
+        color: var(--ink);
+        border: 1px solid #3a4534;
+        padding: 14px 15px;
+        border-radius: 13px;
+        min-height: 48px;
+        font-size: 14px;
+      }
+      .field::placeholder,
+      textarea::placeholder {
+        color: #87917f;
+      }
+      .form-stack {
+        display: grid;
+        gap: 11px;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-weight: 650;
+        padding: 14px 18px;
+        border-radius: 13px;
+        min-height: 48px;
+      }
+      .button-secondary {
+        background: #293225;
+        border: 1px solid #3b4835;
+        padding: 12px 16px;
+        border-radius: 13px;
+        min-height: 46px;
+        font-size: 13px;
+      }
+      .button-danger {
+        background: #31231f;
+        color: #ffb6a6;
+        border: 1px solid #54382e;
+        padding: 12px 16px;
+        border-radius: 13px;
+        min-height: 46px;
+        font-size: 13px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .row > .field {
+        flex: 1;
+        min-width: 0;
+      }
+      .settings-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .settings-section .small {
+        font-size: 11px;
+      }
+      .auth {
+        max-width: 440px;
+        margin: 8vh auto 0;
+      }
+      .auth .panel {
+        padding: 32px;
+      }
+      .auth .station-logo {
+        width: 58px;
+        height: 65px;
+        border-radius: 20px;
+        margin-bottom: 31px;
+      }
+      .auth h1 {
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: -1.1px;
+        margin: 0 0 12px;
+        line-height: 1.15;
+      }
+      .auth p {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0 0 26px;
+      }
+      .auth label {
+        font-size: 12px;
+        color: #c3cdbd;
+        display: grid;
+        gap: 9px;
+      }
+      .password-wrap {
+        position: relative;
+      }
+      .password-wrap input {
+        padding-right: 48px;
+      }
+      .password-eye {
+        position: absolute;
+        right: 7px;
+        top: 6px;
+        width: 38px;
+        height: 38px;
+        background: transparent;
+        color: var(--muted);
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+      }
+      .password-eye svg {
+        width: 19px;
+        height: 19px;
+      }
+      .auth .button-primary {
+        margin-top: 5px;
+      }
+      .auth .privacy-note {
+        font-size: 11px;
+        color: var(--muted);
+        margin: 20px 0 0;
+      }
+      .form-error {
+        color: #ffb5a5;
+        font-size: 12px;
+        line-height: 1.5;
+        min-height: 1px;
+      }
+      .auth-footer {
+        margin-top: 22px;
+        color: #778370;
+        font-size: 11px;
+        text-align: center;
+      }
+      .toast {
+        position: fixed;
+        bottom: 105px;
+        left: 50%;
+        transform: translate(-50%, 12px);
+        z-index: 100;
+        background: #e0edcc;
+        color: #1c2a10;
+        border-radius: 16px;
+        padding: 13px 19px;
+        box-shadow: 0 8px 35px #0006;
+        font-size: 13px;
+        line-height: 1.4;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.15s,
+          transform 0.15s;
+        max-width: min(420px, 90vw);
+        text-align: center;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+      .toast.error {
+        background: #f9c1af;
+        color: #492517;
+      }
+      .kbd-hint {
+        padding: 16px 4px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .busy {
+        opacity: 0.65;
+        pointer-events: none;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+      @media (min-width: 760px) {
+        body {
+          display: flex;
+          align-items: center;
+          min-height: 100vh;
+        }
+        .shell {
+          width: 100%;
+        }
+        .remote-panel {
+          padding: 25px 40px;
+        }
+        .apps-only .app-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .apps-only .app {
+          min-height: 128px;
+          padding: 20px;
+        }
+        .apps-only .app-label {
+          font-size: 15px;
+        }
+        .mobile-only {
+          display: none;
+        }
+        .auth {
+          width: 440px;
+        }
+        .auth.shell {
+          padding-top: 25px;
+          padding-bottom: 25px;
+        }
+      }
+      @media (max-width: 759px) {
+        .shell {
+          padding: 22px 19px max(22px, env(safe-area-inset-bottom));
+          max-width: 480px;
+        }
+        .topbar {
+          margin-bottom: 23px;
+        }
+        .brand h1 {
+          font-size: 21px;
+        }
+        .brand {
+          gap: 10px;
+        }
+        .eyebrow {
+          font-size: 9px;
+          letter-spacing: 1.6px;
+        }
+        .connection {
+          padding: 9px 10px;
+          font-size: 10px;
+          gap: 6px;
+        }
+        .station-logo {
+          width: 36px;
+          height: 42px;
+          border-radius: 13px;
+        }
+        .layout {
+          display: block;
+        }
+        .desktop-aside {
+          display: none;
+        }
+        .remote-panel {
+          padding: 21px 21px 20px;
+        }
+        .panel {
+          border-radius: 23px;
+        }
+        .section-head {
+          margin-bottom: 16px;
+        }
+        .section-head h2 {
+          font-size: 15px;
+        }
+        .tag {
+          font-size: 9px;
+        }
+        .dpad {
+          width: min(270px, 75vw);
+          height: min(270px, 75vw);
+          margin: 17px auto 22px;
+        }
+        .remote-tools {
+          gap: 29px;
+        }
+        .volume {
+          margin-top: 22px;
+        }
+        .nav {
+          position: sticky;
+          bottom: max(15px, env(safe-area-inset-bottom));
+          z-index: 5;
+          width: 100%;
+          margin: 20px auto 0;
+          box-shadow: 0 10px 28px #0d120ccc;
+        }
+        .footer {
+          margin-top: 20px;
+          font-size: 9px;
+        }
+        .quick-apps {
+          display: flex;
+          gap: 9px;
+          margin-top: 16px;
+        }
+        .quick-apps button {
+          flex: 1;
+          display: flex;
+          gap: 7px;
+          align-items: center;
+          justify-content: center;
+          background: #222a1e;
+          border: 1px solid #35412d;
+          color: #cfdcc4;
+          border-radius: 13px;
+          padding: 11px 7px;
+          font-size: 11px;
+        }
+        .quick-apps svg {
+          width: 17px;
+          height: 17px;
+        }
+        .wide-page .panel {
+          padding: 23px;
+        }
+        .wide-page h2 {
+          font-size: 23px;
+        }
+        .app-grid {
+          gap: 11px;
+        }
+        .apps-only .app {
+          padding: 20px 17px;
+          min-height: 120px;
+        }
+        .apps-only .app-label {
+          font-size: 14px;
+        }
+        .auth {
+          margin: 6vh auto 0;
+        }
+        .auth .panel {
+          padding: 29px 24px;
+        }
+        .auth h1 {
+          font-size: 29px;
+        }
+        .auth .station-logo {
+          margin-bottom: 26px;
+        }
+        .auth-footer {
+          padding-bottom: 25px;
+        }
+        .kbd-hint {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-station" viewBox="0 0 32 36">
+          <path d="M8 9h16l2 23H6L8 9Z" />
+          <ellipse cx="16" cy="8" rx="8" ry="4" />
+          <path d="M10 14h12M10 18h12M10 22h12M10 26h12" opacity=".35" />
+          <path d="M12 8h8" stroke-width="2.8" />
+        </symbol>
+        <symbol id="i-up" viewBox="0 0 24 24">
+          <path d="m7 14 5-5 5 5" />
+        </symbol>
+        <symbol id="i-down" viewBox="0 0 24 24">
+          <path d="m7 10 5 5 5-5" />
+        </symbol>
+        <symbol id="i-left" viewBox="0 0 24 24">
+          <path d="m14 7-5 5 5 5" />
+        </symbol>
+        <symbol id="i-right" viewBox="0 0 24 24">
+          <path d="m10 7 5 5-5 5" />
+        </symbol>
+        <symbol id="i-back" viewBox="0 0 24 24">
+          <path
+            d="m9 5-6 6 6 6M3 11h11a6 6 0 0 1 0 12"
+            transform="translate(0 -2)"
+          />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="m4 5 9 7-9 7V5Z" />
+          <path d="M17 5v14M21 5v14" />
+        </symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24">
+          <path d="M5 6h14M5 12h14M5 18h14" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5v14" />
+        </symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+        <symbol id="i-mute" viewBox="0 0 24 24">
+          <path d="M10 5 5 9H2v6h3l5 4V5ZM16 9l6 6M22 9l-6 6" />
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24">
+          <path
+            d="m9 3-.7 2.2L6 6l-2.2-.3L2.5 8l1.5 1.8v2.5l-1.5 1.8 1.3 2.3 2.2-.3 2.3.8L9 19h3l.7-2.1 2.3-.8 2.2.3 1.3-2.3-1.5-1.8V9.8L18.5 8l-1.3-2.3L15 6l-2.3-.8L12 3H9Z"
+            transform="translate(1.5 1)"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-wifi" viewBox="0 0 24 24">
+          <path
+            d="M2 8a16 16 0 0 1 20 0M5.5 12a10.5 10.5 0 0 1 13 0M9 16a5 5 0 0 1 6 0"
+          />
+          <circle cx="12" cy="20" r=".6" fill="currentColor" />
+        </symbol>
+        <symbol id="i-youtube" viewBox="0 0 24 24">
+          <rect x="2" y="5" width="20" height="14" rx="5" />
+          <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-vpn" viewBox="0 0 24 24">
+          <path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4Z" />
+          <path d="m8 12 3 3 5-6" />
+        </symbol>
+        <symbol id="i-alice" viewBox="0 0 24 24">
+          <path d="M4 17c0-4 4-13 8-13s8 9 8 13c0 4-16 4-16 0Z" />
+          <path d="M8 15c0-2 2-7 4-7s4 5 4 7" opacity=".45" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="2" />
+          <rect x="14" y="3" width="7" height="7" rx="2" />
+          <rect x="3" y="14" width="7" height="7" rx="2" />
+          <rect x="14" y="14" width="7" height="7" rx="2" />
+        </symbol>
+        <symbol id="i-send" viewBox="0 0 24 24">
+          <path d="M12 19V5m-6 6 6-6 6 6" />
+        </symbol>
+        <symbol id="i-remote" viewBox="0 0 24 24">
+          <rect x="6" y="2" width="12" height="20" rx="5" />
+          <circle cx="12" cy="10" r="3" />
+          <path d="M10 17h4" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect x="5" y="10" width="14" height="11" rx="3" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <main class="shell auth" id="auth-view" hidden>
+      <div class="panel">
+        <h1 id="auth-title">Пароль пульта</h1>
+        <p id="auth-copy">Введите пароль.</p>
+        <form id="auth-form" class="form-stack">
+          <label
+            ><span id="password-label">Пароль пульта</span>
+            <div class="password-wrap">
+              <input
+                class="field"
+                type="password"
+                id="auth-password"
+                maxlength="128"
+                autocomplete="current-password"
+                required
+                placeholder="Введите пароль"
+              /><button
+                type="button"
+                class="password-eye"
+                aria-label="Показать пароль"
+                data-reveal="auth-password"
+              >
+                <svg><use href="#i-eye" /></svg>
+              </button></div
+          ></label>
+          <label id="confirm-label" hidden
+            >Ещё раз, для проверки<input
+              class="field"
+              type="password"
+              id="auth-confirm"
+              maxlength="128"
+              autocomplete="new-password"
+              placeholder="Повторите пароль"
+          /></label>
+          <div class="form-error" id="auth-error" role="alert"></div>
+          <button class="button-primary" type="submit" id="auth-submit">
+            Подключиться
+          </button>
+        </form>
+        <p class="privacy-note">
+          Пароль нужен для безопасности: он защищает управление Станцией в вашей
+          сети.
+        </p>
+      </div>
+    </main>
+
+    <main class="shell" id="remote-view" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <div><h1>Пульт</h1></div>
+        </div>
+        <div class="connection" id="connection" role="status">
+          <span class="dot"></span><span id="status-label">Подключение</span
+          ><span id="latency"></span>
+        </div>
+      </header>
+      <div class="layout">
+        <section class="page" data-page="remote">
+          <div class="panel remote-panel">
+            <div class="section-head"><h2>Управление</h2></div>
+            <div class="dpad" aria-label="Навигация по телевизору">
+              <button data-key="up" aria-label="Вверх">
+                <svg><use href="#i-up" /></svg>
+              </button>
+              <button data-key="left" aria-label="Влево">
+                <svg><use href="#i-left" /></svg>
+              </button>
+              <button class="ok" data-key="ok" aria-label="Подтвердить">
+                OK
+              </button>
+              <button data-key="right" aria-label="Вправо">
+                <svg><use href="#i-right" /></svg>
+              </button>
+              <button data-key="down" aria-label="Вниз">
+                <svg><use href="#i-down" /></svg>
+              </button>
+            </div>
+            <div class="remote-tools">
+              <div>
+                <button class="icon-button" data-key="back" aria-label="Назад">
+                  <svg><use href="#i-back" /></svg></button
+                ><span class="tool-caption">Назад</span>
+              </div>
+              <div>
+                <button
+                  class="icon-button"
+                  data-key="play"
+                  aria-label="Воспроизведение или пауза"
+                >
+                  <svg><use href="#i-play" /></svg></button
+                ><span class="tool-caption">Пауза</span>
+              </div>
+              <div>
+                <button class="icon-button" data-key="menu" aria-label="Меню">
+                  <svg><use href="#i-menu" /></svg></button
+                ><span class="tool-caption">Меню</span>
+              </div>
+            </div>
+            <div class="volume" aria-label="Громкость">
+              <button data-key="voldown" aria-label="Тише">
+                <svg><use href="#i-minus" /></svg>
+              </button>
+              <div class="volume-name">
+                <span>Громкость</span
+                ><button
+                  data-key="mute"
+                  class="mute"
+                  aria-label="Выключить или включить звук"
+                >
+                  <svg style="width: 19px; height: 19px">
+                    <use href="#i-mute" />
+                  </svg>
+                </button>
+              </div>
+              <button data-key="volup" aria-label="Громче">
+                <svg><use href="#i-plus" /></svg>
+              </button>
+            </div>
+          </div>
+          <form id="text-form" class="text-box">
+            <label for="text-input" class="sr-only"
+              >Текст для ввода на телевизоре</label
+            ><textarea
+              id="text-input"
+              placeholder="Поиск, текст или пароль Wi-Fi"
+              maxlength="1000"
+              rows="1"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+            ></textarea
+            ><button type="submit" aria-label="Ввести текст на телевизоре">
+              <svg><use href="#i-send" /></svg>
+            </button>
+          </form>
+          <div class="text-hint">
+            <label><input type="checkbox" id="hide-text" />Скрыть текст</label>
+          </div>
+          <div class="quick-apps mobile-only">
+            <button data-app="youtube">
+              <svg><use href="#i-youtube" /></svg>YouTube</button
+            ><button data-app="wifi">
+              <svg><use href="#i-wifi" /></svg>Wi-Fi</button
+            ><button data-app="settings">
+              <svg><use href="#i-settings" /></svg>Настройки
+            </button>
+          </div>
+        </section>
+        <aside class="desktop-aside page" data-page="remote">
+          <div class="panel apps-panel">
+            <div class="section-head"><h2>Открыть на ТВ</h2></div>
+            <div class="app-grid" data-app-grid></div>
+          </div>
+        </aside>
+        <section class="page wide-page apps-only" data-page="apps" hidden>
+          <div class="panel">
+            <h2>Приложения</h2>
+            <div class="app-grid" data-app-grid></div>
+          </div>
+        </section>
+        <section class="page wide-page" data-page="settings" hidden>
+          <div class="panel">
+            <h2>Параметры</h2>
+            <div class="settings-section">
+              <h3>Настройки Станции</h3>
+              <p>Откройте системные настройки или выбор сети на телевизоре.</p>
+              <div class="settings-actions">
+                <button class="button-secondary" data-app="settings">
+                  Настройки Android</button
+                ><button class="button-secondary" data-app="wifi">
+                  Настройки Wi-Fi
+                </button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>VPN</h3>
+              <p>
+                Вставьте ключ или ссылку подписки. Импорт нужно подтвердить на
+                экране телевизора.
+              </p>
+              <form id="vpn-form" class="form-stack">
+                <input
+                  class="field"
+                  id="vpn-input"
+                  type="password"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  placeholder="vless://… или ссылка подписки"
+                  aria-label="Ключ или ссылка подписки VPN"
+                  required
+                />
+                <div class="settings-actions">
+                  <button class="button-primary" type="submit">
+                    Добавить в v2rayNG</button
+                  ><button
+                    class="button-secondary"
+                    type="button"
+                    data-app="vpn"
+                  >
+                    Открыть VPN
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="settings-section">
+              <h3>При включении Станции</h3>
+              <p>
+                Для голосового управления оставьте Алису. Изменение сработает
+                при следующем включении.
+              </p>
+              <select
+                class="field"
+                id="boot-select"
+                aria-label="Лаунчер при включении"
+              >
+                <option value="alice">Алиса — с голосовым управлением</option>
+                <option value="couchy">ТВ-лаунчер — без голоса Алисы</option>
+              </select>
+            </div>
+            <div class="settings-section">
+              <h3>Пароль пульта</h3>
+              <p>Поменяйте пароль, если дали доступ другому человеку.</p>
+              <form id="password-form" class="form-stack">
+                <input
+                  class="field"
+                  id="current-password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Текущий пароль"
+                  aria-label="Текущий пароль"
+                  required
+                /><input
+                  class="field"
+                  id="new-password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  maxlength="128"
+                  placeholder="Новый пароль, от 8 символов"
+                  aria-label="Новый пароль"
+                  required
+                /><input
+                  class="field"
+                  id="new-password-confirm"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Повторите новый пароль"
+                  aria-label="Подтверждение нового пароля"
+                  required
+                /><button class="button-secondary" type="submit">
+                  Изменить пароль
+                </button>
+              </form>
+            </div>
+            <div class="settings-section">
+              <h3>Управление доступом</h3>
+              <div class="settings-actions">
+                <button class="button-secondary" id="logout">
+                  Выйти из пульта</button
+                ><button class="button-danger" id="reboot">
+                  Перезагрузить Станцию
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <nav class="nav" aria-label="Разделы пульта">
+        <button class="selected" data-tab="remote">
+          <svg><use href="#i-remote" /></svg>Пульт</button
+        ><button data-tab="apps">
+          <svg><use href="#i-grid" /></svg>Приложения</button
+        ><button data-tab="settings">
+          <svg><use href="#i-settings" /></svg>Параметры
+        </button>
+      </nav>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script>
+      (() => {
+        "use strict";
+        const $ = (s) => document.querySelector(s),
+          $$ = (s) => document.querySelectorAll(s);
+        let setupToken =
+            new URLSearchParams(location.hash.slice(1)).get("setup") || "",
+          state = {},
+          ws = null,
+          nextId = 0,
+          retry = 0,
+          reconnectTimer,
+          holdTimer,
+          toastTimer,
+          activeKey = null,
+          loggingOut = false;
+        const pending = new Map(),
+          repeatKeys = new Set([
+            "up",
+            "down",
+            "left",
+            "right",
+            "volup",
+            "voldown",
+            "delete",
+          ]);
+        if (setupToken) history.replaceState(null, "", location.pathname);
+        const apps = [
+          ["alice", "Алиса", "alice"],
+          ["youtube", "YouTube", "youtube"],
+          ["launcher", "Лаунчер", "grid"],
+          ["vpn", "VPN", "vpn"],
+          ["wifi", "Wi-Fi", "wifi"],
+          ["settings", "Настройки", "settings"],
+        ];
+        $$("[data-app-grid]").forEach((grid) =>
+          apps.forEach(([id, label, icon]) => {
+            const b = document.createElement("button");
+            b.className = "app " + id;
+            b.dataset.app = id;
+            b.innerHTML =
+              '<span class="app-icon"><svg><use href="#i-' +
+              icon +
+              '"/></svg></span><span class="app-label">' +
+              label +
+              "</span>";
+            grid.appendChild(b);
+          }),
+        );
+        function toast(message, error = false) {
+          if (!message) return;
+          clearTimeout(toastTimer);
+          $("#toast").textContent = message;
+          $("#toast").className = "toast show" + (error ? " error" : "");
+          toastTimer = setTimeout(
+            () => $("#toast").classList.remove("show"),
+            3400,
+          );
+        }
+        function status(online, label) {
+          $("#connection").classList.toggle("online", online);
+          $("#status-label").textContent =
+            label || (online ? "На связи" : "Подключение");
+          if (!online) $("#latency").textContent = "";
+        }
+        async function api(path, data) {
+          const r = await fetch("/api/" + path, {
+            method: data ? "POST" : "GET",
+            credentials: "same-origin",
+            headers: data
+              ? {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "X-Remote-CSRF": state.csrf || "",
+                }
+              : {},
+            body: data ? new URLSearchParams(data) : undefined,
+            cache: "no-store",
+          });
+          const result = await r.json();
+          if (!r.ok)
+            throw new Error(result.error || "Не удалось выполнить запрос");
+          return result;
+        }
+        function showAuth() {
+          release();
+          if (ws) ws.close();
+          $("#auth-view").hidden = false;
+          $("#remote-view").hidden = true;
+          const setup = state.setupRequired;
+          $("#auth-title").innerHTML = setup
+            ? "Создайте пароль"
+            : "Пароль пульта";
+          $("#auth-copy").textContent = setup
+            ? "От 8 символов."
+            : "Введите пароль.";
+          $("#password-label").textContent = setup
+            ? "Новый пароль, от 8 символов"
+            : "Пароль пульта";
+          $("#auth-password").autocomplete = setup
+            ? "new-password"
+            : "current-password";
+          $("#auth-password").minLength = setup ? 8 : 1;
+          $("#auth-submit").textContent = setup
+            ? "Создать пароль и начать"
+            : "Подключиться";
+          $("#confirm-label").hidden = !setup;
+          $("#auth-confirm").required = setup;
+          $("#auth-error").textContent =
+            setup && !setupToken
+              ? "Для первого запуска откройте ссылку, которую показал установщик."
+              : "";
+          $("#auth-submit").disabled = setup && !setupToken;
+        }
+        function showRemote() {
+          loggingOut = false;
+          $("#auth-view").hidden = true;
+          $("#remote-view").hidden = false;
+          $("#boot-select").value = state.boot || "alice";
+          connect();
+        }
+        async function init() {
+          try {
+            state = await api("state");
+            if (state.authenticated) showRemote();
+            else showAuth();
+          } catch (e) {
+            $("#auth-view").hidden = false;
+            $("#auth-error").textContent =
+              "Нет связи со Станцией. Проверьте подключение к Wi-Fi.";
+            $("#auth-submit").disabled = true;
+            setTimeout(init, 2500);
+          }
+        }
+        function connect() {
+          clearTimeout(reconnectTimer);
+          if (loggingOut || !state.authenticated) return;
+          if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+          status(false);
+          ws = new WebSocket(
+            "ws://" +
+              location.host +
+              "/ws?csrf=" +
+              encodeURIComponent(state.csrf),
+          );
+          ws.onopen = () => {
+            retry = 0;
+            status(true);
+            send({ action: "ping" }).catch(() => {});
+          };
+          ws.onmessage = (e) => {
+            let msg;
+            try {
+              msg = JSON.parse(e.data);
+            } catch (_) {
+              return;
+            }
+            const p = pending.get(msg.id);
+            if (!p) return;
+            clearTimeout(p.timer);
+            pending.delete(msg.id);
+            const elapsed = Math.round(performance.now() - p.time);
+            if (p.action === "ping")
+              $("#latency").textContent = elapsed + " мс";
+            if (msg.error) p.reject(new Error(msg.error));
+            else p.resolve(msg);
+          };
+          ws.onclose = () => {
+            status(false);
+            clearHeld();
+            for (const p of pending.values()) {
+              clearTimeout(p.timer);
+              p.reject(new Error("Связь прервалась. Повторите нажатие."));
+            }
+            pending.clear();
+            if (!loggingOut && state.authenticated)
+              reconnectTimer = setTimeout(
+                async () => {
+                  try {
+                    state = await api("state");
+                    state.authenticated ? connect() : showAuth();
+                  } catch (_) {
+                    connect();
+                  }
+                },
+                Math.min(4000, 500 * Math.pow(1.6, retry++)),
+              );
+          };
+          ws.onerror = () => status(false);
+        }
+        function send(data) {
+          return new Promise((resolve, reject) => {
+            if (!ws || ws.readyState !== 1) {
+              reject(new Error("Нет связи со Станцией"));
+              return;
+            }
+            if (pending.size > 32) {
+              reject(new Error("Дождитесь выполнения команды"));
+              return;
+            }
+            const id = String(++nextId),
+              timer = setTimeout(() => {
+                pending.delete(id);
+                reject(new Error("Станция не ответила. Повторите команду."));
+              }, 5000);
+            pending.set(id, {
+              resolve,
+              reject,
+              timer,
+              time: performance.now(),
+              action: data.action,
+            });
+            ws.send(
+              new URLSearchParams(Object.assign({ id }, data)).toString(),
+            );
+          });
+        }
+        function command(data, notify = false) {
+          return send(data)
+            .then((r) => {
+              if (notify) toast(r.message);
+              return r;
+            })
+            .catch((e) => {
+              toast(e.message, true);
+              throw e;
+            });
+        }
+        function buzz() {
+          if (navigator.vibrate) navigator.vibrate(7);
+        }
+        function clearHeld() {
+          clearInterval(holdTimer);
+          activeKey = null;
+          $$(".pressed").forEach((b) => b.classList.remove("pressed"));
+        }
+        function release() {
+          if (activeKey && ws && ws.readyState === 1)
+            send({ action: "release" }).catch(() => {});
+          clearHeld();
+        }
+        $$("[data-key]").forEach((button) => {
+          const key = button.dataset.key;
+          button.addEventListener("pointerdown", (e) => {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            release();
+            buzz();
+            button.classList.add("pressed");
+            try {
+              button.setPointerCapture(e.pointerId);
+            } catch (_) {}
+            if (repeatKeys.has(key)) {
+              activeKey = key;
+              command({ action: "key", key, phase: "down" }).catch(() =>
+                clearHeld(),
+              );
+              holdTimer = setInterval(
+                () => send({ action: "hold" }).catch(() => release()),
+                400,
+              );
+            } else
+              command({ action: "key", key, phase: "tap" }).catch(() => {});
+          });
+          const up = () => {
+            if (activeKey === key) {
+              send({ action: "key", key, phase: "up" }).catch(() => {});
+              clearHeld();
+            }
+            button.classList.remove("pressed");
+          };
+          ["pointerup", "pointercancel", "lostpointercapture"].forEach(
+            (event) => button.addEventListener(event, up),
+          );
+          button.addEventListener("keydown", (e) => {
+            if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
+              e.preventDefault();
+              buzz();
+              command({ action: "key", key, phase: "tap" }).catch(() => {});
+            }
+          });
+        });
+        document.addEventListener("click", (e) => {
+          const b = e.target.closest("[data-app]");
+          if (b) {
+            buzz();
+            command({ action: "app", app: b.dataset.app }, true).catch(
+              () => {},
+            );
+          }
+        });
+        $$("[data-tab]").forEach((button) =>
+          button.addEventListener("click", () => {
+            release();
+            $$("[data-page]").forEach(
+              (p) => (p.hidden = p.dataset.page !== button.dataset.tab),
+            );
+            $$("[data-tab]").forEach((b) =>
+              b.classList.toggle("selected", b === button),
+            );
+            window.scrollTo({ top: 0, behavior: "instant" });
+          }),
+        );
+        $("#text-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const text = $("#text-input").value;
+          if (!text) return;
+          try {
+            await command({ action: "text", text }, true);
+            $("#text-input").value = "";
+          } catch (_) {}
+        });
+        $("#hide-text").addEventListener("change", (e) => {
+          $("#text-input").style.webkitTextSecurity = e.target.checked
+            ? "disc"
+            : "none";
+        });
+        $("#vpn-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            await command(
+              { action: "vpn", link: $("#vpn-input").value.trim() },
+              true,
+            );
+            $("#vpn-input").value = "";
+          } catch (_) {}
+        });
+        $("#boot-select").addEventListener("change", async (e) => {
+          const value = e.target.value;
+          if (
+            value === "couchy" &&
+            !confirm(
+              "При следующем включении запустится ТВ-лаунчер, а голос Алисы будет отключён. Продолжить?",
+            )
+          ) {
+            e.target.value = state.boot || "alice";
+            return;
+          }
+          try {
+            await command({ action: "boot", value }, true);
+            state.boot = value;
+          } catch (_) {
+            e.target.value = state.boot || "alice";
+          }
+        });
+        $("#reboot").addEventListener("click", () => {
+          if (
+            confirm(
+              "Перезагрузить Станцию? Во время загрузки управление и голос Алисы будут недоступны.",
+            )
+          )
+            command({ action: "reboot", confirm: "reboot" }, true).catch(
+              () => {},
+            );
+        });
+        $("#logout").addEventListener("click", async () => {
+          try {
+            release();
+            await api("logout", {});
+            loggingOut = true;
+            state.authenticated = false;
+            if (ws) ws.close();
+            $("#auth-password").value = "";
+            showAuth();
+          } catch (e) {
+            toast(e.message, true);
+          }
+        });
+        $("#auth-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const password = $("#auth-password").value;
+          if (state.setupRequired && password !== $("#auth-confirm").value) {
+            $("#auth-error").textContent = "Пароли не совпадают";
+            return;
+          }
+          const b = $("#auth-submit");
+          b.disabled = true;
+          $("#auth-error").textContent = "";
+          try {
+            state = await api(state.setupRequired ? "setup" : "login", {
+              password,
+              token: setupToken,
+            });
+            setupToken = "";
+            $("#auth-password").value = "";
+            $("#auth-confirm").value = "";
+            showRemote();
+          } catch (err) {
+            $("#auth-error").textContent = err.message;
+          } finally {
+            b.disabled = false;
+          }
+        });
+        $("#password-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if ($("#new-password").value !== $("#new-password-confirm").value) {
+            toast("Новые пароли не совпадают", true);
+            return;
+          }
+          try {
+            state = await api("password", {
+              current: $("#current-password").value,
+              password: $("#new-password").value,
+            });
+            e.target.reset();
+            if (ws) {
+              ws.onclose = null;
+              ws.close();
+              ws = null;
+            }
+            connect();
+            toast("Пароль изменён. Другие устройства вышли из пульта.");
+          } catch (err) {
+            toast(err.message, true);
+          }
+        });
+        $$("[data-reveal]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const f = document.getElementById(b.dataset.reveal);
+            f.type = f.type === "password" ? "text" : "password";
+            b.setAttribute(
+              "aria-label",
+              f.type === "password" ? "Показать пароль" : "Скрыть пароль",
+            );
+          }),
+        );
+        const keyboard = {
+          ArrowUp: "up",
+          ArrowDown: "down",
+          ArrowLeft: "left",
+          ArrowRight: "right",
+          Enter: "ok",
+          Escape: "back",
+        };
+        document.addEventListener("keydown", (e) => {
+          if (
+            $("#remote-view").hidden ||
+            /INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target.tagName) ||
+            e.ctrlKey ||
+            e.metaKey
+          )
+            return;
+          const key = keyboard[e.key];
+          if (!key) return;
+          e.preventDefault();
+          if (e.repeat) return;
+          if (repeatKeys.has(key)) {
+            release();
+            activeKey = key;
+            command({ action: "key", key, phase: "down" }).catch(() => {});
+            holdTimer = setInterval(
+              () => send({ action: "hold" }).catch(() => release()),
+              400,
+            );
+          } else command({ action: "key", key, phase: "tap" }).catch(() => {});
+        });
+        document.addEventListener("keyup", (e) => {
+          if (keyboard[e.key] === activeKey) release();
+        });
+        window.addEventListener("blur", release);
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) release();
+          else if (state.authenticated) connect();
+        });
+        window.addEventListener("pagehide", release);
+        setInterval(() => {
+          if (ws && ws.readyState === 1 && !document.hidden)
+            send({ action: "ping" }).catch(() => {});
+        }, 12000);
+        init();
+      })();
+    </script>
+  </body>
+</html>
