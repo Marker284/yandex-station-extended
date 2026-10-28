@@ -29,14 +29,15 @@ echo 0   > /sys/class/leds/micro:red:ring1/brightness    # погасить
 
 Для краткой индикации через уже настроенный SSH-псевдоним `alice`:
 
-1. Закройте чат и остановите GPT-мост, если он работает, чтобы два обработчика
-   не управляли одними LED одновременно.
+1. Закройте чат и остановите нативный клиент или GPT-мост, если он работает, чтобы два
+   обработчика не управляли одними LED одновременно.
 2. Клонируйте [Alisa-ChatGPT-voice-assistant][led-project] на ПК. В каталоге проекта
-   передайте проверенный [station/indicator.sh][plum-indicator] на колонку:
+   передайте проверенный [indicator.sh][plum-indicator] на колонку:
 
     ```sh
     ssh alice 'mkdir -p /data/opt/alice-led'
-    ssh alice 'umask 077; cat > /data/opt/alice-led/indicator.sh' < station/indicator.sh
+    ssh alice 'umask 077; cat > /data/opt/alice-led/indicator.sh' \
+        < engines/bridge/station/indicator.sh
     ```
 
 3. Подайте синий кадр на одну секунду и освободите кольцо:
@@ -78,17 +79,23 @@ LED-trigger. Если оставить `none`, штатная анимация �
 
 ### Радуга в голосовом режиме { #plum-led-rainbow }
 
-В [GPT-мосте](llm.md#chatgpt-web) контроллер [indicator.py][rainbow-controller]
-формирует кадры до 10 раз/с: три оттенка со сдвигом на 120°, оборот за 6 секунд,
+В [Alisa Voice](llm.md#chatgpt-web) подсветка настраивается в обоих режимах через
+«Настройки → Подсветка». Доступны радуга, постоянные цвета, пульсация и отключение
+GPT-подсветки. При выборе стрелками на колонке показывается демо; Enter сохраняет цвет,
+Esc возвращает прежний.
+
+Контроллер [indicator.py][rainbow-controller] моста формирует кадры до 10 раз/с:
+три оттенка со сдвигом на 120°, оборот за 6 секунд,
 плавная пульсация с периодом 2 секунды, яркость не выше 160/255.
 Радуга включается во время ответа GPT; в паузах режима кольцо удерживается погашенным,
-после выхода возвращается штатное управление. `ALICE_LED_STYLE=blue` выбирает синий стиль.
+после выхода возвращается штатное управление. В нативном клиенте кадры формирует
+[C++-модуль][native-led], ПК для анимации не нужен.
 
 На устройстве проверены 30 цветовых кадров, подавление штатной анимации во время
 удержания LED и её возврат после освобождения. Проверка запускала голосовой ввод
 через IPC, а не акустическое произнесение слова «Алиса».
 Тесты EOF, тайм-аута, повторных циклов и нового владельца —
-[tests/test_voice_controls.py][led-tests].
+[test_voice_controls.py][led-tests].
 
 Для удаления отдельного демонстрационного обработчика завершите его и выполните:
 
@@ -99,9 +106,11 @@ ssh alice 'rm /data/opt/alice-led/indicator.sh && rmdir /data/opt/alice-led'
 Системные файлы и автозапуск этот пример не меняет.
 
 [led-project]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant
-[plum-indicator]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/972e637/station/indicator.sh
-[rainbow-controller]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/972e637/indicator.py
-[led-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/972e637/tests/test_voice_controls.py
+[plum-indicator]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/station/indicator.sh
+[rainbow-controller]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/indicator.py
+[led-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/tests/test_voice_controls.py
+
+[native-led]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/native/native/effects.hpp
 
 ## Анимации прошивки: формат `.led`
 

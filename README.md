@@ -50,7 +50,7 @@
   [свои звуки](https://hackalice.me/recipes/sounds/),
   [подсветка](https://hackalice.me/recipes/led/).
 - 🤖 **[Своя LLM вместо Алисы](https://hackalice.me/recipes/llm/)** — Home Assistant, свой
-  бэкенд или голосовой режим сайта ChatGPT; рядом —
+  бэкенд или ChatGPT Voice на колонке либо через ПК; рядом —
   [обработанный микрофон VQE](https://hackalice.me/recipes/microphone/) и
   [озвучка своего текста](https://hackalice.me/recipes/sounds/#native-tts).
 - 📺 **[ТВ-набор для Станции 1](https://hackalice.me/recipes/station1-tv/)** — веб-пульт,

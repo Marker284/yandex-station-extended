@@ -11,49 +11,39 @@
 
 ## Запуск готового моста { #vqe-start }
 
-1. Настройте root-SSH по ключу и зависимости
-   [Alisa-ChatGPT-voice-assistant][bridge]. Мосту нужны Linux-ПК с PipeWire-Pulse
-   или совместимым PulseAudio, Python 3.11+, OpenSSH и ALSA utilities;
-   на колонке — штатный Quasar, `socat` и `aplay`.
-2. В каталоге проекта соберите вспомогательные ARM32-библиотеки через Clang/LLD:
+Если уже работает нативный клиент Alisa Voice, остановите его в CLI перед установкой
+моста: одновременно микрофонами и динамиком управляет один режим.
+
+1. Настройте [root и SSH](../start/ssh.md) на колонке.
+2. Установите [Alisa Voice][bridge] по [инструкции](llm.md#chatgpt-setup).
+   Выберите режим «Мост». Нужны Linux-ПК с PipeWire-Pulse или совместимым PulseAudio,
+   Python 3.10+ и Chromium; на колонке — штатный Quasar, `socat` и `aplay`.
+   Компилятор для готового пакета не нужен.
+3. Если требуется только микрофон для другого приложения, пропустите вход в ChatGPT
+   и тест его голосового ответа в мастере. Для захвата звука этот аккаунт не нужен.
+4. Если мост остановлен, запустите его:
 
     ```sh
-    python3 scripts/build.py --target arm
+    ~/.local/bin/alisa bridge start
     ```
 
-3. Закройте голосовой чат и остановите ранее запущенный экземпляр моста.
-   Для пользовательской службы:
+5. Проверьте состояние в другом терминале:
 
     ```sh
-    systemctl --user stop alice-voice-bridge.service
+    ~/.local/bin/alisa bridge status
     ```
 
-    При запуске в терминале используйте `python3 bridge.py stop`.
+В состоянии должны быть `microphone_source: vqe` и `microphone_rate: 16000`.
+Виртуальный источник для приложений на ПК называется `alice_station_mic`.
+CLI выбирает VQE по умолчанию; переменная окружения в службе не требуется.
+Автозапуск настраивается в меню «Настройки» режима «Мост».
 
-4. Запустите в режиме VQE:
-
-    ```sh
-    ALICE_MICROPHONE_SOURCE=vqe python3 bridge.py start
-    ```
-
-5. В другом терминале выполните `python3 bridge.py status`.
-   Проверьте `microphone_source: vqe` и `microphone_rate: 16000`.
-   Виртуальный источник для приложений на ПК называется `alice_station_mic`.
-
-Для постоянной настройки уже установленной службы добавьте через
-`systemctl --user edit alice-voice-bridge.service`:
-
-```ini
-[Service]
-Environment=ALICE_MICROPHONE_SOURCE=vqe
-```
-
-Затем перезапустите службу. Для захвата звука вход в ChatGPT не требуется;
-он нужен для [голосового режима сайта](llm.md#chatgpt-web).
+Для нативного ChatGPT передавать микрофон на ПК не нужно: клиент получает VQE-поток
+на самой колонке.
 
 ## Как получен поток { #vqe-implementation }
 
-Исходник [station/vqe_tap.c][vqe-source] копирует выход экспортированной функции
+Исходник [vqe_tap.c][vqe-source] копирует выход экспортированной функции
 `YandexVqeC_GetOutputChannelData` только для **типа 6, канала 0**.
 Исходная функция вызывается; её буфер, возвращаемое значение и `errno` сохраняются.
 Проверенный формат — нормализованный float32. Модуль преобразует его в PCM S16_LE
@@ -67,8 +57,8 @@ Environment=ALICE_MICROPHONE_SOURCE=vqe
 Мост создаёт отдельный временный профиль `launch.bridge.json` в `/data/opt/alice-voice`
 и перезапускает Quasar для загрузки модуля через `LD_PRELOAD`.
 Системный `launch.json` и библиотека VQE не переписываются.
-Сборка и тесты модуля доступны в [scripts/build.py][build-source] и
-[tests/test_vqe_tap.py][vqe-tests]. Образы и библиотеки прошивки проект не распространяет.
+Сборка и тесты модуля доступны в [build.py][build-source] и
+[test_vqe_tap.py][vqe-tests]. Образы и библиотеки прошивки проект не распространяет.
 
 !!! warning "Модуль совместим только с проверенной версией библиотеки"
     Типы каналов и ABI не документированы производителем. До смены профиля мост проверяет
@@ -83,18 +73,18 @@ Environment=ALICE_MICROPHONE_SOURCE=vqe
 
 <a id="rollback"></a>
 
-## Откат: сырой вход и штатный профиль { #vqe-restore }
+## Откат: вернуть штатную Алису { #vqe-restore }
 
-Остановите мост. Для следующего запуска выберите `ALICE_MICROPHONE_SOURCE=raw`;
-в установленной службе измените ту же переменную и перезапустите службу.
-Для полного возврата к штатному профилю, когда мост уже остановлен:
+Отключите автозапуск и остановите мост:
 
 ```sh
-python3 bridge.py restore
+~/.local/bin/alisa bridge autostart off
+~/.local/bin/alisa bridge stop
 ```
 
-`restore` переключает Quasar обратно на системный профиль и перезапускает его.
-Эти действия не требуют сброса колонки.
+Остановка удаляет временные звуковые устройства на ПК, возвращает Quasar системный
+профиль и перезапускает его. Для удаления модулей выберите «Установка и обслуживание →
+Удалить программу» в CLI. Root, SSH и вход ChatGPT сохраняются; сброс колонки не нужен.
 
 ## Что проверено { #vqe-validation }
 
@@ -105,6 +95,6 @@ python3 bridge.py restore
 - Количественное улучшение распознавания и эхоподавления не измерено.
 
 [bridge]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant
-[vqe-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/972e637/station/vqe_tap.c
-[build-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/972e637/scripts/build.py
-[vqe-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/972e637/tests/test_vqe_tap.py
+[vqe-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/station/vqe_tap.c
+[build-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/scripts/build.py
+[vqe-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/tests/test_vqe_tap.py
