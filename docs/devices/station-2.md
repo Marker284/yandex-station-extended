@@ -226,6 +226,8 @@ xhci-hcd xhci-hcd.0.auto: HC died; cleaning up
 - Фразы вызова — `/system/vendor/quasar/spotter_models/activation/`: `alisa`, `yandex` и
   `yasmina`. Каждая — отдельная нейросеть на одно слово (`spotter-type chen14`, в `words.txt`
   два класса: `filler` и само слово), поэтому своё слово вызова текстом не задать.
+  Формат моделей и режим своего слова в движке — в
+  [голосовом тракте](../internals/voice.md#nnet-format).
 - Короткие команды без обращения («громче», «пауза», «дальше» — `spotter_models/command`)
   включены, только пока играет собственный плеер Алисы. Иначе колонка их слышит, но в
   `maind.log` пишет `Phrase … is disabled in commandPhrasesConfig`.

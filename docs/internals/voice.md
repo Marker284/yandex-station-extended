@@ -66,13 +66,72 @@ flowchart TD
 
 | Модель | Задача |
 |---|---|
-| `activation/alisa`, `activation/yandex` | ключевые слова «Алиса» / «Яндекс», работают всегда |
+| `activation/alisa`, `activation/yandex`, `activation/yasmina` | ключевые слова «Алиса», «Яндекс» и «Ясмина» (международная версия Yango); загружено одно, выбранное в приложении, работает всегда |
 | `counteractivation` | подавление ложных срабатываний (например «Алиса» из рекламы по ТВ) |
 | `command` | ~25 команд **без** ключевого слова: дальше, назад, громче, тише, стоп, хватит, пауза, играй, включи/выключи, свет, телевизор, блютуз, лайк/дизлайк… (`words.txt`) |
 | `vad` | `<speech_started>` / `<speech_finished>` |
 | `bio_lingware/*` | голосовой отпечаток (ECAPA-TDNN) + пол/возраст — «узнавание» пользователя (`MatchedUser`, `Biometry.Classification`) |
 
 Подтверждено логом: `command_spotter_capability.cpp: Command phrase spotted: ^ дизлайк`.
+
+### Формат моделей { #nnet-format }
+
+**Проверено на:** Станция 2, прошивка 0.369.1.46, октябрь 2026.
+
+Модели исполняет библиотека `/system/vendor/quasar/libs/libyandex_evil.so` (пространство
+имён `Spotter`), `maind` её только загружает. В каталоге каждой модели три файла:
+
+- `acoustic_model.nnet` — сама сеть;
+- `flags.txt` — признаки и пороги: `spotter-type chen14`, 40 mel-полос, окно 25 мс, шаг
+  10 мс, порог `subthresholds`;
+- `words.txt` — классы выхода: `filler` и само слово.
+
+`acoustic_model.nnet` — бинарный [Kaldi](https://kaldi-asr.org/) nnet3 (файл начинается
+с `\0B<Nnet3>`) со своими слоями Яндекса. Штатные утилиты Kaldi его поэтому не прочитают.
+
+| Часть файла | Что внутри |
+|---|---|
+| Граф сети | текстом: `input-node`, `component-node`, `output-node` |
+| Слои Kaldi | `FixedAffine`, `FixedBias` и `FixedScale` (нормализация CMVN), `RectifiedLinear`, `Softmax` |
+| `GroupConvCorouComponent` | своя свёртка по времени на каждый канал: матрица «каналы × 12–32 кадра» и `ContextParam` |
+| `Q16FixedAffineComponent`, `Q16GroupConvCorouComponent` | те же слои с весами int16: масштаб `<S>` и матрица с меткой `SIM` |
+| `hardswish` | функция активации без параметров |
+| `MultichannelAttention(…)` | дескриптор входа слоя, есть только в «Алисе» |
+
+Сеть — стопка SVDF-блоков: проекция признаков, свёртка по времени, ReLU и слой TDNN.
+У «Алисы» 38 слоёв и 1,8 МБ, на выходе 2 класса; у `command` — 22 и 6 классов. Смысл
+`ContextParam`, `<S>` (вес — `int16 × S`) и `MultichannelAttention` выведен по размерам и
+именам, код этих слоёв не разобран *(вывод)*.
+
+Разобрать модель на компьютере помогает [`contrib/spotter_nnet.py`][spotter-nnet]. Скрипт
+печатает граф и слои; пять моделей Станции 2 он разбирает до последнего байта:
+
+```sh
+python3 contrib/spotter_nnet.py acoustic_model.nnet
+```
+
+### Своё слово вызова в движке { #ckws }
+
+В `libyandex_evil.so` есть режим произвольного слова вызова, заданного текстом:
+`Spotter::CKWS` (custom keyword spotting). Его параметры:
+
+| Параметр | Назначение *(вывод по имени)* |
+|---|---|
+| `custom_spotter_keyword`, `custom_spotter_keyword_max_length` | само слово |
+| `custom_spotter_ctc_head_model_path` | модель распознавания звуков (CTC) |
+| `custom_spotter_verifier_model_path` | модель проверки срабатывания |
+| `custom_keyword_spotter_first_stage_threshold`, `custom_spotter_span_min`, `custom_spotter_span_max` | пороги и длительность слова |
+
+В `quasar.cfg` ему соответствует секция `customActivationSpotterSettings`. Режим работает
+на NPU-моделях `.tflite`, как `spotterRecognizer`: на это указывает ошибка
+`Failed to cast NpuAmConfig to AudioEmbedderConfig` *(вывод)*.
+
+На Станции 2 режим не включён. Моделей CTC и верификатора в прошивке нет, `spotter.json`
+содержит `null`, каталог `/data/quasar/data/spotter_model` пуст. Откуда их берут колонки
+с включённым режимом, неизвестно. Поэтому своё слово вызова на этой прошивке не задать:
+можно подменить только файл `nnet`, а инструментов обучения моделей этого формата нет.
+
+[spotter-nnet]: https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotter_nnet.py
 
 ## 4. Активация → поток в облако (SpeechKit)
 

@@ -85,6 +85,11 @@
 * **[`patch_boot.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_boot.py)** — модификация boot-образа ядра для снятия флага `rh_unlock=0` (UART-консоль).
 * **[`patch_max_adb_candidate.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_max_adb_candidate.py)** — патчер для включения отладки на Станции Макс.
 * **[`decrypt_ota.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/decrypt_ota.py)** — распаковка и расшифровка OTA-пакетов прошивки.
+* **[`spotter_nnet.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotter_nnet.py)** —
+  разбор моделей слова вызова и команд (`spotter_models/*/acoustic_model.nnet`, Kaldi nnet3
+  со слоями Яндекса) на компьютере: граф сети и слои. Только чтение. Проверен на моделях
+  Станции 2. [Формат](https://hackalice.me/internals/voice/#nnet-format), тест:
+  `python3 -m unittest discover -s contrib/tests -p test_spotter_nnet.py`.
 
 ### Звук, медиа и стриминг:
 
