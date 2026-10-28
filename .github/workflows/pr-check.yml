@@ -35,3 +35,7 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Сборка сайта
         run: mkdocs build --strict
+      - name: Оформление изменённых страниц (STYLE.md)
+        run: |
+          files=$(git diff --name-only "origin/${{ github.base_ref }}"...HEAD -- 'docs/**/*.md' 'docs/*.md')
+          if [ -n "$files" ]; then python3 contrib/wikilint.py --errors $files; fi
