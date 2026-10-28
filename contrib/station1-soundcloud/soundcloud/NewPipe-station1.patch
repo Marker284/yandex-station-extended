@@ -1,0 +1,8 @@
+--- a/app/src/main/java/org/schabi/newpipe/ktx/View.kt
++++ b/app/src/main/java/org/schabi/newpipe/ktx/View.kt
+@@ -277,3 +277,4 @@
+     // not hiding normally because the view needs to still capture touches and allow scroll
+-    animate().alpha(0.0f).setDuration(200).start()
++    animate().cancel()
++    alpha = 0f
+ }
