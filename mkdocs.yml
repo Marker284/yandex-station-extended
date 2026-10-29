@@ -112,6 +112,7 @@ plugins:
   # старые адреса страниц (до реорганизации) продолжают работать
   - redirects:
       redirect_maps:
+        recipes/yam.md: recipes/packagemanagers.md
         platform/access.md: start/root.md
         platform/unbrick.md: start/recovery.md
         packages.md: start/packages.md

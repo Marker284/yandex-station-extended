@@ -139,6 +139,6 @@ exit
 ## Что дальше
 
 - **SSH и пакеты.** Ядро и userspace здесь 32-битные (`armv7l`). Сборки под `aarch64` не
-  запустятся, в том числе [`.yap`](packages.md#yap) и [YAM](../recipes/yam.md). Нужны
+  запустятся, в том числе [`.yap`](packages.md#yap) и [YAM](../recipes/packagemanagers.md). Нужны
   сборки под ARMv7: Entware `armv7sf-k3.2`, а `dropbear` из `contrib/bin` (armhf) стоит проверить.
 - **Железо и разделы** — на [странице модели](../devices/jbl-link-music.md).
