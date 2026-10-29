@@ -20,9 +20,10 @@ Lua-скрипты и бинарники и даёт им доступ к жел
     и поддержка старых `.yap` вынесены в отдельный пакет `yam-lua-runtime`. Старые пакеты
     несовместимы.
 
-    Релиза у новой версии пока нет, поэтому короткие адреса `hackalice.me/install.sh`
-    и `install.ps1` закреплены за 0.1.19 — рабочей версией, которую и описывает эта
-    страница. Когда новая версия выйдет, страницу придётся переписать.
+    Короткие адреса `hackalice.me/install.sh` и `install.ps1` ведут на установщик из
+    ветки `main` и ставят новую версию (релизы `yam-v0.2.*`). Эта страница пока описывает
+    0.1.19, поэтому в командах ниже — установщик по тегу
+    [`v0.1.19`](https://github.com/nyakokitsu/yam/tree/v0.1.19).
 
 !!! warning "Web UI и API без пароля"
     Панель на порту `8099` не спрашивает пароль. Любой в вашей сети может ставить пакеты, а
@@ -40,9 +41,16 @@ Lua-скрипты и бинарники и даёт им доступ к жел
 
 ## Установка { #install }
 
-Короткие адреса `hackalice.me/install.sh` и `hackalice.me/install.ps1` скачивают и запускают
-актуальный установщик из репозитория YAM. Прямые адреса — в
-[README YAM](https://github.com/nyakokitsu/yam#readme).
+Новая версия ставится одной командой с коротких адресов — они запускают актуальный
+установщик из ветки `main` репозитория YAM:
+
+```sh
+curl -fsSL https://hackalice.me/install.sh | sh    # Linux, macOS
+irm https://hackalice.me/install.ps1 | iex          # Windows PowerShell
+```
+
+Шаги ниже — для версии 0.1.19, которую описывает эта страница, поэтому в них адреса
+установщика по тегу `v0.1.19`.
 
 === "Windows"
 
@@ -63,7 +71,7 @@ Lua-скрипты и бинарники и даёт им доступ к жел
     3. Запустите установщик в обычном PowerShell, права администратора не нужны:
 
         ```powershell
-        irm https://hackalice.me/install.ps1 | iex
+        irm https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.ps1 | iex
         ```
 
         CLI ставится в `%LOCALAPPDATA%\YAM\bin`, папка добавляется в `Path`, а адрес
@@ -82,8 +90,8 @@ Lua-скрипты и бинарники и даёт им доступ к жел
     Конкретная версия и удаление CLI:
 
     ```powershell
-    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Version 0.1.13
-    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Uninstall
+    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.ps1))) -Version 0.1.13
+    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.ps1))) -Uninstall
     ```
 
     `-Uninstall` в Windows-установщике удаляет только CLI на компьютере. `yamd` с колонки
@@ -103,7 +111,7 @@ Lua-скрипты и бинарники и даёт им доступ к жел
     3. Запустите установщик:
 
         ```sh
-        curl -fsSL https://hackalice.me/install.sh | sh
+        curl -fsSL https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.sh | sh
         ```
 
     4. Проверьте команду `yam device` и откройте веб-панель на порту 8099
@@ -115,8 +123,8 @@ Lua-скрипты и бинарники и даёт им доступ к жел
     Конкретная версия и удаление (CLI и `yamd` на колонке):
 
     ```sh
-    curl -fsSL https://hackalice.me/install.sh | sh -s -- 0.1.13
-    curl -fsSL https://hackalice.me/install.sh | sh -s -- --uninstall
+    curl -fsSL https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.sh | sh -s -- 0.1.13
+    curl -fsSL https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.sh | sh -s -- --uninstall
     ```
 
     У BetterYAM свой установщик — см. [BetterYAM](#betteryam).
@@ -352,13 +360,13 @@ SSH. YAM — менеджер плагинов с веб-панелью и API �
 === "Linux и macOS"
 
     ```sh
-    curl -fsSL https://hackalice.me/install.sh | sh -s -- --uninstall
+    curl -fsSL https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.sh | sh -s -- --uninstall
     ```
 
 === "Windows"
 
     ```powershell
-    & ([scriptblock]::Create((irm https://hackalice.me/install.ps1))) -Uninstall
+    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/nyakokitsu/yam/refs/tags/v0.1.19/install.ps1))) -Uninstall
     ```
 
 В Windows установщик убирает только CLI, демон с колонки удаляется вручную:
