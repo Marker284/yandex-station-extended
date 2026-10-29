@@ -165,7 +165,7 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
   Станции 2, Мини, Мини 2, Мини 3 и Мини 3 Про: на Лайт 2 плагин по умолчанию забирает часы
   и подсветку, а ключ `--shared-audio` включает общий режим без своего интерфейса. В вики
   это не проверялось; плагин работает под демоном `yamd`, то есть под [старой версией
-  YAM](yam.md).
+  YAM](packagemanagers.md).
 
 ## Станция 2: AirPlay 2 одним набором { #station-2-bundle }
 
