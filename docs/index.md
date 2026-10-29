@@ -35,7 +35,7 @@
 -   :material-lightbulb-on: **[Рецепты](recipes/index.md)**
 
     USB Host (флешки, Ethernet, наушники), AirPlay, свои звуки, Fastfetch, подсветка,
-    плагины [YAM](recipes/yam.md).
+    плагины [YAM](recipes/packagemanagers.md).
 
 -   :material-speaker: **[Устройства](devices/index.md)**
 

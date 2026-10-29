@@ -41,7 +41,7 @@ Quasar Bridge и quasard подменяют адрес сервера голос
 
 1. Получите root и доступ по SSH.
 2. Выберите, где запускать прокси: на отдельном хосте или на самой колонке через
-   [YAM](yam.md). Готовые пакеты для Linux ARM64 и контрольные суммы лежат в
+   [YAM](packagemanagers.md). Готовые пакеты для Linux ARM64 и контрольные суммы лежат в
    [релизах проекта](https://github.com/skrashevich/quasar-bridge/releases).
 3. Укажите в конфигурации OpenAI-совместимый адрес модели. Для управления домом
    подключите [HA MCP](https://github.com/homeassistant-ai/ha-mcp) и опишите правила

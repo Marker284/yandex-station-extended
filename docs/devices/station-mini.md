@@ -38,7 +38,7 @@
 | Свои звуки | не проверялось | — |
 | Обработанный микрофон | не проверялось | — |
 | Подсветка | не проверялось | — |
-| YAM | работает | [BetterYAM](../recipes/yam.md#betteryam) |
+| YAM | работает | [BetterYAM](../recipes/packagemanagers.md#betteryam) |
 | Своя LLM | не проверялось | — |
 
 ## Получение root { #root }

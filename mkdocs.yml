@@ -166,6 +166,7 @@ nav:
   - Устройства:
       - devices/index.md
       - Станция Лайт (Micro): devices/station-lite.md
+      - Fiero Hi (партнёрская Лайт): devices/fiero-hi.md
       - Станция Лайт 2 (Plum): devices/station-lite2.md
       - Станция Мини 3 (Bergamot): devices/station-mini3.md
       - Станция Мини 3 Про (Pickle): devices/station-mini3-pro.md
