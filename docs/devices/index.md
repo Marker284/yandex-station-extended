@@ -40,7 +40,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | [ADB до перезагрузки](../start/adb-max.md) | [Макс с Zigbee](station-max-zigbee.md) |
 | Станция (1-го поколения) | `tulip-d1` | Allwinner R18 (sun50iw1) | [AliceBridge](../start/root-android.md#station-1) | [Станция gen1](station-gen1.md) |
 | Умный хаб Яндекса (не колонка) | `yandex,saturn` | Amlogic AXG | [подмена DNS](../start/root.md) | [Умный хаб](yandex-hub.md) |
-| Станция Мини 3 | `yandex,station-mini3` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |
+| Станция Мини 3 | `yandex,bergamot` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |
 | Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | только на заводской [factory-12](station-mini3-pro.md#factory-12) | [Мини 3 Про](station-mini3-pro.md) |
 | JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | [ADB по USB](../start/root-jbl-link-music.md) | [JBL Link Music](jbl-link-music.md) |
 | Станция 3 | `yandex,orion-pvt` (orion) | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Станция 3](station-3.md) |
