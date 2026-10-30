@@ -186,6 +186,7 @@ nav:
       - Звонки Алисы (порт 5081): internals/calls.md
       - Голосовой тракт Алисы: internals/voice.md
       - Телеметрия: internals/telemetry.md
+      - Zigbee на Миди с quasard: internals/zigbee.md
       - Директивы и capabilities: internals/directives.md
       - Подводные камни: internals/gotchas.md
       - Сборка софта: internals/toolchain.md
