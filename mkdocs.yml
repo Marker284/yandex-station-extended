@@ -163,6 +163,7 @@ nav:
       - YAM и BetterYAM: recipes/packagemanagers.md
       - Голосовой спутник Home Assistant: recipes/home-assistant.md
       - Своя LLM вместо Алисы: recipes/llm.md
+      - Свой бэкенд (quasard, v3rt3p): recipes/selfhosted-backend.md
       - Колонка без Яндекса: recipes/standalone.md
       - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
       - Ограничить метрики (Станция 1): recipes/station1-privacy.md
