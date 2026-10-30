@@ -108,6 +108,8 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
 
 ## Индикация { #led }
 
+Розничный код модели — **YNDX-00020**; существует вариант с часами, в облаке он значится как `yandexmini_2` («Мини 2 с часами»). Яркость часов прошивка хранит в `/data/quasar/data/clock_display_settings.dat` (`brightness` 0..1, `clockEnabled`, `isClockOn`, `showClockDuringDnd`) и **перерисовывает время каждые ~30–60 секунд** — своё изображение через sysfs живёт до следующего тика maind. YAM умеет писать часы напрямую: `PUT /api/clock {"time":"12:34","brightness":0..255}` (6 диодов, профиль `mini2`).
+
 - **Кольцо, 6 RGB-зон**: `/sys/class/leds/mini2:{red,green,blue}:ring{1..6}` (18 каналов).
 - **LED-часы**: `/sys/class/leds/mini2:white:clock*` — сегменты `clockA1`…`clockG4`, `clockDEGREE`,
   `clockMINUS`, `clockPLUS1`…`clockPLUS4`.

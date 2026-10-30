@@ -64,6 +64,8 @@ flowchart TD
 Движок `nnet`, признаки `cmn:lda`, модели в `spotter_models/` (обновляются с CDN Яндекса в
 `/data/quasar/data/spotter_model`, сборочные — fallback):
 
+Состав командных споттеров управляется аккаунтом: в `account_config` — `enabledCommandSpotters.music.{playAndPause,volume,navigation,feedback,bluetooth}`, `tv.{navigation,backToHome}`, `smartHome.{light,tv}` и `alwaysOnMicForShortcuts`; в приложении это ползунки категории «Ассистент». Поэтому набор быстрых команд у разных колонок отличается.
+
 | Модель | Задача |
 |---|---|
 | `activation/alisa`, `activation/yandex`, `activation/yasmina` | ключевые слова «Алиса», «Яндекс» и «Ясмина» (международная версия Yango); загружено одно, выбранное в приложении, работает всегда |
