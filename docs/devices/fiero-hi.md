@@ -48,6 +48,7 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 |---|---|---|
 | Root и SSH | работает | [подмена DNS](#root) |
 | Подсветка (кольцо RGB) | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
+| SoundCloud голосом | работает | [SoundCloud на Fiero Hi](../recipes/fiero-hi-soundcloud.md) |
 
 ## Получение root { #root }
 
