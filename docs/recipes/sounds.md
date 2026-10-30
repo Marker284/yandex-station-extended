@@ -35,6 +35,33 @@ LD_LIBRARY_PATH=/system/vendor/quasar:libs ./maind --gst-launch \
     python3 contrib/alice-say.py --host alice 'Привет! Это мой текст.'
     ```
 
+??? note "Если root получен через AliceBridge"
+    Root-SSH и `socat` ставятся с телефона в [AliceBridge](../start/root-android.md),
+    без компьютера:
+
+    1. В панели управления колонки установите **YSE/Entware** и **SSH**
+       (пользователь `root`, порт `2222`).
+    2. В интерактивном терминале колонки смените пароль `1` на свой и поставьте `socat`:
+
+        ```sh
+        passwd
+        /data/opt/bin/yse install socat
+        ```
+
+    3. На ПК добавьте ключ для входа без пароля по [инструкции SSH](../start/ssh.md)
+       и укажите порт в псевдониме:
+
+        ```text
+        Host alice
+            HostName <IP колонки>
+            User root
+            Port 2222
+        ```
+
+    Дальше — шаги 2 и 3 выше. AliceBridge подключается к Fiero Hi и определяет её
+    как Станцию Лайт 1. Установка `socat` из приложения и запуск клиента после неё
+    на Fiero Hi отдельно не проверялись.
+
 Для проверки сборки запроса без SSH и без звука:
 
 ```sh
