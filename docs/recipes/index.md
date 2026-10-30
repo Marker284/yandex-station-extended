@@ -16,7 +16,7 @@
 | [SoundCloud голосом](station1-soundcloud.md) | воспроизведение треков и плейлистов через AliceBridge без HDMI | Станция 1 |
 | [ТВ-набор и веб-пульт](station1-tv.md) | быстрый веб-пульт с паролем и управление HDMI-выходом | Станция 1 |
 | [Ограничение метрик](station1-privacy.md) | отключение AppMetrica без удаления Quasar с гарантированным откатом | Станция 1 |
-| [Свой бэкенд (Self-hosted)](selfhosted-backend.md) | полная замена серверов Яндекса на свой стек (quasard, v3rt3p) | Станция 2, Мини 1/2 |
+| [Бэкенд (Self-hosted)](bekend-self-hosted.md) | собственный сервер вместо облака Яндекса (quasard, v3rt3p) | Станция 2, Мини 1/2 |
 | [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)), свой бэкенд ([quasard](llm.md#quasard)) или [ChatGPT Voice: нативно или через ПК](llm.md#chatgpt-web) | Quasar Bridge — Станция 2, Quasar 3.21; quasard — ~1.56 и 3.x; ChatGPT — Лайт 2 / Plum |
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |
 | [Отключение обновлений](station1-disable-updates.md) | остановка цикла обязательного OTA, из-за которого Алиса отвечает с ошибками | проверено на Станции 1, прошивка 2.369.5.46 |
