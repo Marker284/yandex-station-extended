@@ -73,6 +73,10 @@
   Станция 1: веб-пульт с паролем и WebSocket, один `install.sh` для терминала AliceBridge.
   Устанавливает пульт, недостающие Couchy, SmartTube и v2rayNG 1.9.45; исходники Java,
   шаблоны и сборка находятся рядом. [Рецепт](https://hackalice.me/recipes/station1-tv/).
+* **[`panel/install-panel.sh`](panel/install-panel.sh)** — веб-панель колонки по HTTPS
+  на 8443: пароль задаётся при первом входе по одноразовому коду, графики, громкость,
+  консоль, файлы, автозапуск и расписание. Один файл, POSIX `sh` + Entware (`socat`,
+  `openssl-util`). Проверен на Fiero Hi. [Рецепт](../docs/recipes/web-panel.md).
 * **[`killswitch.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/killswitch.sh)** — аварийный киллсвич для мгновенной изоляции колонки от облачных серверов Яндекса.
 * **[`rollback.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/rollback.sh)** —
   непроверенная запись собственных дампов Мини 2 через root ADB в среде восстановления.
