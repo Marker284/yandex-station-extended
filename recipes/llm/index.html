@@ -1,0 +1,3644 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Community-вики по модификации и исследованию умных колонок Яндекс (семейство Станций) — доступ, прошивка quasar, железо, рецепты">
+      
+      
+        <meta name="author" content="Yandex Station Extended community">
+      
+      
+        <link rel="canonical" href="https://hackalice.me/recipes/llm/">
+      
+      
+        <link rel="prev" href="../home-assistant/">
+      
+      
+        <link rel="next" href="../standalone/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Своя LLM вместо Алисы - Yandex Station Extended</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/editor-entry.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  
+  
+    <meta name="yse-editor-api" content="https://yse-wiki-editor.push-to-claude-worker.workers.dev">
+    <meta name="yse-editor-repo" content="Marker284/yandex-station-extended">
+    <meta name="yse-editor-url" content="../../edit/">
+  
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href="../.." title="Yandex Station Extended" class="md-header__button md-logo" aria-label="Yandex Station Extended" data-md-component="logo">
+      
+  <img src="../../assets/images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yandex Station Extended
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Своя LLM вместо Алисы
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Светлая тема"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Светлая тема" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Тёмная тема"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Тёмная тема" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Поделиться" aria-label="Поделиться" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Marker284/yandex-station-extended" title="Перейти к репозиторию" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Marker284/yandex-station-extended
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Yandex Station Extended" class="md-nav__button md-logo" aria-label="Yandex Station Extended" data-md-component="logo">
+      
+  <img src="../../assets/images/logo.png" alt="logo">
+
+    </a>
+    Yandex Station Extended
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Marker284/yandex-station-extended" title="Перейти к репозиторию" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Marker284/yandex-station-extended
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Главная
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../start/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Начало работы
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Начало работы
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/adb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Установка ADB на компьютер
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Получение root
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1. Получение root
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Большинство моделей — подмена DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/retail-ca/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Лайт 2 (Plum) — сертификат из factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/retail-ca-mini3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Мини 3 (Bergamot) — сертификат и маркеры
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root-android/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станции на Android — AliceBridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/adb-max/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс — доступ через ADB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root-mini1-usb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Мини 1 (2019) — ADB по USB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root-jbl-link-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JBL Link Music — ADB по USB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/ssh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. SSH и обновления
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Пакеты yse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Если что-то сломалось
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Рецепты
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Рецепты
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usb-host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USB Host (OTG)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../airplay/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirPlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bt-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Плееры как Bluetooth (bt-proxy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spotify Connect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station1-soundcloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoundCloud голосом (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../youtube-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YouTube Music
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sounds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Свои звуки
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../microphone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Обработанный микрофон
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fastfetch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fastfetch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../led/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Подсветка
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packagemanagers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAM и BetterYAM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../home-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Голосовой спутник Home Assistant
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Своя LLM вместо Алисы
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Своя LLM вместо Алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Какой способ выбрать
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quasar-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quasar Bridge: своя LLM с голосом Алисы
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quasar Bridge: своя LLM с голосом Алисы">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bridge-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как подключить
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bridge-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как распределяются запросы
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bridge-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ограничения
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quasard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        quasard: свой сервер вместо облака
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="quasard: свой сервер вместо облака">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quasard-how" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как это работает
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quasard-req" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что понадобится
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quasard-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как запустить
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quasard-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ограничения
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chatgpt-web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChatGPT Voice: нативный режим и мост
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ChatGPT Voice: нативный режим и мост">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-req" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что понадобится
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как подключить
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Команды и настройки
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ограничения
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как вернуть Алису
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v3rt3p" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v3rt3p: самостоятельный стек
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что пока не исследовано
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Откат
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../standalone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Колонка без Яндекса
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station1-disable-updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Отключение обновлений (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station1-privacy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ограничить метрики (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station1-tv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ТВ-набор (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station1-debian/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debian (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../upravlenie-golosom-alisy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Управление голосом алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Бэкенд
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Бэкенд
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bekend-self-hosted/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Бэкенд (Self-hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../v3rt3p/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v3rt3p
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quasard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    quasard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../devices/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Устройства
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Устройства
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-lite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Лайт (Micro)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/fiero-hi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiero Hi (партнёрская Лайт)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-lite2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Лайт 2 (Plum)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 3 (Bergamot)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini3-pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 3 Про (Pickle)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 3 (Orion)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини (1 пок)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-midi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Миди (Cucumber)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-street/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Стрит (Mango)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-max/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-max-zigbee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс с Zigbee
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-gen1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция (1 поколения)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/yandex-hub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Умный хаб (Saturn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/jbl-link-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JBL Link Music
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Как это устроено
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Как это устроено
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Архитектура прошивки
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Сеть и порты
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Звонки Алисы (порт 5081)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/voice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Голосовой тракт Алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Телеметрия
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/zigbee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zigbee на Миди с quasard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Директивы и capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/gotchas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Подводные камни
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/toolchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Сборка софта
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Словарь
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Как дополнять вики
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Участники
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Какой способ выбрать
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quasar-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quasar Bridge: своя LLM с голосом Алисы
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quasar Bridge: своя LLM с голосом Алисы">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bridge-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как подключить
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bridge-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как распределяются запросы
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bridge-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ограничения
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quasard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        quasard: свой сервер вместо облака
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="quasard: свой сервер вместо облака">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quasard-how" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как это работает
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quasard-req" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что понадобится
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quasard-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как запустить
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quasard-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ограничения
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chatgpt-web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChatGPT Voice: нативный режим и мост
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ChatGPT Voice: нативный режим и мост">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-req" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что понадобится
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как подключить
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Команды и настройки
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ограничения
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chatgpt-rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как вернуть Алису
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v3rt3p" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v3rt3p: самостоятельный стек
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что пока не исследовано
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Откат
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+
+  
+    
+      <a href="../../edit/?path=docs/recipes/llm.md" title="Править эту страницу" class="md-content__button md-icon" rel="edit" data-yse-edit>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+      </a>
+    
+  
+  
+    
+      
+    
+    <a href="https://github.com/Marker284/yandex-station-extended/raw/main/docs/recipes/llm.md" title="Посмотреть исходный код страницы" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="llm">Своя LLM вместо Алисы<a class="headerlink" href="#llm" title="Permanent link">&para;</a></h1>
+<p>Отвечать на общие вопросы своей моделью — ChatGPT, Claude, Ollama — вместо штатной Алисы.
+Способов три, и они сильно разные: один оставляет голос Алисы и облако Яндекса, другой
+заменяет облако целиком, третий подключает к колонке ChatGPT Voice.</p>
+<h2 id="compare">Какой способ выбрать<a class="headerlink" href="#compare" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><a href="#quasar-bridge">Quasar Bridge</a></th>
+<th><a href="#quasard">quasard</a></th>
+<th><a href="#chatgpt-web">ChatGPT Voice</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Чей голос отвечает</td>
+<td>Алисы</td>
+<td>свой клон или синтез</td>
+<td>ChatGPT</td>
+</tr>
+<tr>
+<td>Умный дом Яндекса</td>
+<td>работает</td>
+<td>нет</td>
+<td>работает вне чата</td>
+</tr>
+<tr>
+<td>Музыка Яндекса</td>
+<td>работает</td>
+<td>своя реализация</td>
+<td>ставится на паузу</td>
+</tr>
+<tr>
+<td>Нужен интернет</td>
+<td>да</td>
+<td>только для облачной модели</td>
+<td>да</td>
+</tr>
+<tr>
+<td>Что нужно держать включённым</td>
+<td>при установке Quasar Bridge на колонку — только колонку; при установке на компьютер — колонку и этот компьютер</td>
+<td>компьютер с видеокартой</td>
+<td>колонку; для моста — ещё Linux-ПК</td>
+</tr>
+<tr>
+<td>Проверено на</td>
+<td>Станция 2, Quasar 3.21; Миди — установка и автозапуск</td>
+<td>прошивки ~1.56 и 3.x</td>
+<td>Лайт 2 (Plum), 0.369.1.50</td>
+</tr>
+</tbody>
+</table>
+<p>Quasar Bridge и quasard подменяют адрес сервера голосового соединения — ключи
+<code>uniProxyUrl</code> и <code>uniProxyQuicUrl</code> в файле <code>/system/vendor/quasar/quasar.cfg</code>. Файл лежит
+на системном разделе и правится после <code>mount -o remount,rw /</code>. ChatGPT Voice
+адрес не меняет: он работает со звуком на самой колонке. Как устроена передача голоса от
+микрофона до ответа, описано в <a href="../../internals/voice/">голосовом тракте Алисы</a>.</p>
+<div class="admonition danger">
+<p class="admonition-title">Quasar Bridge и quasard меняют системный конфиг</p>
+<p>Перед подключением этих двух проектов снимите копию <code>quasar.cfg</code>, чтобы вернуть адреса:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>adb<span class="w"> </span>pull<span class="w"> </span>/system/vendor/quasar/quasar.cfg<span class="w"> </span>./quasar.cfg.orig
+</span></code></pre></div>
+<p>Все три проекта неофициальные, с Яндексом не связаны и годятся только для своих
+устройств.</p>
+</div>
+<h2 id="quasar-bridge">Quasar Bridge: своя LLM с голосом Алисы<a class="headerlink" href="#quasar-bridge" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/skrashevich/quasar-bridge">Quasar Bridge</a> — прокси на Go, который
+распределяет запросы колонки между своей моделью, Home Assistant и Яндексом. Распознавание
+речи и озвучивание ответов остаются облачными, поэтому отвечает голос Алисы.</p>
+<h3 id="bridge-setup">Как подключить<a class="headerlink" href="#bridge-setup" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Получите root и доступ по SSH.</li>
+<li>Выберите, где запускать прокси: на отдельном хосте или на самой колонке через
+   <a href="../packagemanagers/">YAM</a>. Готовые пакеты для Linux ARM64 и контрольные суммы лежат в
+   <a href="https://github.com/skrashevich/quasar-bridge/releases">релизах проекта</a>.</li>
+<li>Укажите в конфигурации OpenAI-совместимый адрес модели. Для управления домом
+   подключите <a href="https://github.com/homeassistant-ai/ha-mcp">HA MCP</a> и опишите правила
+   маршрутизации под свои запросы.</li>
+<li>Направьте <code>uniProxyUrl</code> и <code>uniProxyQuicUrl</code> колонки на свой сервер по
+   <a href="https://github.com/skrashevich/quasar-bridge#readme">инструкции проекта</a>. Установка
+   пакета сама по себе адрес не меняет.</li>
+</ol>
+<h3 id="bridge-routing">Как распределяются запросы<a class="headerlink" href="#bridge-routing" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Запрос</th>
+<th>Кто отвечает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Управление устройствами и вопросы об их состоянии</td>
+<td>Home Assistant, формулирует своя модель</td>
+</tr>
+<tr>
+<td>Сложные вопросы, «спроси нейросеть», чтение страниц и истории</td>
+<td>своя модель</td>
+</tr>
+<tr>
+<td>Музыка, погода, таймеры и остальные обычные команды</td>
+<td>Яндекс</td>
+</tr>
+</tbody>
+</table>
+<p>Правила описываются в JSON и перечитываются без пересборки сервера. Если облачная Алиса
+отказалась отвечать, запрос можно передать своей модели. Для подряд идущих локальных
+вопросов сохраняется контекст диалога; модели доступны чтение страниц по адресу, поиск по
+журналу запросов и текущее время. Журнал по умолчанию выключен.</p>
+<h3 id="bridge-limits">Ограничения<a class="headerlink" href="#bridge-limits" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Привязка колонки к аккаунту Яндекса сохраняется: распознавание и синтез речи идут через
+  облако даже тогда, когда отвечает своя модель.</li>
+<li>Прокси на колонке не означает модель на колонке: её API должен быть доступен по сети.</li>
+<li>Пакет собран для ARM64 и проверен на Станции 2. Остальные модели не проверялись.</li>
+<li>Медленный ответ модели прикрывается настраиваемым беззвучным ожиданием, но общий лимит
+  обработки запроса остаётся.</li>
+<li>
+<p>Пакет <code>.yap</code> ставится только в YAM 0.1.x со службой <code>yamd</code>. <code>hackalice.me/install.sh</code>
+  ставит YAM 0.2, у которого совместимость со старыми пакетами потеряна. Ставьте 0.1.15
+  установщиком из его тега, а в <code>settings.toml</code> <code>yamd</code> выключите автообновление
+  (<code>[updates] enabled = false</code>), иначе <code>yamd</code> попытается обновиться до последнего релиза:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/nyakokitsu/yam/v0.1.15/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w"> </span>-s<span class="w"> </span>--<span class="w"> </span>v0.1.15
+</span></code></pre></div>
+</li>
+<li>
+<p>С Ollama берите модель без рассуждений. Тег <code>qwen3:30b-a3b</code> рассуждает, и отключить это
+  через Ollama не удалось: ответ обрезается лимитом токенов или рассуждения попадают в
+  озвучку. <code>qwen3:30b-a3b-instruct-2507-q4_K_M</code> отвечает сразу, около 1,6 с на M1 Max.
+  Проверено на Станции 2 (прошивка 0.369.1.46), Quasar Bridge 0.4.2, октябрь 2026.</p>
+</li>
+</ul>
+<h2 id="quasard">quasard: свой сервер вместо облака<a class="headerlink" href="#quasard" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/amirilivice/quasard">quasard</a> от <a href="https://github.com/amirilivice">@amirilivice</a>
+заменяет облако Алисы целиком. Колонка считает, что говорит с Яндексом, но активация,
+разговор и музыка идут через ваш сервер, наружу станция больше не ходит.</p>
+<h3 id="quasard-how">Как это работает<a class="headerlink" href="#quasard-how" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart LR
+    S["Станция"] --&gt;|"домены Яндекса&lt;br&gt;уведены на свой DNS"| H
+    S --&gt;|"вопрос голосом"| V
+    T --&gt;|"ответ голосом"| S
+    subgraph server["Сервер quasard"]
+        direction TB
+        H["Активация и настройки&lt;br&gt;вместо облака Яндекса"]
+        V["Распознавание&lt;br&gt;Silero VAD + GigaAM"] --&gt; L["Модель&lt;br&gt;OpenAI-совместимая"]
+        L --&gt; T["Синтез речи&lt;br&gt;F5-TTS или Edge TTS"]
+    end</code></pre>
+<ul>
+<li><strong>Активация без облака.</strong> Сервер сам отвечает на запросы входа, регистрации,
+  синхронизации, списка устройств и метрик. Обновления прошивки заблокированы, чтобы
+  колонка не перешла на версию, которая всё сломает.</li>
+<li><strong>Оба формата голосового соединения.</strong> На прошивках около 1.56 это JSON, на 3.x —
+  двоичный protobuf. Формат определяется по первому кадру; схемы для 3.x восстановлены из
+  прошивки и лежат в репозитории.</li>
+<li><strong>Распознавание</strong> — GigaAM v3, модель сразу расставляет пунктуацию, конец фразы ловит
+  Silero VAD. Занимает около 1 ГБ видеопамяти.</li>
+<li><strong>Ответы</strong> — любой OpenAI-совместимый API: Groq, Ollama, vLLM, LM Studio. История
+  диалога сохраняется, характер задаётся в файле <code>system_prompt.txt</code> рядом с конфигом и
+  перечитывается на лету.</li>
+<li><strong>Ответ озвучивается по фразам.</strong> Текст модели режется по знакам препинания, первая
+  готовая фраза уходит на колонку, пока модель дописывает остальное, поэтому станция
+  начинает говорить почти без паузы.</li>
+<li><strong>Голос</strong> — клон по образцу на 10–15 секунд (F5-TTS, русские веса ESpeech, около 3,4 ГБ
+  видеопамяти). Запасной вариант без видеокарты — Edge TTS.</li>
+<li><strong>Музыка</strong> из Яндекс Музыки: «Моя волна», поиск по исполнителю, треку и альбому,
+  «дальше», «назад», лайк, пауза, «что сейчас играет».</li>
+<li><strong>Быстрые команды</strong> без модели: громкость, «стоп», bluetooth, сброс диалога.</li>
+</ul>
+<p>Облачного умного дома и сценариев Яндекса при этом нет, и голос отвечает не Алисин.
+Зато всё работает без аккаунта и без интернета — кроме самой модели и музыки, если они
+облачные. Гибрид «своя модель для разговоров, облако для остального» на этой основе
+собрать можно: сервер уже разбирает оба формата соединения и видит распознанный текст, не
+хватает только проксирования остальных запросов в Яндекс.</p>
+<h3 id="quasard-req">Что понадобится<a class="headerlink" href="#quasard-req" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Windows или Linux с видеокартой NVIDIA. Проверялось на RTX 5080 с 16 ГБ.</li>
+<li>Python 3.12, <a href="https://github.com/astral-sh/uv">uv</a> и ffmpeg.</li>
+<li>Роутер, на котором домены Яндекса уводятся на этот компьютер, принудительный DNS и
+  сертификат, которому доверяет колонка. Настройка с примерами для OpenWrt описана в
+  <a href="https://github.com/amirilivice/quasard/blob/main/docs/TRAFFIC_CAPTURE.md">документации проекта</a>.</li>
+<li>Ключ к облачной модели — по умолчанию бесплатный Groq — или своя локальная модель.</li>
+</ul>
+<h3 id="quasard-setup">Как запустить<a class="headerlink" href="#quasard-setup" title="Permanent link">&para;</a></h3>
+<p>Склонируйте репозиторий и поднимите сервер:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-bat highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>uv venv -p 3.12 .venv
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv pip install -p .venv torch torchaudio --index-url https://download.pytorch.org/whl/cu128
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>uv pip install -p .venv -r requirements.txt
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">copy</span> config.example.toml config.toml
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>.venv\Scripts\python -m alice_server
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>venv<span class="w"> </span>-p<span class="w"> </span><span class="m">3</span>.12<span class="w"> </span>.venv
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-p<span class="w"> </span>.venv<span class="w"> </span>torch<span class="w"> </span>torchaudio<span class="w"> </span>--index-url<span class="w"> </span>https://download.pytorch.org/whl/cu128
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-p<span class="w"> </span>.venv<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>cp<span class="w"> </span>config.example.toml<span class="w"> </span>config.toml
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>alice_server
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Сервер слушает порты 80 и 443 — на них роутер и уводит домены Яндекса. Остальное есть в
+<a href="https://github.com/amirilivice/quasard#readme">README проекта</a>, там же лежит <code>start.ps1</code>
+для Windows.</p>
+<p>Проверить сервер без колонки помогают имитаторы из каталога <code>tools</code>: <code>activation_sim.py</code>
+повторяет активацию, <code>station_sim.py --text "Привет"</code> — разговор, <code>fake_llm.py</code> отвечает
+вместо модели, если ключа ещё нет.</p>
+<h3 id="quasard-limits">Ограничения<a class="headerlink" href="#quasard-limits" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Прямые ссылки Яндекс Музыки отдаются через переадресацию, и сервер проходит её за
+  колонку: плеер старой прошивки переадресацию не понимает.</li>
+<li>Скорость и качество голоса упираются в видеокарту: на слабой первая фраза приходит
+  через одну-две секунды.</li>
+<li>У бесплатных тарифов облачных моделей есть суточный лимит запросов.</li>
+</ul>
+<h2 id="chatgpt-web">ChatGPT Voice: нативный режим и мост<a class="headerlink" href="#chatgpt-web" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/rison1337/Alisa-ChatGPT-voice-assistant">Alisa Voice</a> подключает микрофоны и динамик Станции Лайт 2 к ChatGPT Voice.
+В <a href="https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/releases/tag/v0.2.0">версии 0.2.0</a> доступны два режима с общим установщиком:</p>
+<table>
+<thead>
+<tr>
+<th>Режим</th>
+<th>Где работает клиент</th>
+<th>Что нужно держать включённым</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Нативный</td>
+<td>на колонке; WebRTC и обработка звука работают без ПК</td>
+<td>только колонку</td>
+</tr>
+<tr>
+<td>Мост</td>
+<td>сайт ChatGPT в фоновом Chromium на Linux-ПК</td>
+<td>колонку и ПК</td>
+</tr>
+</tbody>
+</table>
+<p>Распознавание речи и ответы ChatGPT в обоих случаях остаются облачными. Используется
+аккаунт ChatGPT, API-ключ не нужен.</p>
+<p><strong>Проверено на:</strong> Станция Лайт 2 YNDX-00028 (Plum), прошивка
+<code>0.369.1.50.4794654278.20261021.133</code>, CachyOS x86_64, 28 октября 2026.
+Настоящие аккаунты Free и Plus проверены в обоих режимах; Go и Windows не проверены.
+<a href="https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/docs/validation.md">Результаты проверки проекта</a>.</p>
+<h3 id="chatgpt-req">Что понадобится<a class="headerlink" href="#chatgpt-req" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Станция Лайт 2 с уже работающими <a href="../../start/ssh/">root и SSH</a>, доступная из сети ПК.</li>
+<li>Linux x86_64, Python 3.10+ и рабочий стол для первого входа в Chromium.
+  В нативном режиме компьютер нужен для установки и настройки.</li>
+<li>Для моста — работающий PipeWire с PulseAudio-интерфейсом или PulseAudio.</li>
+<li>Аккаунт ChatGPT с доступным голосовым режимом и доступ колонки к сервисам Алисы.</li>
+<li>На колонке должен работать штатный Quasar. Также нужны socat и проигрыватель aplay из ALSA.</li>
+</ul>
+<p>Мастер проверяет модель, SHA-256 maind и библиотеки VQE, свободное место и компоненты.
+Готовые ARM-модули входят в релиз: Clang и LLD для установки не нужны. Недостающие пакеты
+на ПК предлагается установить через pacman, apt-get или dnf. Из этих семейств полный
+живой прогон выполнен только на CachyOS.</p>
+<h3 id="chatgpt-setup">Как подключить<a class="headerlink" href="#chatgpt-setup" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p>Запустите установщик в терминале Linux:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/rison1337/Alisa-ChatGPT-voice-assistant/main/bootstrap-linux.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+</span></code></pre></div>
+</li>
+<li>
+<p>Выберите нативный режим или мост.</p>
+</li>
+<li>Укажите IP, порт и пароль SSH колонки. После проверки мастер создаёт отдельный ключ;
+   параметры подключения запоминаются, пароль не сохраняется. Псевдоним alice не нужен.</li>
+<li>Выберите автозапуск, голосовые фразы и подсветку. В нативном режиме можно добавить
+   VLESS для GPT по отдельной ссылке или подписке с выбором сервера.</li>
+<li>Подтвердите установку после просмотра размера компонентов и свободного места.</li>
+<li>Войдите в ChatGPT в открывшемся окне Chromium. Вход обнаруживается и сохраняется
+   автоматически; закрывать окно вручную для подтверждения не нужно.</li>
+<li>Запустите предложенный короткий тест голосового ответа.</li>
+</ol>
+<p>Проверка сети показывает внешний IP и страну выхода: в нативном режиме — колонки,
+в мосте — ПК. Для российского IP предлагается VPN. Эта проверка не подтверждает
+доступность ChatGPT Voice; для этого служит отдельный голосовой тест после входа.
+В нативном режиме после установки и входа ПК можно выключить.</p>
+<h3 id="chatgpt-usage">Команды и настройки<a class="headerlink" href="#chatgpt-usage" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Команда по умолчанию</th>
+<th>Что происходит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>«Алиса, открой чат»</td>
+<td>продолжить разговор с GPT</td>
+</tr>
+<tr>
+<td>«Алиса, создай новый чат»</td>
+<td>начать новый разговор</td>
+</tr>
+<tr>
+<td>«Алиса, открой предыдущий чат»</td>
+<td>вернуться к предыдущему разговору</td>
+</tr>
+<tr>
+<td>«Алиса, закрой чат»</td>
+<td>вернуть обычную Алису</td>
+</tr>
+</tbody>
+</table>
+<p>Управление после установки открывается командой:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>~/.local/bin/alisa
+</span></code></pre></div>
+<p>В меню доступны смена аккаунта, фразы после «Алиса», подсветка с живым демо, автозапуск,
+обновление и удаление. Голос нативного клиента выбирается в CLI, голос моста — на сайте
+ChatGPT. Смена фраз и цвета применяется без перезапуска текущего разговора.</p>
+<p>Оба режима можно держать установленными. Перед запуском другого остановите текущий:
+они используют одни микрофоны и динамик. Настройки и входы раздельные; включение
+автозапуска одного режима отключает автозапуск другого.</p>
+<p>VLESS нативного клиента направляет через туннель только трафик GPT, включая WebRTC.
+При потере туннеля прямое подключение блокируется, разговор завершается, управление
+возвращается Алисе. Маршруты самой Алисы и SSH не заменяются.</p>
+<h3 id="chatgpt-limits">Ограничения<a class="headerlink" href="#chatgpt-limits" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Это отдельный режим ChatGPT. Команды переключения распознаёт облако Яндекса;
+  для входа и выхода голосом нужен доступ к нему.</li>
+<li>Пока идёт разговор с ChatGPT, ответы Алисы подавляются, штатная музыка ставится на паузу.</li>
+<li>Доступность и лимиты задаёт ChatGPT. Распознанные ошибки входа, соединения и лимита
+  закрывают разговор и освобождают управление Алисе. Изменения сайта или протокола могут
+  потребовать обновления клиента.</li>
+<li>В нативном режиме сессия хранится на колонке, в мосте — в отдельном профиле Chromium
+  на ПК. Эти данные не входят в установочный пакет.</li>
+<li>Проверены одна колонка и одна сборка прошивки. При несовпадении проверяемых хешей
+  установщик останавливается; другие сборки требуют проверки совместимости модулей.</li>
+</ul>
+<p>В обоих режимах используются <a href="../microphone/">обработанный микрофон VQE</a> и
+<a href="../led/#plum-led-rainbow">настраиваемая подсветка Plum</a>.</p>
+<h3 id="chatgpt-rollback">Как вернуть Алису<a class="headerlink" href="#chatgpt-rollback" title="Permanent link">&para;</a></h3>
+<p>Отключите автозапуск выбранного режима и остановите его:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Нативный</label><label for="__tabbed_2_2">Мост</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>~/.local/bin/alisa<span class="w"> </span>native<span class="w"> </span>autostart<span class="w"> </span>off
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>~/.local/bin/alisa<span class="w"> </span>native<span class="w"> </span>stop
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>~/.local/bin/alisa<span class="w"> </span>bridge<span class="w"> </span>autostart<span class="w"> </span>off
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>~/.local/bin/alisa<span class="w"> </span>bridge<span class="w"> </span>stop
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Для удаления программных файлов выберите «Установка и обслуживание → Удалить программу».
+Перед удалением показывается состав и создаётся резервная копия. Вход, чаты, root и SSH
+сохраняются; выход из аккаунта выполняется отдельно в меню «Аккаунт ChatGPT».
+Для удаления только VLESS и его файлов используйте меню «VPN / VLESS».</p>
+<h2 id="v3rt3p">v3rt3p: самостоятельный стек<a class="headerlink" href="#v3rt3p" title="Permanent link">&para;</a></h2>
+<p>Ещё один путь полностью заменить облако — <a href="https://v3rt3p.github.io/ru/index.html">v3rt3p</a>,
+набор сервисов для своего голосового интерфейса. В отличие от домашних приложений «в один
+клик», его разворачивают и настраивают вручную: выбор языковой модели, обработка звука и
+отдельные компоненты протокола под своим контролем. Нужны навыки работы с Docker, DNS,
+логами и ключами доступа. В вики проект не проверялся — описание и установка в его
+<a href="https://v3rt3p.github.io/ru/index.html">документации</a>.</p>
+<h2 id="open">Что пока не исследовано<a class="headerlink" href="#open" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Как отличить обычный разговор от команды умного дома внутри голосового соединения.
+  Разбор формата есть в <a href="../../internals/voice/">голосовом тракте</a> и в коде quasard.</li>
+<li>Совместимость гибридного прокси с другими моделями и прошивками: проверен только
+  Quasar Bridge на Станции 2.</li>
+</ul>
+<p>Свой текст голосом Алисы — задача уже решённая: локально это делает API glagol, см.
+<a href="../../internals/network/#glagol">сеть и порты</a>, а на Лайт 2 проверен
+<a href="../sounds/#native-tts">вызов через SSH</a>.</p>
+<h2 id="rollback">Откат<a class="headerlink" href="#rollback" title="Permanent link">&para;</a></h2>
+<p>Для Quasar Bridge, установленного на колонку новым установщиком, сначала верните
+исходное подключение Алисы. Выполните на колонке по SSH:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sh<span class="w"> </span>/data/opt/quasar-bridge/app/control.sh<span class="w"> </span>rollback
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>reboot
+</span></code></pre></div>
+<p>После успешного отката и перезагрузки проверьте, что Алиса снова отвечает. Затем удалите
+программу и её автозапуск:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sh<span class="w"> </span>/data/opt/quasar-bridge/app/uninstall.sh
+</span></code></pre></div>
+<p>Настройки, ключи и журналы остаются в <code>/data/opt/quasar-bridge</code>. Удаление откажется
+работать, пока не выполнен <code>rollback</code>: иначе колонка продолжит обращаться к остановленному
+прокси.</p>
+<p>Для Quasar Bridge на отдельном хосте, старой установки через YAM и quasard верните
+исходный <code>quasar.cfg</code> из копии, снятой <a href="#compare">перед первой правкой</a>, и перезагрузите
+колонку:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>adb<span class="w"> </span>push<span class="w"> </span>./quasar.cfg.orig<span class="w"> </span>/system/vendor/quasar/quasar.cfg
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>adb<span class="w"> </span>shell<span class="w"> </span>sync<span class="p">;</span><span class="w"> </span>adb<span class="w"> </span>reboot
+</span></code></pre></div>
+<p>Корневая файловая система для записи перемонтируется так же, как при правке:
+<code>mount -o remount,rw /</code>.</p>
+<ul>
+<li><strong>Quasar Bridge</strong> — остановить прокси и удалить его пакет, если ставили на колонку
+  через YAM.</li>
+<li><strong>quasard</strong> — выключить подмену DNS на роутере, чтобы домены Яндекса снова шли в облако.</li>
+<li><strong>ChatGPT Voice</strong> — остановить выбранный режим или удалить его через CLI, как описано
+  в <a href="#chatgpt-rollback">возврате к Алисе</a>.</li>
+</ul>
+
+  
+  
+  <aside class="yse-suggest" data-yse-path="docs/recipes/llm.md" data-yse-title="Своя LLM вместо Алисы" data-yse-edit-url="../../edit/" aria-label="Правка страницы">
+    <div class="yse-suggest__text">
+      <p class="yse-suggest__title">Нашли ошибку или хотите дополнить?</p>
+      <p class="yse-suggest__hint">Правка займёт пару минут. Нужен только вход через GitHub, git знать не нужно. Можно выделить фрагмент текста и нажать «Предложить правку».</p>
+    </div>
+    <div class="yse-suggest__actions">
+      <a class="md-button md-button--primary" href="../../edit/?path=docs/recipes/llm.md" data-yse-edit>Править эту страницу</a>
+      <a class="md-button" href="../../edit/?new=1&amp;dir=recipes" data-yse-edit>Новая страница</a>
+      <a class="yse-suggest__report" href="#" data-yse-report>Только сообщить об ошибке</a>
+    </div>
+  </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  К началу
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Нижний колонтитул" >
+        
+          
+          <a href="../home-assistant/" class="md-footer__link md-footer__link--prev" aria-label="Назад: Голосовой спутник Home Assistant">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Назад
+              </span>
+              <div class="md-ellipsis">
+                Голосовой спутник Home Assistant
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../standalone/" class="md-footer__link md-footer__link--next" aria-label="Вперед: Колонка без Яндекса">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Вперед
+              </span>
+              <div class="md-ellipsis">
+                Колонка без Яндекса
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      ©2026 YSE contributors. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://t.me/hackalice" target="_blank" rel="noopener" title="Чат в Telegram" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M256 8a248 248 0 1 0 0 496 248 248 0 1 0 0-496m115 168.7c-3.7 39.2-19.9 134.4-28.1 178.3-3.5 18.6-10.3 24.8-16.9 25.4-14.4 1.3-25.3-9.5-39.3-18.7-21.8-14.3-34.2-23.2-55.3-37.2-24.5-16.1-8.6-25 5.3-39.5 3.7-3.8 67.1-61.5 68.3-66.7.2-.7.3-3.1-1.2-4.4s-3.6-.8-5.1-.5c-2.2.5-37.1 23.5-104.6 69.1-9.9 6.8-18.9 10.1-26.9 9.9-8.9-.2-25.9-5-38.6-9.1-15.5-5-27.9-7.7-26.8-16.3.6-4.5 6.7-9 18.4-13.7 72.3-31.5 120.5-52.3 144.6-62.3 68.9-28.6 83.2-33.6 92.5-33.8 2.1 0 6.6.5 9.6 2.9 2 1.7 3.2 4.1 3.5 6.7.5 3.2.6 6.5.4 9.8z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/Marker284/yandex-station-extended" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/toc-tabs.js"></script>
+      
+        <script src="../../javascripts/editor-entry.js"></script>
+      
+    
+  </body>
+</html>

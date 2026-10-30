@@ -1,0 +1,3557 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Community-вики по модификации и исследованию умных колонок Яндекс (семейство Станций) — доступ, прошивка quasar, железо, рецепты">
+      
+      
+        <meta name="author" content="Yandex Station Extended community">
+      
+      
+        <link rel="canonical" href="https://hackalice.me/devices/station-2/">
+      
+      
+        <link rel="prev" href="../station-midi/">
+      
+      
+        <link rel="next" href="../station-street/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Станция 2 - Yandex Station Extended</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/editor-entry.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  
+  
+    <meta name="yse-editor-api" content="https://yse-wiki-editor.push-to-claude-worker.workers.dev">
+    <meta name="yse-editor-repo" content="Marker284/yandex-station-extended">
+    <meta name="yse-editor-url" content="../../edit/">
+  
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#2" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href="../.." title="Yandex Station Extended" class="md-header__button md-logo" aria-label="Yandex Station Extended" data-md-component="logo">
+      
+  <img src="../../assets/images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yandex Station Extended
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Станция 2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Светлая тема"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Светлая тема" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Тёмная тема"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Тёмная тема" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Поделиться" aria-label="Поделиться" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Marker284/yandex-station-extended" title="Перейти к репозиторию" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Marker284/yandex-station-extended
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Yandex Station Extended" class="md-nav__button md-logo" aria-label="Yandex Station Extended" data-md-component="logo">
+      
+  <img src="../../assets/images/logo.png" alt="logo">
+
+    </a>
+    Yandex Station Extended
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Marker284/yandex-station-extended" title="Перейти к репозиторию" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Marker284/yandex-station-extended
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Главная
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../start/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Начало работы
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Начало работы
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/adb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Установка ADB на компьютер
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Получение root
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1. Получение root
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Большинство моделей — подмена DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/retail-ca/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Лайт 2 (Plum) — сертификат из factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/retail-ca-mini3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Мини 3 (Bergamot) — сертификат и маркеры
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root-android/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станции на Android — AliceBridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/adb-max/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс — доступ через ADB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root-mini1-usb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Мини 1 (2019) — ADB по USB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/root-jbl-link-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JBL Link Music — ADB по USB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/ssh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. SSH и обновления
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Пакеты yse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start/recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Если что-то сломалось
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../recipes/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Рецепты
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Рецепты
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/usb-host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USB Host (OTG)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/airplay/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirPlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/bt-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Плееры как Bluetooth (bt-proxy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spotify Connect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-soundcloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoundCloud голосом (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/youtube-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YouTube Music
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/sounds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Свои звуки
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/microphone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Обработанный микрофон
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/fastfetch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fastfetch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/led/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Подсветка
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/packagemanagers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAM и BetterYAM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/home-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Голосовой спутник Home Assistant
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Своя LLM вместо Алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/standalone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Колонка без Яндекса
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-disable-updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Отключение обновлений (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-privacy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ограничить метрики (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-tv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ТВ-набор (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-debian/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debian (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/upravlenie-golosom-alisy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Управление голосом алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Бэкенд
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Бэкенд
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/bekend-self-hosted/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Бэкенд (Self-hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/v3rt3p/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v3rt3p
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/quasard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    quasard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Устройства
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Устройства
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-lite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Лайт (Micro)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fiero-hi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiero Hi (партнёрская Лайт)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-lite2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Лайт 2 (Plum)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-mini3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 3 (Bergamot)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-mini3-pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 3 Про (Pickle)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 3 (Orion)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-mini2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-mini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини (1 пок)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-midi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Миди (Cucumber)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 2
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Платформа в двух словах
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что работает
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Получение root
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Чем отличается
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#partitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Разделы флеша
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#i2c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Шина I2C и периферия
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#led" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Индикация
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Индикация">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direct-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Прямое управление
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Звук
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Вход
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usb-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USB-host (OTG)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Алиса: фразы вызова и локальный канал
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Обновления
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что ещё проверить
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-street/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Стрит (Mango)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-max/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-max-zigbee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс с Zigbee
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../station-gen1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция (1 поколения)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yandex-hub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Умный хаб (Saturn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jbl-link-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JBL Link Music
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Как это устроено
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Как это устроено
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Архитектура прошивки
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Сеть и порты
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Звонки Алисы (порт 5081)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/voice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Голосовой тракт Алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Телеметрия
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/zigbee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zigbee на Миди с quasard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Директивы и capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/gotchas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Подводные камни
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/toolchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Сборка софта
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Словарь
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Как дополнять вики
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Участники
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Платформа в двух словах
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что работает
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Получение root
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Чем отличается
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#partitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Разделы флеша
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#i2c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Шина I2C и периферия
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#led" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Индикация
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Индикация">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direct-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Прямое управление
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Звук
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Вход
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usb-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USB-host (OTG)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Алиса: фразы вызова и локальный канал
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Обновления
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что ещё проверить
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+
+  
+    
+      <a href="../../edit/?path=docs/devices/station-2.md" title="Править эту страницу" class="md-content__button md-icon" rel="edit" data-yse-edit>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+      </a>
+    
+  
+  
+    
+      
+    
+    <a href="https://github.com/Marker284/yandex-station-extended/raw/main/docs/devices/station-2.md" title="Посмотреть исходный код страницы" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="2">Станция 2<a class="headerlink" href="#2" title="Permanent link">&para;</a></h1>
+<p>Розничное имя — <strong>Яндекс Станция 2</strong> (флагман 2-го поколения). SoC — <strong>Amlogic AXG</strong>,
+как у <a href="../station-lite/">Лайта</a>. Ядро 4.9, но это старшая модель линейки: вдвое больше
+ОЗУ (~490 МБ), 512 МБ NAND, сенсорная панель, Wi-Fi Marvell и USB-C PD.</p>
+<div class="admonition warning">
+<p class="admonition-title">Внутреннее имя Midi принадлежит Станции 2</p>
+<p>В device-tree эта модель называется <strong><code>yandex,station-midi</code></strong> (model
+«Yandex Station Midi», hostname <code>…gen2</code>). Это <strong>не</strong> розничная
+<a href="../station-midi/">«Станция Миди»</a> — та имеет кодовое имя Cucumber на SoC A5.
+Внутреннее имя Midi принадлежит розничной <strong>Станции 2</strong>, а розничная
+«Станция Миди» — это Cucumber. Ориентируйтесь на SoC и ОЗУ, а не на слово Midi.
+Не путайте её со <a href="../station-max/"><strong>Станцией Макс</strong></a>, у которой Android-идентификатор
+<code>ro.product.device=yandexstation_2</code> (другое устройство, Android 9).</p>
+</div>
+<h2 id="platform">Платформа в двух словах<a class="headerlink" href="#platform" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Что</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SoC</td>
+<td><strong>Amlogic AXG</strong> (<code>amlogic, axg</code>)</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>4× Cortex-A53 (<code>0xd03</code>), до <strong>1.2 ГГц</strong></td>
+</tr>
+<tr>
+<td>ОЗУ</td>
+<td><strong>~490 МБ</strong> (MemTotal 501664 kB) — вдвое больше минислушателей</td>
+</tr>
+<tr>
+<td>Флеш</td>
+<td><strong>NAND Micron 512 МБ SLC</strong> (ID <code>0x2c 0xdc</code>, page 4096, erase 256 КБ), UBI</td>
+</tr>
+<tr>
+<td>Ядро</td>
+<td>Linux <strong>4.9.68</strong> aarch64 (сборка 20261013)</td>
+</tr>
+<tr>
+<td>Userspace</td>
+<td>Buildroot <strong>2020.02.1</strong></td>
+</tr>
+<tr>
+<td>АЦП</td>
+<td><strong>TLV320ADC3101</strong> (TI) — опорный сигнал усилителя, не микрофоны (см. <a href="#audio">Звук</a>)</td>
+</tr>
+<tr>
+<td>Усилитель</td>
+<td><strong>SY6045S</strong> (как у Мини 2)</td>
+</tr>
+<tr>
+<td>Индикация</td>
+<td>LED-дисплей через <strong>Gowin</strong> (<code>gowin_led_device</code>) — FPGA/CPLD-контроллер</td>
+</tr>
+<tr>
+<td>Сенсор касания</td>
+<td><code>midi_touch</code></td>
+</tr>
+<tr>
+<td>Питание</td>
+<td><strong>USB-C Power Delivery</strong> (<code>husb238_pd</code>)</td>
+</tr>
+<tr>
+<td>Датчик света</td>
+<td><strong>LTR-308</strong> (<code>0-0x53</code>)</td>
+</tr>
+<tr>
+<td>Радио</td>
+<td><strong>Marvell/NXP</strong> (<code>mlan</code> + <code>moal</code>), BT через <code>hci_uart</code></td>
+</tr>
+<tr>
+<td>quasar</td>
+<td>3.21 (<code>0.369.1.46.4778263334.20261013</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="features">Что работает<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Что</th>
+<th>Состояние</th>
+<th>Где описано</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Root и SSH</td>
+<td>работает</td>
+<td><a href="../../start/root/">подмена DNS</a></td>
+</tr>
+<tr>
+<td>USB Host (OTG)</td>
+<td>работает</td>
+<td><a href="../../recipes/usb-host/">USB Host</a></td>
+</tr>
+<tr>
+<td>AirPlay</td>
+<td>работает</td>
+<td><a href="../../recipes/airplay/#station-2-bundle">AirPlay 2 одним набором</a></td>
+</tr>
+<tr>
+<td>Spotify Connect</td>
+<td>работает</td>
+<td><a href="../../recipes/spotify/">Spotify Connect</a></td>
+</tr>
+<tr>
+<td>YouTube Music</td>
+<td>частично (голосом не проверялось)</td>
+<td><a href="../../recipes/youtube-music/">YouTube Music</a></td>
+</tr>
+<tr>
+<td>Плеер как Bluetooth-источник</td>
+<td>не проверялось</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Свои звуки</td>
+<td>не проверялось</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Обработанный микрофон</td>
+<td>не проверялось</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Подсветка</td>
+<td>работает</td>
+<td><a href="#led">Индикация</a></td>
+</tr>
+<tr>
+<td>YAM</td>
+<td>не проверялось</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Своя LLM</td>
+<td>работает</td>
+<td><a href="../../recipes/llm/#quasar-bridge">Quasar Bridge</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="root">Получение root<a class="headerlink" href="#root" title="Permanent link">&para;</a></h2>
+<p>Основной способ — <strong><a href="../../start/root/">подмена DNS</a></strong>: сброс с зажатой кнопкой
+отключения микрофона или центральной сенсорной кнопкой при включении питания,
+затем подмена DNS на роутере. После получения root —
+<a href="../../start/ssh/">настройка SSH и отключение обновлений</a>.</p>
+<h2 id="differences">Чем отличается<a class="headerlink" href="#differences" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Другой Wi-Fi:</strong> Marvell/NXP (<code>mlan</code> + <code>moal</code>) — на Лайте/Мини 2 Unisoc, на Мини 1
+  Broadcom. BT — через <code>hci_uart</code>.</li>
+<li><strong>Больше ресурсов:</strong> ~490 МБ ОЗУ и <strong>512 МБ NAND Micron</strong> (у минислушателей —
+  256 МБ Toshiba).</li>
+<li><strong>LED-дисплей на Gowin</strong> (<code>gowin_led_device</code>) — отдельный FPGA/CPLD-контроллер
+  индикации (у Станции 2 — текстово-пиксельная «шторка»), а не прямые светодиоды
+  sysfs (каталог <code>/sys/class/leds</code> пуст).</li>
+<li><strong>Сенсорная панель</strong> (<code>midi_touch</code>).</li>
+<li><strong>USB-C PD</strong> (<code>husb238</code>) и отдельный аудио-<strong>АЦП TLV320ADC3101</strong>: он даёт опорный
+  сигнал усилителя, а микрофоны идут через PDM — см. <a href="#audio">Звук</a>.</li>
+</ul>
+<h2 id="partitions">Разделы флеша<a class="headerlink" href="#partitions" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>mtd0 "bootloader" 4 MB    mtd1 "tpl" 6 MB     mtd2 "boot" 20 MB
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>mtd3 "system" 176 MB -&gt; ubi0:rootfs (ubifs, RO)
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>mtd4 "nv" 1 MB -&gt; /tee (vfat, RO)
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>mtd5 "bkupgrade" 233 MB -&gt; ubi1 (RW) = /bkupgrade
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>mtd6 "recovery" 60 MB
+</span></code></pre></div>
+<p>NAND — <strong>Micron 512 МБ SLC</strong>, page 4096, OOB 128, erase 256 КБ. Разделы заметно
+крупнее, чем у минислушателей.</p>
+<h2 id="i2c">Шина I2C и периферия<a class="headerlink" href="#i2c" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Шина:адрес</th>
+<th>Чип</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0-0x08</code></td>
+<td><strong>HUSB238</strong> (husb238_pd)</td>
+<td>USB-C Power Delivery</td>
+</tr>
+<tr>
+<td><code>0-0x53</code></td>
+<td><strong>LTR-308</strong></td>
+<td>датчик освещённости</td>
+</tr>
+<tr>
+<td><code>0-0x51/0x54/0x55</code>, <code>1-0x50</code></td>
+<td>24C02</td>
+<td>EEPROM</td>
+</tr>
+<tr>
+<td><code>1-0x18</code></td>
+<td><strong>TLV320ADC3101</strong></td>
+<td>аудио-АЦП, опорный сигнал усилителя (см. <a href="#audio">Звук</a>)</td>
+</tr>
+<tr>
+<td><code>1-0x2a</code></td>
+<td><strong>SY6045S</strong></td>
+<td>Class-D усилитель</td>
+</tr>
+</tbody>
+</table>
+<h2 id="led">Индикация<a class="headerlink" href="#led" title="Permanent link">&para;</a></h2>
+<p>Под светорассеивающей поверхностью — панель из 88 светодиодов. Ей управляет отдельный
+контроллер <strong>Gowin FPGA/CPLD</strong> (<code>gowin_led_device</code>) по SPI, а из Linux она видна как обычный
+framebuffer:</p>
+<table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Устройство</td>
+<td><code>/dev/fb0</code> (<code>YNDX LED screen</code>)</td>
+</tr>
+<tr>
+<td>Разрешение</td>
+<td><code>89×1</code> (логическое)</td>
+</tr>
+<tr>
+<td>Формат</td>
+<td>32 bpp, 4 байта на пиксель</td>
+</tr>
+<tr>
+<td>Размер кадра</td>
+<td>356 байт</td>
+</tr>
+<tr>
+<td>Светодиоды</td>
+<td>88, индексы <code>0–87</code> (<code>88</code> не загорается)</td>
+</tr>
+</tbody>
+</table>
+<p>Хотя разрешение логическое <code>89×1</code>, светодиоды стоят <strong>в шахматном порядке</strong>, и каждый пиксель
+кадра — один светодиод. Карта индексов составлена экспериментально:</p>
+<p><img alt="Карта светодиодов Станции 2" src="../../assets/images/station2-led-map.png" /></p>
+<p><em>Красные ячейки — основная панель (<code>0–83</code>), цветные — четыре центральных светодиода (<code>84–87</code>),
+белые — пустые места.</em></p>
+<h3 id="direct-control">Прямое управление<a class="headerlink" href="#direct-control" title="Permanent link">&para;</a></h3>
+<p>Кадр — 356 байт в <code>/dev/fb0</code>, светодиод <code>index</code> — байты с <code>index * 4</code> по <code>index * 4 + 3</code>.
+Вся панель на небольшой яркости:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">sh</label><label for="__tabbed_1_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">i</span><span class="o">=</span><span class="m">0</span><span class="p">;</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$i</span><span class="w"> </span>-lt<span class="w"> </span><span class="m">89</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">'\020\020\020\000'</span><span class="p">;</span><span class="w"> </span><span class="nv">i</span><span class="o">=</span><span class="k">$((</span><span class="nv">i</span><span class="o">+</span><span class="m">1</span><span class="k">))</span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/fb0
+</span></code></pre></div>
+<p>Байты в <code>printf</code> записываются восьмеричными кодами: <code>\020</code> — это <code>0x10</code>, <code>\377</code> — <code>0xFF</code>.</p>
+</div>
+<div class="tabbed-block">
+<p>Нужен Python — <code>yse install python3</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"/dev/fb0"</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">fb</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">fb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">([</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">])</span> <span class="o">*</span> <span class="mi">89</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Порядок каналов в пикселе — <strong>R, G, B, W</strong>, по байту на канал (<code>0x00</code>–<code>0xFF</code>).</p>
+<p>Анимации панели <code>.led</code> содержат по строке на кадр: цвета светодиодов RRGGBBWW через пробел,
+в конце указана длительность кадра. Общий формат описан на
+<a href="../station-lite/#led-format">странице Лайт</a>.</p>
+<ul>
+<li>Рассеиватель сглаживает соседние светодиоды: крупные символы и силуэты читаются лучше
+  мелких деталей.</li>
+<li>Прошивка перерисовывает панель во время работы Алисы и может затереть ваш кадр.</li>
+<li>Штатные анимации — файлы <code>.led</code>: в каталоге <code>/system/vendor/quasar/ledpatterns/panel/</code> для
+  основной панели (<code>0–83</code>), в <code>/system/vendor/quasar/ledpatterns/oknix/</code> для четырёх центральных
+  светодиодов логотипа (<code>84–87</code>).</li>
+</ul>
+<p><a id="sound"></a></p>
+<h2 id="audio">Звук<a class="headerlink" href="#audio" title="Permanent link">&para;</a></h2>
+<ul>
+<li>ALSA card0 <code>AML-AUGESOUND</code>: <code>TDM-B-sy6045s-hifi</code> (усилитель),
+  <code>TDM-C-tlv320adc3101-adc</code> (АЦП), <code>PDM</code> (микрофоны).</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Устройство</th>
+<th>Что это</th>
+<th>Кто держит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hw:0,0</code>, воспроизведение</td>
+<td>усилитель; 48 кГц, S16, период 960, буфер 7680</td>
+<td><code>dmix_spk</code>, медиа-демон Алисы (<code>maind --mediad</code>)</td>
+</tr>
+<tr>
+<td><code>hw:0,1</code>, захват</td>
+<td>TLV320ADC3101, 2 канала</td>
+<td><code>arecord … /dev/null</code> из <code>/etc/init.d/S40adc</code></td>
+</tr>
+<tr>
+<td><code>hw:0,2</code>, захват</td>
+<td><code>PDM-dummy</code>, 16 каналов, 48 кГц: микрофоны и опорный сигнал</td>
+<td><code>maind --platformd</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>S40adc</code> читает <code>hw:0,1</code> в <code>/dev/null</code> только для того, чтобы с АЦП пошли данные: по
+  комментарию в скрипте они затем появляются в каналах 8 и 9 <code>hw:0,2</code>, а <code>/etc/asound.conf</code>
+  собирает из <code>hw:0,2</code> семь каналов (<code>hw_feedback_and_mics</code>). Отдельного входа с
+  микрофонами нет: всё идёт через <code>hw:0,2</code>, который монопольно держит <code>platformd</code>.</li>
+<li>Громкость Алисы — регулятор <code>Master Playback Volume</code> (моно, 0–255): <code>set_volume.sh</code> →
+  <code>amixer set Master N%</code>. Системный <code>softvol</code> (<code>pcm.soft_volume</code> в <code>/etc/asound.conf</code>)
+  создаёт его без шкалы в дБ.</li>
+</ul>
+<h2 id="input">Вход<a class="headerlink" href="#input" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>gpio-keys</code> (<code>/dev/input/event0</code>) — физические кнопки.</li>
+<li><code>midi_touch</code> (<code>/dev/input/event1</code>) — сенсорная панель. Оба устройства читает
+  <code>maind --platformd</code>.</li>
+<li>Кнопка Алисы — <code>EV_KEY</code> с кодом <strong>582</strong> (<code>KEY_VOICECOMMAND</code>) на <code>event1</code>. Удержание дольше
+  ~1,5 с — <code>Starting conversation</code>, Алиса слушает. Короткое нажатие — <code>Toggle play/pause</code>;
+  если ни один плеер не активен, <code>maind</code> на это просит у Алисы музыку.</li>
+<li>Нажатие имитируется записью <code>struct input_event</code> в <code>/dev/input/event1</code>. busybox 32-битный,
+  поэтому событие — 16 байт: время (8), тип (2), код (2), значение (4). На модели с
+  64-битным userspace то же событие занимает 24 байта — пример для Мини 3 Про
+  <a href="../station-mini3-pro/#audio">на её странице</a>:</li>
+</ul>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">Z</span><span class="o">=</span><span class="s1">'\0\0\0\0\0\0\0\0'</span><span class="p">;</span><span class="w"> </span><span class="nv">SYN</span><span class="o">=</span><span class="s2">"</span><span class="nv">$Z</span><span class="s2">\0\0\0\0\0\0\0\0"</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">"</span><span class="nv">$Z</span><span class="s2">\001\000\106\002\001\000\000\000</span><span class="nv">$SYN</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/input/event1<span class="w">   </span><span class="c1"># нажата</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>usleep<span class="w"> </span><span class="m">1700000</span><span class="w">                                                       </span><span class="c1"># удержание</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nb">printf</span><span class="w"> </span><span class="s2">"</span><span class="nv">$Z</span><span class="s2">\001\000\106\002\000\000\000\000</span><span class="nv">$SYN</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/input/event1<span class="w">   </span><span class="c1"># отпущена</span>
+</span></code></pre></div>
+<h2 id="usb-host">USB-host (OTG)<a class="headerlink" href="#usb-host" title="Permanent link">&para;</a></h2>
+<p>Порт Type-C по умолчанию отдан gadget-контроллеру: <code>dwc_otg</code> (<code>ff400000.dwc2_a</code>) держит
+USB2-порт 1, а <code>xhci-hcd.0.auto</code> стартует без порта и умирает при загрузке:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>xhci-hcd xhci-hcd.0.auto: xHCI host not responding to stop endpoint command.
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>xhci-hcd xhci-hcd.0.auto: Assuming host is dying, halting host.
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>xhci-hcd xhci-hcd.0.auto: HC died; cleaning up
+</span></code></pre></div>
+<p>Переключение — те же регистры, что у <a href="../station-lite/">Лайт</a> (PHY <code>ffe09000</code>, раскладка
+как в Amlogic <code>phy-aml-new-usb3.c</code>, <code>set_mode()</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Адрес</th>
+<th>Регистр</th>
+<th>До</th>
+<th>После</th>
+<th>Смысл</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0xffe09084</code></td>
+<td><code>usb_r1</code></td>
+<td><code>0x01000000</code></td>
+<td><code>0x01000000</code></td>
+<td>у Лайт здесь <code>0x01002000</code>; на Станции 2 порт уже включён</td>
+</tr>
+<tr>
+<td><code>0xffe09080</code></td>
+<td><code>usb_r0</code></td>
+<td><code>0x8000006A</code></td>
+<td><code>0x0000006A</code></td>
+<td><code>u2d_act = 0</code>: порт → xHCI</td>
+</tr>
+<tr>
+<td><code>0xffe09090</code></td>
+<td><code>usb_r4</code></td>
+<td><code>0x00000002</code></td>
+<td><code>0x00000000</code></td>
+<td><code>p21_SLEEPM0 = 0</code></td>
+</tr>
+<tr>
+<td><code>0xffe09020</code></td>
+<td><code>u2p_r0</code></td>
+<td><code>0x10252000</code></td>
+<td><code>0x00252060</code></td>
+<td>подтяжки 15 кОм на D+/D- (роль хоста)</td>
+</tr>
+</tbody>
+</table>
+<p>Порядок: <code>unbind</code> <code>ff400000.dwc2_a</code> → <code>unbind</code> <code>xhci-hcd.0.auto</code> → четыре <code>devmem</code> →
+<code>bind</code> <code>xhci-hcd.0.auto</code>. <code>dwc3</code> не отвязывать — будет oops в <code>dwc3_remove</code>.</p>
+<p>Проверено на живом устройстве (<code>YNDX-00051</code>, прошивка от 21.10.2026):</p>
+<ul>
+<li>хаб Genesys <code>05e3:0610</code> плюс вложенный WCH <code>1a86:8091</code> — определяются на 480 Мбит/с;</li>
+<li>флешка 8,18 ГБ (<code>/dev/sdb</code>, FAT32, монтируется) и SD-карта 7,4 ГБ в картридере
+  <code>05e3:0751</code> (<code>/dev/sda</code>) — читаются;</li>
+<li>USB-Ethernet Realtek RTL8153 (<code>0bda:8153</code>) — после <code>r8152</code> появляется <code>eth0</code>;</li>
+<li>модули из <a href="https://github.com/Marker284/yandex-station-extended/tree/main/contrib/modules"><code>contrib/modules</code></a>
+  (<code>sd_mod</code>, <code>usb-storage</code>, <code>uas</code>, <code>mii</code>, <code>usbnet</code>, <code>r8152</code>) загружаются без единой ошибки ядра;
+  <code>snd-usb-audio</code> на этой модели <strong>не проверялся</strong>.</li>
+</ul>
+<p>Отличия от <a href="../../recipes/usb-host/">рецепта для Лайт</a>:</p>
+<ul>
+<li><strong>картридер не сообщает о вставке карты.</strong> <code>/dev/sda</code> остаётся нулевого размера, пока
+  устройство не переподключить: <code>echo 1-1.2.1 &gt; /sys/bus/usb/drivers/usb/unbind</code>, пауза,
+  <code>echo 1-1.2.1 &gt; /sys/bus/usb/drivers/usb/bind</code>. Пересчёт <code>scsi_host/*/scan</code> помогает только
+  на старте; на раннем старте каталога ещё нет и glob подставляется буквально;</li>
+<li>после переключения USB-gadget (ADB, режим прошивки) недоступен до перезагрузки.</li>
+</ul>
+<p>Установка та же, что на Лайт: <code>contrib/otg/install.sh</code> распознаёт обе модели
+(<code>yandex,station-micro</code> и <code>yandex,station-midi</code>). Пошаговая инструкция, скрипты и защита
+от бутлупа — в рецепте <a href="../../recipes/usb-host/">USB Host (OTG)</a>.</p>
+<h2 id="voice">Алиса: фразы вызова и локальный канал<a class="headerlink" href="#voice" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Фразы вызова — <code>/system/vendor/quasar/spotter_models/activation/</code>: <code>alisa</code>, <code>yandex</code> и
+  <code>yasmina</code>. Каждая — отдельная нейросеть на одно слово (<code>spotter-type chen14</code>, в <code>words.txt</code>
+  два класса: <code>filler</code> и само слово), поэтому своё слово вызова текстом не задать.
+  Формат моделей и режим своего слова в движке — в
+  <a href="../../internals/voice/#nnet-format">голосовом тракте</a>.</li>
+<li>Короткие команды без обращения («громче», «пауза», «дальше» — <code>spotter_models/command</code>)
+  включены, только пока играет собственный плеер Алисы. Иначе колонка их слышит, но в
+  <code>maind.log</code> пишет <code>Phrase … is disabled in commandPhrasesConfig</code>.</li>
+<li>Локальный канал <code>127.0.0.1:9875</code>: кадр — 4 байта длины и protobuf, поле <code>253 = 3</code> —
+  состояние Алисы, поле <code>252</code> — вложенное сообщение (формат — у
+  <a href="https://github.com/derangedabbot/yandex-station-2-airplay/blob/main/docs/09-voice.md">derangedabbot</a>).
+  Поле <code>1</code> вложенного сообщения — статус: <code>0</code> — свободна, <code>1</code> — слушает, <code>3</code> — фраза
+  распознана, текст в поле <code>2</code>. Номера сверены с <code>onAliceStateChanged</code> в <code>maind.log</code>; статус
+  <code>0</code> protobuf не передаёт — поля просто нет.</li>
+</ul>
+<h2 id="ota">Обновления<a class="headerlink" href="#ota" title="Permanent link">&para;</a></h2>
+<p>Цепочка OTA на этой модели:</p>
+<ol>
+<li><code>maind --updatesd</code> скачивает образ и вызывает <code>/system/vendor/quasar/device_ota_update.sh</code>;</li>
+<li>тот вызывает <code>/usr/bin/apply_packed_ota</code>: образ переезжает в
+   <code>/bkupgrade/ota/yandex_io_ota.swu</code>, ставится <code>fw_setenv boot_to_recovery 1</code>, перезагрузка;</li>
+<li>загрузчик (<code>yandex_io_check_recovery</code>) уходит в recovery, а тот прошивает образ.</li>
+</ol>
+<p><code>onboot.sh</code> при каждой загрузке чистит <code>/bkupgrade/ota/*</code> и <code>/bkupgrade/update_*</code>.
+<a href="../../start/ssh/#kill-ota"><code>yandex-noupdate.sh</code></a> закрывает первые два звена. Чтобы закрыть и
+третье, заглушают <code>apply_packed_ota</code> и следят, чтобы <code>boot_to_recovery</code> оставался <code>0</code>
+(<code>fw_printenv -n boot_to_recovery</code>).</p>
+<h2 id="todo">Что ещё проверить<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Протокол Gowin LED по SPI, порядок цветовых каналов и назначение индекса 88;
+  подробности — в разделе <a href="#led">Индикация</a>.</li>
+<li>Marvell/NXP Wi-Fi (<code>mlan</code>/<code>moal</code>) — чип и возможности (monitor/AP).</li>
+<li>Карта регистров TLV320ADC3101 (опорный сигнал усилителя).</li>
+<li>USB-C PD-профили (<code>husb238</code>).</li>
+</ul>
+<p><em>Данные для этой страницы собрал <strong>@sharazhniy</strong> — спасибо за вклад.</em></p>
+
+  
+  
+  <aside class="yse-suggest" data-yse-path="docs/devices/station-2.md" data-yse-title="Станция 2" data-yse-edit-url="../../edit/" aria-label="Правка страницы">
+    <div class="yse-suggest__text">
+      <p class="yse-suggest__title">Нашли ошибку или хотите дополнить?</p>
+      <p class="yse-suggest__hint">Правка займёт пару минут. Нужен только вход через GitHub, git знать не нужно. Можно выделить фрагмент текста и нажать «Предложить правку».</p>
+    </div>
+    <div class="yse-suggest__actions">
+      <a class="md-button md-button--primary" href="../../edit/?path=docs/devices/station-2.md" data-yse-edit>Править эту страницу</a>
+      <a class="md-button" href="../../edit/?new=1&amp;dir=devices" data-yse-edit>Новая страница</a>
+      <a class="yse-suggest__report" href="#" data-yse-report>Только сообщить об ошибке</a>
+    </div>
+  </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  К началу
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Нижний колонтитул" >
+        
+          
+          <a href="../station-midi/" class="md-footer__link md-footer__link--prev" aria-label="Назад: Станция Миди (Cucumber)">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Назад
+              </span>
+              <div class="md-ellipsis">
+                Станция Миди (Cucumber)
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../station-street/" class="md-footer__link md-footer__link--next" aria-label="Вперед: Станция Стрит (Mango)">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Вперед
+              </span>
+              <div class="md-ellipsis">
+                Станция Стрит (Mango)
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      ©2026 YSE contributors. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://t.me/hackalice" target="_blank" rel="noopener" title="Чат в Telegram" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M256 8a248 248 0 1 0 0 496 248 248 0 1 0 0-496m115 168.7c-3.7 39.2-19.9 134.4-28.1 178.3-3.5 18.6-10.3 24.8-16.9 25.4-14.4 1.3-25.3-9.5-39.3-18.7-21.8-14.3-34.2-23.2-55.3-37.2-24.5-16.1-8.6-25 5.3-39.5 3.7-3.8 67.1-61.5 68.3-66.7.2-.7.3-3.1-1.2-4.4s-3.6-.8-5.1-.5c-2.2.5-37.1 23.5-104.6 69.1-9.9 6.8-18.9 10.1-26.9 9.9-8.9-.2-25.9-5-38.6-9.1-15.5-5-27.9-7.7-26.8-16.3.6-4.5 6.7-9 18.4-13.7 72.3-31.5 120.5-52.3 144.6-62.3 68.9-28.6 83.2-33.6 92.5-33.8 2.1 0 6.6.5 9.6 2.9 2 1.7 3.2 4.1 3.5 6.7.5 3.2.6 6.5.4 9.8z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/Marker284/yandex-station-extended" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/toc-tabs.js"></script>
+      
+        <script src="../../javascripts/editor-entry.js"></script>
+      
+    
+  </body>
+</html>

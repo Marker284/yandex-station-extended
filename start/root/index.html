@@ -1,0 +1,3809 @@
+
+<!doctype html>
+<html lang="ru" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Community-вики по модификации и исследованию умных колонок Яндекс (семейство Станций) — доступ, прошивка quasar, железо, рецепты">
+      
+      
+        <meta name="author" content="Yandex Station Extended community">
+      
+      
+        <link rel="canonical" href="https://hackalice.me/start/root/">
+      
+      
+        <link rel="prev" href="../adb/">
+      
+      
+        <link rel="next" href="../retail-ca/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Большинство моделей — подмена DNS - Yandex Station Extended</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/editor-entry.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  
+  
+    <meta name="yse-editor-api" content="https://yse-wiki-editor.push-to-claude-worker.workers.dev">
+    <meta name="yse-editor-repo" content="Marker284/yandex-station-extended">
+    <meta name="yse-editor-url" content="../../edit/">
+  
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-root-dns" class="md-skip">
+          Перейти к содержанию
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
+    <a href="../.." title="Yandex Station Extended" class="md-header__button md-logo" aria-label="Yandex Station Extended" data-md-component="logo">
+      
+  <img src="../../assets/images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yandex Station Extended
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Большинство моделей — подмена DNS
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Светлая тема"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Светлая тема" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Тёмная тема"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Тёмная тема" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Поиск" placeholder="Поиск" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Поиск">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Поделиться" aria-label="Поделиться" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Очистить" aria-label="Очистить" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Инициализация поиска
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Marker284/yandex-station-extended" title="Перейти к репозиторию" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Marker284/yandex-station-extended
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Yandex Station Extended" class="md-nav__button md-logo" aria-label="Yandex Station Extended" data-md-component="logo">
+      
+  <img src="../../assets/images/logo.png" alt="logo">
+
+    </a>
+    Yandex Station Extended
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Marker284/yandex-station-extended" title="Перейти к репозиторию" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Marker284/yandex-station-extended
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Главная
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Начало работы
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Начало работы
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Установка ADB на компьютер
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Получение root
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1. Получение root
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Большинство моделей — подмена DNS
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Большинство моделей — подмена DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что понадобится
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-unlock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Инструкция
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Инструкция">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Сбросьте колонку к заводским настройкам
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-wi-fi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Начните привязку в приложении — и остановитесь на Wi-Fi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-dns-179254167126" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Включите DNS 179.254.167.126 на роутере
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-wi-fi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Подключите колонку к Wi-Fi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-adb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Зайдите по ADB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Сразу переходите к шагу 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restore-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Верните обычный DNS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Подготовьте ПК
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Выберите прошивку
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Запустите сервер обновлений
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Включите DNS на роутере
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Привяжите колонку в приложении
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-adb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Проверьте ADB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Сразу закройте доступ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Совместимость варианта 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Если не получилось
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Совместимость
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как это работает
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retail-ca/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Лайт 2 (Plum) — сертификат из factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retail-ca-mini3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Мини 3 (Bergamot) — сертификат и маркеры
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-android/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станции на Android — AliceBridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adb-max/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс — доступ через ADB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-mini1-usb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Мини 1 (2019) — ADB по USB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-jbl-link-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JBL Link Music — ADB по USB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ssh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. SSH и обновления
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Пакеты yse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Если что-то сломалось
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../recipes/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Рецепты
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Рецепты
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/usb-host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    USB Host (OTG)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/airplay/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirPlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/bt-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Плееры как Bluetooth (bt-proxy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spotify Connect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-soundcloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoundCloud голосом (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/youtube-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YouTube Music
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/sounds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Свои звуки
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/microphone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Обработанный микрофон
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/fastfetch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fastfetch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/led/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Подсветка
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/packagemanagers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAM и BetterYAM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/home-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Голосовой спутник Home Assistant
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Своя LLM вместо Алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/standalone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Колонка без Яндекса
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-disable-updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Отключение обновлений (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-privacy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ограничить метрики (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-tv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ТВ-набор (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/station1-debian/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debian (Станция 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/upravlenie-golosom-alisy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Управление голосом алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Бэкенд
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Бэкенд
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/bekend-self-hosted/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Бэкенд (Self-hosted)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/v3rt3p/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v3rt3p
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/quasard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    quasard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../devices/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Устройства
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Устройства
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-lite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Лайт (Micro)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/fiero-hi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiero Hi (партнёрская Лайт)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-lite2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Лайт 2 (Plum)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 3 (Bergamot)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini3-pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 3 Про (Pickle)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 3 (Orion)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-mini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Мини (1 пок)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-midi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Миди (Cucumber)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-street/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Стрит (Mango)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-max/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-max-zigbee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция Макс с Zigbee
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/station-gen1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Станция (1 поколения)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/yandex-hub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Умный хаб (Saturn)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devices/jbl-link-music/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JBL Link Music
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Как это устроено
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Как это устроено
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Архитектура прошивки
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Сеть и порты
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Звонки Алисы (порт 5081)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/voice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Голосовой тракт Алисы
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/telemetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Телеметрия
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/zigbee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zigbee на Миди с quasard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Директивы и capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/gotchas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Подводные камни
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/toolchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Сборка софта
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Словарь
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Как дополнять вики
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Участники
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Содержание">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Содержание
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Что понадобится
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-unlock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Инструкция
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Инструкция">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Сбросьте колонку к заводским настройкам
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-wi-fi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Начните привязку в приложении — и остановитесь на Wi-Fi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-dns-179254167126" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Включите DNS 179.254.167.126 на роутере
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-wi-fi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Подключите колонку к Wi-Fi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-adb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Зайдите по ADB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Сразу переходите к шагу 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restore-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Верните обычный DNS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Подготовьте ПК
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Выберите прошивку
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Запустите сервер обновлений
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Включите DNS на роутере
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Привяжите колонку в приложении
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-adb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Проверьте ADB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Сразу закройте доступ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Совместимость варианта 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Если не получилось
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Совместимость
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Как это работает
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+
+  
+    
+      <a href="../../edit/?path=docs/start/root.md" title="Править эту страницу" class="md-content__button md-icon" rel="edit" data-yse-edit>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+      </a>
+    
+  
+  
+    
+      
+    
+    <a href="https://github.com/Marker284/yandex-station-extended/raw/main/docs/start/root.md" title="Посмотреть исходный код страницы" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="1-root-dns">Шаг 1. Root по сети: подмена DNS<a class="headerlink" href="#1-root-dns" title="Permanent link">&para;</a></h1>
+<p>Сетевой ADB с правами <code>root</code> — без разборки корпуса, пайки и программатора, примерно
+за пятнадцать минут. Способ подходит Мини, Мини 2, Мини 3, Миди, Станции 2, Станции 3,
+Стрит, Умному хабу и Лайт первого поколения. В вики и в чате его называют коротко —
+DNS-метод.</p>
+<p>После этого шага переходите к <a href="../ssh/">шагу 2</a>: SSH и отключение обновлений. Без него
+Яндекс может прислать обновление и закрыть доступ.</p>
+<h2 id="_1">Что понадобится<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>роутер, в котором можно поменять DNS (Keenetic, OpenWrt, MikroTik, Asus…), <strong>или</strong> второй
+  Android-смартфон, раздающий Wi-Fi;</li>
+<li>компьютер в той же сети с утилитой <code>adb</code>, инструкция по установке —
+  <a href="../adb/">как поставить</a>;</li>
+<li>смартфон с приложением «Дом с Алисой» (или «Яндекс»);</li>
+<li>колонка и её блок питания.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Сброс к заводским настройкам очищает раздел /data</p>
+<p>Пользовательские настройки и всё, что вы туда ставили, пропадут, а колонку придётся
+заново привязать к аккаунту.</p>
+</div>
+<h2 id="dns-unlock">Инструкция<a class="headerlink" href="#dns-unlock" title="Permanent link">&para;</a></h2>
+<p>Выберите способ — оба дают сетевой ADB с root:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Вариант 1. Сервер 179.254.167.126</label><label for="__tabbed_1_2">Вариант 2. Свой сервер обновлений на компьютере</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<h3 id="1">1. Сбросьте колонку к заводским настройкам<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
+<p>Кнопка и порядок зависят от модели — выберите свою.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:5"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Лайт (1-го поколения)</label><label for="__tabbed_2_2">Мини 2, Мини 3, Стрит</label><label for="__tabbed_2_3">Лайт 2 (Plum)</label><label for="__tabbed_2_4">Мини 3 Про</label><label for="__tabbed_2_5">Миди, Станция 2</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>Отключите кабель питания, подождите несколько секунд и вставьте обратно.</li>
+<li><strong>Сразу после этого</strong> зажмите кнопку паузы (▶‖) и держите 6–10 секунд, пока
+   подсветка не станет жёлто-зелёной. Если зажать кнопку до подачи питания,
+   сброса не будет.</li>
+<li>Отпустите кнопку: подсветка пульсирует голубым, колонка ждёт настройки.</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>Отключите кабель питания.</li>
+<li>Зажмите кнопку отключения микрофона или паузы.</li>
+<li>Не отпуская кнопку, вставьте кабель.</li>
+<li>Держите 10–15 секунд, пока подсветка не замигает и Алиса не скажет
+   о начале сброса.</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<p>Только для сборок до 21 октября 2026 года.</p>
+<ol>
+<li>Отключите кабель питания.</li>
+<li>Зажмите кнопку отключения микрофона и, не отпуская её, подключите питание.</li>
+<li>Держите кнопку 10–15 секунд, пока подсветка не замигает и Алиса не скажет
+   о начале сброса.</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>Отвяжите колонку от аккаунта в приложении и отключите кабель питания.</li>
+<li>Зажмите кнопку отключения микрофона и не отпускайте.</li>
+<li>Подключите питание: подсветка замигает жёлтым, кнопку всё ещё держите.</li>
+<li>Когда жёлтый погаснет, отпустите кнопку.</li>
+</ol>
+<p>Проверено на заводской <code>factory-12</code>, см.
+<a href="../../devices/station-mini3-pro/#factory-12">страницу модели</a>.</p>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>Отключите питание.</li>
+<li>Зажмите центральную сенсорную кнопку или кнопку микрофона сзади
+   и подключите питание.</li>
+<li>Дождитесь звукового сигнала и сообщения о начале сброса.</li>
+</ol>
+</div>
+</div>
+</div>
+<p>Через 1–2 минуты колонка предложит настроить её через приложение.</p>
+<h3 id="2-wi-fi">2. Начните привязку в приложении — и остановитесь на Wi-Fi<a class="headerlink" href="#2-wi-fi" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Включите на смартфоне Bluetooth и геолокацию.</li>
+<li>«Дом с Алисой» → <strong>«+»</strong> → <strong>«Устройство с Алисой»</strong>.</li>
+<li>Дойдите до экрана <strong>«Выберите сеть Wi-Fi и введите пароль»</strong>.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Нажатие кнопки подключения до смены DNS приведёт к ошибке</p>
+<p>Не нажимайте «Подключиться» до выполнения шага 3: приложение не сможет связать
+колонку с аккаунтом, и настройку придётся начинать заново.</p>
+</div>
+<h3 id="3-dns-179254167126">3. Включите DNS <code>179.254.167.126</code> на роутере<a class="headerlink" href="#3-dns-179254167126" title="Permanent link">&para;</a></h3>
+<p>Колонка должна получить DNS <code>179.254.167.126</code>. Выберите свой роутер:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:5"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><input id="__tabbed_3_4" name="__tabbed_3" type="radio" /><input id="__tabbed_3_5" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Keenetic</label><label for="__tabbed_3_2">TP-Link</label><label for="__tabbed_3_3">OpenWrt</label><label for="__tabbed_3_4">Другой роутер</label><label for="__tabbed_3_5">Раздача с Android</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><strong>Веб-интерфейс:</strong> «Сетевые правила» → «Домашняя сеть» → «Параметры IP и DHCP» →
+<strong>DNS 1</strong> = <code>179.254.167.126</code>, поле <strong>DNS 2</strong> очистите → «Сохранить».</p>
+<p><strong>Или CLI</strong> — подменяет только нужный домен, остальная сеть не затронута:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ip host quasar.yandex.net 179.254.167.126
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>system configuration save
+</span></code></pre></div>
+<p>Откат после шага 2 — верните прежние DNS в веб-интерфейсе или выполните
+<code>no ip host quasar.yandex.net</code> и <code>system configuration save</code>.</p>
+</div>
+<div class="tabbed-block">
+<p><strong>Веб-интерфейс:</strong> «Дополнительные настройки» → «Сеть» → «DHCP-сервер» →
+<strong>Предпочитаемый DNS-сервер</strong> = <code>179.254.167.126</code>, поле <strong>Альтернативный DNS-сервер</strong>
+очистите → «Сохранить». В старом (зелёном) интерфейсе те же поля обычно лежат в
+разделе «DHCP» → «Настройки DHCP».</p>
+<p>Откат после шага 2 — верните прежние значения (обычно поля оставляют пустыми).</p>
+</div>
+<div class="tabbed-block">
+<p>Команды выполняются по SSH на роутере. Выберите <strong>один</strong> способ:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Только домены активации</label><label for="__tabbed_4_2">Все DNS-запросы (DNAT)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Пересылка в dnsmasq только для трёх доменов. Остальные запросы обслуживаются
+как обычно, в том числе через Podkop:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uci<span class="w"> </span>add_list<span class="w"> </span>dhcp.@dnsmasq<span class="o">[</span><span class="m">0</span><span class="o">]</span>.server<span class="o">=</span><span class="s1">'/quasar.yandex.net/179.254.167.126'</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uci<span class="w"> </span>add_list<span class="w"> </span>dhcp.@dnsmasq<span class="o">[</span><span class="m">0</span><span class="o">]</span>.server<span class="o">=</span><span class="s1">'/quasar.yandex.ru/179.254.167.126'</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>uci<span class="w"> </span>add_list<span class="w"> </span>dhcp.@dnsmasq<span class="o">[</span><span class="m">0</span><span class="o">]</span>.server<span class="o">=</span><span class="s1">'/scbh.yandex.net/179.254.167.126'</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>uci<span class="w"> </span>commit<span class="w"> </span>dhcp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>/etc/init.d/dnsmasq<span class="w"> </span>reload
+</span></code></pre></div>
+<p>Правила действуют для этих доменов и их поддоменов у всех клиентов dnsmasq,
+а не только у колонки. Запросы клиентов напрямую к другим DNS-серверам этот
+способ не перехватывает.</p>
+<p>Проверено на OpenWrt 24.10.5 с Podkop: Мини 2, прошивка
+<code>0.369.1.46.4793643989.20261020.299</code>, и Миди, прошивка
+<code>0.369.1.46.4778262955.20261013.160</code>.</p>
+<p><a id="rollback-openwrt-domains"></a></p>
+<p><strong>Откат после шага 2</strong> — удалите только добавленные записи:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>uci<span class="w"> </span>-q<span class="w"> </span>del_list<span class="w"> </span>dhcp.@dnsmasq<span class="o">[</span><span class="m">0</span><span class="o">]</span>.server<span class="o">=</span><span class="s1">'/quasar.yandex.net/179.254.167.126'</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uci<span class="w"> </span>-q<span class="w"> </span>del_list<span class="w"> </span>dhcp.@dnsmasq<span class="o">[</span><span class="m">0</span><span class="o">]</span>.server<span class="o">=</span><span class="s1">'/quasar.yandex.ru/179.254.167.126'</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>uci<span class="w"> </span>-q<span class="w"> </span>del_list<span class="w"> </span>dhcp.@dnsmasq<span class="o">[</span><span class="m">0</span><span class="o">]</span>.server<span class="o">=</span><span class="s1">'/scbh.yandex.net/179.254.167.126'</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>uci<span class="w"> </span>commit<span class="w"> </span>dhcp<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>/etc/init.d/dnsmasq<span class="w"> </span>reload
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="admonition warning">
+<p class="admonition-title">Правило перехватывает DNS всей локальной сети</p>
+<p>Podkop и другие настройки DNS после него могут перестать работать. Если в
+сети такое есть, используйте пересылку только доменов активации, а перед
+переходом на неё удалите правило <code>Quasar-Unlock</code> по инструкции отката ниже.</p>
+</div>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uci<span class="w"> </span>add<span class="w"> </span>firewall<span class="w"> </span>redirect
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.name<span class="o">=</span><span class="s1">'Quasar-Unlock'</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.src<span class="o">=</span><span class="s1">'lan'</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.proto<span class="o">=</span><span class="s1">'tcp udp'</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.src_dport<span class="o">=</span><span class="s1">'53'</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.dest_ip<span class="o">=</span><span class="s1">'179.254.167.126'</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.dest_port<span class="o">=</span><span class="s1">'53'</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>uci<span class="w"> </span><span class="nb">set</span><span class="w"> </span>firewall.@redirect<span class="o">[</span>-1<span class="o">]</span>.target<span class="o">=</span><span class="s1">'DNAT'</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>uci<span class="w"> </span>commit<span class="w"> </span>firewall<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>/etc/init.d/firewall<span class="w"> </span>reload
+</span></code></pre></div>
+<p><a id="rollback-openwrt-dnat"></a></p>
+<p><strong>Откат после шага 2</strong> — удалите все правила <code>Quasar-Unlock</code>, даже если правило
+добавляли несколько раз. Цикл проверен через <code>sh -n</code>, на роутере отдельно
+не выполнялся:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">while</span><span class="w"> </span>:<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nv">section</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">        </span>uci<span class="w"> </span>show<span class="w"> </span>firewall<span class="w"> </span><span class="p">|</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">            </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">"s/^\(firewall\.[^.]*\)\.name='Quasar-Unlock'</span>$<span class="s2">/\1/p"</span><span class="w"> </span><span class="p">|</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">            </span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="k">)</span><span class="s2">"</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="o">[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">"</span><span class="nv">$section</span><span class="s2">"</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">break</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span>uci<span class="w"> </span>delete<span class="w"> </span><span class="s2">"</span><span class="nv">$section</span><span class="s2">"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">break</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="k">done</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>uci<span class="w"> </span>commit<span class="w"> </span>firewall<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>/etc/init.d/firewall<span class="w"> </span>reload
+</span></code></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="tabbed-block">
+<p>В настройках локальной сети найдите DNS-серверы, которые роутер раздаёт по DHCP:
+<strong>DNS 1</strong> = <code>179.254.167.126</code>, <strong>DNS 2</strong> — пусто. Обычно это раздел
+«Локальная сеть» / «LAN» → «DHCP-сервер» (Asus и другие).</p>
+<p>Если DNS там задаётся только для подключения к провайдеру (WAN), это не подойдёт:
+используйте раздачу с Android.</p>
+<p>Откат после шага 2 — верните прежние значения (обычно поле оставляют пустым или
+ставят IP роутера).</p>
+</div>
+<div class="tabbed-block">
+<p>Если роутер не даёт менять DNS:</p>
+<ol>
+<li>Раздайте Wi-Fi с одного телефона.</li>
+<li>На раздающем телефоне поставьте <strong>DNS Changer</strong> и задайте <code>179.254.167.126</code>.</li>
+<li>Привязывайте колонку с <strong>другого</strong> телефона к этой точке доступа.</li>
+</ol>
+</div>
+</div>
+</div>
+<h3 id="4-wi-fi">4. Подключите колонку к Wi-Fi<a class="headerlink" href="#4-wi-fi" title="Permanent link">&para;</a></h3>
+<p>Вернитесь в приложение и нажмите <strong>«Подключиться»</strong>. Колонка подключится к сети,
+сходит на сервер разблокировки, помигает и издаст звук готовности.</p>
+<h3 id="5-adb">5. Зайдите по ADB<a class="headerlink" href="#5-adb" title="Permanent link">&para;</a></h3>
+<p>IP колонки посмотрите в списке клиентов роутера.</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>adb<span class="w"> </span>connect<span class="w"> </span><span class="m">192</span>.168.1.120:5555<span class="w">      </span><span class="c1"># IP вашей колонки</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>adb<span class="w"> </span>devices<span class="w">          </span><span class="c1"># должно быть: 192.168.1.120:5555    device</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>adb<span class="w"> </span>shell<span class="w">            </span><span class="c1"># приглашение «#» — это root</span>
+</span></code></pre></div>
+<h3 id="6-2">6. Сразу переходите к шагу 2<a class="headerlink" href="#6-2" title="Permanent link">&para;</a></h3>
+<p>👉 <strong><a href="../ssh/">SSH и отключение обновлений</a></strong> — сделайте это до того, как вернёте DNS.</p>
+<h3 id="restore-dns">7. Верните обычный DNS<a class="headerlink" href="#restore-dns" title="Permanent link">&para;</a></h3>
+<p>После шага 2 уберите <code>179.254.167.126</code> из настроек роутера — команды отката есть на
+вкладке вашего роутера в шаге 3. Доступ сохранится.</p>
+<div class="admonition warning">
+<p class="admonition-title">Мини 2: ADB выключается после первой синхронизации с облаком</p>
+<p>На Мини 2 (<code>0.369.1.46…299</code>) Quasar выключает ADB, как только получает настройки
+от настоящего <code>quasar.yandex.net</code>: в <code>/data/quasar/quasar_adb.log</code> появляется
+<code>Deactivate adb by quasmodrom config</code>, порт <code>5555</code> закрывается. Маркеры в
+<code>/data/quasar/</code> это не спасает. SSH из <a href="../ssh/">шага 2</a> работает дальше, поэтому
+сделайте шаг 2 до возврата DNS. ADB включается снова по SSH:
+<code>/system/vendor/quasar/activate_adb.sh --quasmodrom --network activate</code> — до
+следующей синхронизации, а Quasar делает её при каждом старте.</p>
+</div>
+<ul>
+<li>OpenWrt: <a href="#rollback-openwrt-domains">только домены активации</a> или
+  <a href="#rollback-openwrt-dnat">DNAT</a>.</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><a id="local-stand"></a></p>
+<p>Альтернатива серверу <code>179.254.167.126</code>: DNS и HTTPS поднимаются на вашем компьютере
+(Windows, Linux или macOS), и колонка получает <strong>настоящий ответ Яндекса</strong>, в который
+добавлено <code>adbd.remoteActivation</code>. Никаких внешних сервисов — только свой ПК и роутер
+со сменным DNS.</p>
+<p><strong>Чем отличается от варианта 1:</strong> первый вариант обращается к внешнему серверу разблокировки.
+Второй — полностью локальный: вы видите запросы колонки, можете обновлять прошивку и
+включать ADB повторно после сброса. Подходит для тех, кто не хочет зависеть от чужого сервера.</p>
+<h3 id="1_1">1. Подготовьте ПК<a class="headerlink" href="#1_1" title="Permanent link">&para;</a></h3>
+<p>Сервер и скрипты запуска для всех трёх систем лежат в
+<a href="https://github.com/krevetkqqq/lite-kit">репозитории lite-kit</a>, там же установщик
+прошивок. Порты 53 (UDP и TCP), 80 и 443 на компьютере должны быть свободны.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Windows 10/11</label><label for="__tabbed_5_2">Linux</label><label for="__tabbed_5_3">macOS</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>Установите <a href="https://www.python.org/downloads/">Python 3.8 или новее</a>,
+   отметив галочку <strong>Add python.exe to PATH</strong>.</li>
+<li>
+<p>Склонируйте репозиторий:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">krevetkqqq</span><span class="p">/</span><span class="n">lite-kit</span> <span class="n">C</span><span class="p">:\</span><span class="n">lite-kit</span>
+</span></code></pre></div>
+<p>Без git — скачайте
+<a href="https://github.com/krevetkqqq/lite-kit/archive/refs/heads/main.zip">ZIP-архив</a>
+и распакуйте в <code>C:\lite-kit</code>.</p>
+</li>
+<li>
+<p>Освободите порт 53: его иногда занимает служба «Общий доступ к подключению
+   к Интернету».</p>
+</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>
+<p>Поставьте зависимости и склонируйте репозиторий:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>dnsmasq<span class="w"> </span>python3<span class="w"> </span>openssl<span class="w"> </span>dnsutils
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/krevetkqqq/lite-kit<span class="w"> </span>~/lite-kit
+</span></code></pre></div>
+</li>
+<li>
+<p>Освободите порт 53: его обычно занимают <code>systemd-resolved</code> или <code>avahi</code>.</p>
+</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>
+<p>Поставьте зависимости и склонируйте репозиторий:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>brew<span class="w"> </span>install<span class="w"> </span>dnsmasq
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/krevetkqqq/lite-kit<span class="w"> </span>~/lite-kit
+</span></code></pre></div>
+</li>
+<li>
+<p>Убедитесь, что порт 53 свободен.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<h3 id="2">2. Выберите прошивку<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<p>Сервер умеет раздавать колонке нужную сборку: если в <code>firmware/</code> лежит <code>.zip</code>,
+а версия колонки отличается — он сам предложит обновление.</p>
+<p>Если на колонке уже стоит нужная версия (или файл прошивки уже лежит
+в <code>firmware/</code>), ничего выбирать не нужно — переходите к запуску сервера обновлений.</p>
+<p><strong>Рекомендуемые версии прошивок</strong> — для моделей из
+<a href="#compat-local">таблицы совместимости</a> ниже; на остальных вариант 2 не проверялся:</p>
+<table>
+<thead>
+<tr>
+<th>Модель</th>
+<th>Версия</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Лайт 1 (<code>yandexmicro</code>)</td>
+<td><code>0.369.1.46.4778262442.20261013.297</code> (сборка от 13.10.2026)</td>
+</tr>
+<tr>
+<td>Мини 1 (<code>yandexmini</code>)</td>
+<td>сборка 2025 года: <code>1.305.4.16.3237824040.20250721</code></td>
+</tr>
+<tr>
+<td>Мини 2 (<code>yandexmini_2</code>)</td>
+<td><code>0.369.1.46.4778262943.20261013.299</code> (сборка от 13.10.2026)</td>
+</tr>
+<tr>
+<td>Мини 3, Лайт 2, Миди, Станция 2 и остальные</td>
+<td>желательно <strong>последняя сборка до обновления 20–21 октября 2026</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Более новые сборки сертификат не принимают — ADB через <code>get_sync_info</code>
+на них не поднимется.</p>
+<div class="admonition tip">
+<p class="admonition-title">Мини 2 на сборках после 21 октября 2026 года</p>
+<p>Сборка <code>0.372.1.13.4794674157.20261021.302</code> своему серверу не доверяет: на <code>443</code>
+колонка обрывает TLS алертом <code>unknown_ca</code> (48), до <code>get_sync_info</code> дело не доходит.
+В логе сервера этого не видно, только в <code>tcpdump</code> на его интерфейсе. Сброс возвращает
+factory-образ <code>0.17.1.32.1145264292.20211203.factory-3</code>, а он серверу доверяет: дальше
+как у Лайт 1 ниже, сервер отдаёт <code>.46</code> из <code>firmware/yandexmini_2/</code>. Проверено на Мини 2
+(YNDX-00020): откат на <code>0.369.1.46.4778262943.20261013.299</code>, ADB с root, затем
+<a href="../ssh/">шаг 2</a>.</p>
+</div>
+<p>Лайт 1 со сборкой <code>0.369.1.50…</code> тоже открывается, но прошивка откатится на <code>.46</code>:
+сервер сам отдаст её колонке во время настройки. Это несколько лишних минут и
+работает только здесь, на своём сервере обновлений.</p>
+<details class="note">
+<summary>Почему на этой сборке нужен именно свой сервер</summary>
+<p>Сброс грузит factory-образ из раздела <code>recovery</code>
+(<code>0.5.1.20.1624028365.20230208.factory-4</code>), и он серверу обновлений доверяет. После
+<code>POST /register</code> factory-образ не запрашивает <code>get_sync_info</code>, а ждёт обновления:
+сервер отдаёт ему <code>.46</code> из <code>firmware/</code>, колонка скачивает 67 МБ, ставит прошивку и
+через несколько минут перезагружается. Уже сборка <code>.46</code> запрашивает <code>get_sync_info</code>
+и включает ADB с root.</p>
+<p>Поэтому сервер, который на <code>check_updates</code> отвечает только <code>{"hasUpdate":false}</code>,
+здесь не годится: factory-образ так и останется ждать обновления.</p>
+<p>Проверено на Лайт 1 с <code>0.369.1.50…</code>: откат на
+<code>0.369.1.46.4778262442.20261013.297</code>, ADB с root, дальше <a href="../ssh/">шаг 2</a>. Отдаёт ли
+прошивку для отката сервер <code>179.254.167.126</code> из варианта 1, не проверялось.</p>
+</details>
+<div class="admonition warning">
+<p class="admonition-title">Дождитесь завершения скачивания и установки</p>
+<p>После начала скачивания (в логе <code>[OTA] отдано …</code>) не выдёргивайте питание: скачивание
+67 МБ, установка и перезагрузка занимают несколько минут. Признак завершения —
+<code>[SYNC-REAL→] … adbd=on</code> в логе. Если прервать, factory-образ в <code>recovery</code> цел,
+но процесс придётся начать заново.</p>
+</div>
+<p>Скачать и положить в <code>firmware/&lt;версия&gt;.zip</code> можно установщиком:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Windows</label><label for="__tabbed_6_2">Linux и macOS</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">.\</span><span class="nb">install-firmware</span><span class="p">.</span><span class="n">ps1</span>                 <span class="c"># меню: платформа -&gt; версия (по цифрам)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="p">.\</span><span class="nb">install-firmware</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-List</span>           <span class="c"># только список платформ</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">.\</span><span class="nb">install-firmware</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-Platform</span> <span class="n">yandexmicro</span> <span class="n">-Version</span> <span class="n">0</span><span class="p">.</span><span class="n">369</span><span class="p">.</span><span class="n">1</span><span class="p">.</span><span class="n">46</span><span class="p">.</span><span class="n">4778262442</span><span class="p">.</span><span class="n">20261013</span><span class="p">.</span><span class="n">297</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>./install-firmware.sh
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Уже проверенные версии в меню помечены <code>&lt;-- проверено (ADB работает)</code>.</p>
+<h3 id="3">3. Запустите сервер обновлений<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Windows</label><label for="__tabbed_7_2">Linux и macOS</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">lite-kit</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="p">.\</span><span class="n">start</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># сам запросит права администратора</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nb">cd</span><span class="w"> </span>~/lite-kit
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>sudo<span class="w"> </span>./start.sh
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Скрипт напечатает <strong>IP этого ПК</strong> и проверит DNS. В логе (<code>log\server.log</code>,
+<code>log\yandex.log</code>, <code>log\local.log</code>, <code>log\dns.log</code>) видно каждый запрос колонки.</p>
+<h3 id="4-dns">4. Включите DNS на роутере<a class="headerlink" href="#4-dns" title="Permanent link">&para;</a></h3>
+<p>DNS 1 = <strong>IP компьютера с сервером обновлений</strong>, DNS 2 — пусто. Способы те же, что в
+<a href="#dns-unlock">варианте 1</a> (вкладки шага 3), только вместо <code>179.254.167.126</code> — IP
+компьютера.</p>
+<p>Проверка с ПК:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>nslookup<span class="w"> </span>quasar.yandex.net<span class="w"> </span>&lt;IP-роутера&gt;<span class="w">   </span><span class="c1"># должен вернуть IP компьютера</span>
+</span></code></pre></div>
+<h3 id="5">5. Привяжите колонку в приложении<a class="headerlink" href="#5" title="Permanent link">&para;</a></h3>
+<p>Действия те же, что в варианте 1: сброс → «Дом с Алисой» → «+» → «Устройство с Алисой»
+→ дойти до выбора Wi-Fi. <strong>DNS включайте только на экране выбора сети</strong> — иначе
+приложение не сможет привязать колонку.</p>
+<p><strong>Особенность при настройке через телефон:</strong>
+если телефон подключён к той же Wi-Fi-сети, что и колонка, запросы приложения к
+<code>quasar.yandex.net</code> тоже уходят на сервер обновлений. Приложение не принимает его
+сертификат (в логе сервера каждые пару секунд появляется ошибка <code>alert certificate unknown</code>),
+и настройка срывается — например, с сообщением «Не получилось подключить колонку по Bluetooth».
+Выключите на телефоне Wi-Fi, оставьте мобильный интернет и Bluetooth, а сеть и пароль
+для колонки введите вручную. Тогда DNS можно включить и до сброса. Проверено на iPhone с Лайт 1.</p>
+<details class="example">
+<summary>Скриншоты: весь путь до экрана Wi-Fi (10 шагов)</summary>
+<p><div class="shots">
+  <img src="../../assets/images/root-local/01.jpeg" alt="Мой дом → плюс">
+  <img src="../../assets/images/root-local/02.jpeg" alt="Добавить → Устройство с Алисой">
+  <img src="../../assets/images/root-local/03.jpeg" alt="Выбор модели: Лайт">
+  <img src="../../assets/images/root-local/04.jpeg" alt="Выбор дома → Выбрать">
+  <img src="../../assets/images/root-local/05.jpeg" alt="Проверка мигания → Станция мигает">
+  <img src="../../assets/images/root-local/06.jpeg" alt="Адрес → Напишу адрес потом">
+  <img src="../../assets/images/root-local/07.jpeg" alt="Bluetooth не сработал → Подключить иначе">
+  <img src="../../assets/images/root-local/08.jpeg" alt="Колонка не найдена → Станция мигает">
+  <img src="../../assets/images/root-local/09.jpeg" alt="Экран Wi-Fi: здесь включаем DNS">
+  <img src="../../assets/images/root-local/10.jpeg" alt="Поднесите телефон → Прогнать звук">
+</div></p>
+<p><style>
+.shots {
+  display: flex;
+  gap: .6rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: .4rem;
+}
+.shots img {
+  flex: 0 0 auto;
+  width: min(78vw, 320px);
+  border-radius: 12px;
+  scroll-snap-align: center;
+  box-shadow: 0 6px 22px rgba(0,0,0,.35);
+}
+.shots img:target { outline: 2px solid var(--md-accent-fg-color); }
+</style></p>
+</details>
+<p>Листайте вправо — это десять последовательных экранов приложения, девятый и есть
+момент, когда нужно включить DNS.</p>
+<p>После «Подключиться» колонка сходит на ваш ПК, получит конфиг с <code>adbd</code> и откроет порт.</p>
+<h3 id="6-adb">6. Проверьте ADB<a class="headerlink" href="#6-adb" title="Permanent link">&para;</a></h3>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>adb<span class="w"> </span>connect<span class="w"> </span>&lt;IP-колонки&gt;:5555
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>adb<span class="w"> </span>shell<span class="w"> </span>id<span class="w">          </span><span class="c1"># uid=0(root)</span>
+</span></code></pre></div>
+<p>Если порт закрыт:</p>
+<p><div class="language-powershell highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">.\</span><span class="n">check</span><span class="p">.</span><span class="n">ps1</span>           <span class="c"># Windows</span>
+</span></code></pre></div>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>./check.sh<span class="w">            </span><span class="c1"># Linux / macOS</span>
+</span></code></pre></div></p>
+<p>В логе сервера обновлений должно быть:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>&gt;&gt;&gt; [SYNC-REAL→] payload …, adbd: config.system_config.adbd=on, …, top.adbd=on
+</span></code></pre></div>
+<h3 id="7">7. Сразу закройте доступ<a class="headerlink" href="#7" title="Permanent link">&para;</a></h3>
+<p>Пока не вернули DNS — переходите к <a href="../ssh/">шагу 2</a>: SSH и отключение обновлений.
+Сервер сам прошивку не навязывает: он отдаёт только ответ Яндекса (плюс <code>adbd</code>),
+а обновления закрываются на <a href="../ssh/">шаге 2</a>.</p>
+<h3 id="2_1">Совместимость варианта 2<a class="headerlink" href="#2_1" title="Permanent link">&para;</a></h3>
+<p>Отдельно от таблицы выше — что реально проверено именно на своём сервере обновлений
+на компьютере:</p>
+<p><a id="compat-local"></a></p>
+<table>
+<thead>
+<tr>
+<th>Модель</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Лайт 1 (<code>yandexmicro</code>, YNDX-00025)</td>
+<td>✅ проверено, в том числе с <code>0.369.1.50…</code> (откат на <code>.46</code>)</td>
+</tr>
+<tr>
+<td>Мини (<code>yandexmini</code>, <code>1.305.4.16.3237824040.20250721</code>)</td>
+<td>✅ проверено</td>
+</tr>
+<tr>
+<td>Мини 2 (<code>yandexmini_2</code>, YNDX-00020)</td>
+<td>✅ проверено, в том числе с <code>0.372.1.13…</code> (откат на <code>.46…299</code>)</td>
+</tr>
+<tr>
+<td>Миди (<code>cucumber</code>, с часами)</td>
+<td>✅ проверено</td>
+</tr>
+<tr>
+<td>Лайт 2, Станция 2, Макс, Дуо Макс, Умный хаб</td>
+<td>❔ не проверялось</td>
+</tr>
+</tbody>
+</table>
+<p>На проверенных моделях после привязки: <code>/get_sync_info</code> отдаёт <code>adbd.remoteActivation=true</code>,
+<code>adb connect &lt;IP&gt;:5555</code> проходит, <code>adb shell id</code> → <code>uid=0(root)</code>.</p>
+</div>
+</div>
+</div>
+<h2 id="_2">Если не получилось<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Симптом</th>
+<th>Что делать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Приложение пишет «Не удалось подключиться к Wi-Fi»</td>
+<td>DNS включили слишком рано. Уберите DNS, сбросьте колонку и пройдите привязку заново, включая DNS только на экране ввода пароля Wi-Fi</td>
+</tr>
+<tr>
+<td>Колонка в сети, но порт 5555 закрыт (<code>Connection refused</code>)</td>
+<td>Отключите на роутере фильтрацию DNS (Яндекс.DNS, AdGuard и другие) и передёрните питание колонки. Проверка с компьютера: <code>nslookup quasar.yandex.net</code> должен вернуть <code>179.254.167.126</code></td>
+</tr>
+<tr>
+<td><code>adb connect</code> пишет <code>unable to connect</code></td>
+<td>Компьютер и колонка должны быть в одной сети, не в гостевой с изоляцией клиентов. Проверьте доступность: <code>ping &lt;IP_колонки&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">Совместимость<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Модель</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Мини 1, Миди, Станция 2, Стрит, Умный хаб</td>
+<td>✅ проверено</td>
+</tr>
+<tr>
+<td>Лайт (1-го поколения), Мини 2</td>
+<td>✅ проверено; сборки после 21.10.2026 — <a href="#local-stand">свой сервер обновлений</a> с откатом на <code>.46</code></td>
+</tr>
+<tr>
+<td>Fiero Hi (партнёрская Лайт, <code>blackthorn</code>)</td>
+<td>✅ проверено на <code>.50</code> — нужен полный заводский сброс (factory-образ шлёт <code>get_sync_info</code>), см. <a href="../../devices/fiero-hi/#root">Fiero Hi</a></td>
+</tr>
+<tr>
+<td>Мини 3 (bergamot)</td>
+<td>✅ до 21.10.2026; на новых сборках — <a href="../retail-ca-mini3/">retail CA и маркеры из factory</a></td>
+</tr>
+<tr>
+<td>Лайт 2 (Plum)</td>
+<td>➡️ основной способ — <a href="../retail-ca/">retail CA из factory</a>; DNS-метод — только сборки до 21.10.2026</td>
+</tr>
+<tr>
+<td>Станция 3 (orion)</td>
+<td>✅ проверено на заводской <code>factory-13</code>; свой сервер обновлений колонка не примет — <a href="../../devices/station-3/#tls">причины в описании TLS</a></td>
+</tr>
+<tr>
+<td>Станция Макс, Станция 1-го поколения</td>
+<td>❌ Android-платформа, способ не работает; для Макса есть <a href="../adb-max/">ADB Max</a>, для Станции 1 — <a href="../root-android/#station-1">AliceBridge</a></td>
+</tr>
+</tbody>
+</table>
+<p>Проверено на Мини 2 (YNDX-00020): стоковая <code>0.372.1.13.4794674157.20261021.302</code> своему
+серверу не доверяет (<code>unknown_ca</code>); после сброса и отката на
+<code>0.369.1.46.4778262943.20261013.299</code> через <a href="#local-stand">свой сервер обновлений</a> работают
+ADB с root и SSH.</p>
+<h2 id="_4">Как это работает<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Сброс возвращает колонку в заводское состояние: <code>/data</code> очищен.</li>
+<li>При первом подключении колонка запрашивает настройки у <code>quasar.yandex.net</code>. С DNS
+   <code>179.254.167.126</code> запрос уходит на сервер разблокировки.</li>
+<li>Сервер отвечает настройками, в которых сетевой ADB включён.</li>
+<li>Прошивка создаёт маркеры <code>/data/quasar/activate_adb_quasmodrom</code> и
+   <code>/data/quasar/activate_network_adb</code> и запускает <code>adbd</code> на порту <strong>5555</strong>.</li>
+<li>При каждой загрузке <code>onboot.sh</code> вызывает <code>activate_adb.sh check</code>: пока маркеры на месте,
+   ADB поднимается сам — DNS больше не нужен. На Мини 3 это не так: после возврата DNS ADB
+   выключается, см. <a href="../retail-ca-mini3/#adb-after-dns">раздел про возврат DNS</a>.</li>
+</ol>
+
+  
+  
+  <aside class="yse-suggest" data-yse-path="docs/start/root.md" data-yse-title="Большинство моделей — подмена DNS" data-yse-edit-url="../../edit/" aria-label="Правка страницы">
+    <div class="yse-suggest__text">
+      <p class="yse-suggest__title">Нашли ошибку или хотите дополнить?</p>
+      <p class="yse-suggest__hint">Правка займёт пару минут. Нужен только вход через GitHub, git знать не нужно. Можно выделить фрагмент текста и нажать «Предложить правку».</p>
+    </div>
+    <div class="yse-suggest__actions">
+      <a class="md-button md-button--primary" href="../../edit/?path=docs/start/root.md" data-yse-edit>Править эту страницу</a>
+      <a class="md-button" href="../../edit/?new=1&amp;dir=start" data-yse-edit>Новая страница</a>
+      <a class="yse-suggest__report" href="#" data-yse-report>Только сообщить об ошибке</a>
+    </div>
+  </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  К началу
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Нижний колонтитул" >
+        
+          
+          <a href="../adb/" class="md-footer__link md-footer__link--prev" aria-label="Назад: Установка ADB на компьютер">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Назад
+              </span>
+              <div class="md-ellipsis">
+                Установка ADB на компьютер
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../retail-ca/" class="md-footer__link md-footer__link--next" aria-label="Вперед: Лайт 2 (Plum) — сертификат из factory">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Вперед
+              </span>
+              <div class="md-ellipsis">
+                Лайт 2 (Plum) — сертификат из factory
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      ©2026 YSE contributors. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://t.me/hackalice" target="_blank" rel="noopener" title="Чат в Telegram" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M256 8a248 248 0 1 0 0 496 248 248 0 1 0 0-496m115 168.7c-3.7 39.2-19.9 134.4-28.1 178.3-3.5 18.6-10.3 24.8-16.9 25.4-14.4 1.3-25.3-9.5-39.3-18.7-21.8-14.3-34.2-23.2-55.3-37.2-24.5-16.1-8.6-25 5.3-39.5 3.7-3.8 67.1-61.5 68.3-66.7.2-.7.3-3.1-1.2-4.4s-3.6-.8-5.1-.5c-2.2.5-37.1 23.5-104.6 69.1-9.9 6.8-18.9 10.1-26.9 9.9-8.9-.2-25.9-5-38.6-9.1-15.5-5-27.9-7.7-26.8-16.3.6-4.5 6.7-9 18.4-13.7 72.3-31.5 120.5-52.3 144.6-62.3 68.9-28.6 83.2-33.6 92.5-33.8 2.1 0 6.6.5 9.6 2.9 2 1.7 3.2 4.1 3.5 6.7.5 3.2.6 6.5.4 9.8z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/Marker284/yandex-station-extended" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/toc-tabs.js"></script>
+      
+        <script src="../../javascripts/editor-entry.js"></script>
+      
+    
+  </body>
+</html>
