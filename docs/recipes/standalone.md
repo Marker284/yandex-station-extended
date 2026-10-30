@@ -16,6 +16,8 @@
 ## Что можно запустить вместо Алисы
 
 - [AirPlay](airplay.md).
+- [Голосовой спутник Home Assistant через Pulsar](home-assistant.md): проверен на работающей
+  Станции Лайт 2 (Plum); на колонках с подписочной блокировкой не проверялся.
 - Spotify Connect: сторонний проект [spotiya](https://github.com/klockky/spotiya)
   (проверен автором на Мини 2).
 - Свои звуки и потоки через [`maind --gst-launch`](sounds.md).
