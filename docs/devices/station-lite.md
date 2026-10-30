@@ -51,7 +51,7 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 | USB Host (OTG) | работает | [USB Host](../recipes/usb-host.md) |
 | AirPlay | не проверялось | — |
 | Spotify Connect | не проверялось | — |
-| Плеер как Bluetooth-источник | не проверялось | — |
+| Плеер как Bluetooth-источник | работает | [bt-proxy](../recipes/bt-proxy/) |
 | Свои звуки | работает | [Свои звуки](../recipes/sounds.md) |
 | Обработанный микрофон | не проверялось | — |
 | Подсветка | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
