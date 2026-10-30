@@ -166,6 +166,58 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   `appsrc ! opusparse ! opusdec ! volume ! alsasink`. Музыка — в `maind --mediad`.
 - Текстовые запросы (из приложения) идут как `Vins.TextInput` и **минуют ASR**.
 
+### Потоковый TTS и частичные ответы { #tts-streaming }
+
+В protobuf Alice API у `TtsSpeak` есть поля, которых нет в краткой таблице выше:
+`LazyTtsStreaming`, `SoundChunkType` (`CHUNK_DEFAULT` / `CHUNK_WITH_META`) и
+`SubStreamId`. Отдельный `StreamControl` содержит действие `LazyTTS` с полем
+`ChunkSize`; клиент также может отправлять `TtsUpdateState` с длительностью уже
+проигранного TTS, флагом `IsPlaying`, причиной отчёта (`Interruption` / `Finish`) и
+`SubStreamId`.
+
+Точная семантика `LazyTTS` по одной схеме protobuf **не установлена**. В старом
+SpeechKit-протоколе есть отдельное действие `ACTION_NEXT_CHUNK`, но структуры
+протоколов различаются, поэтому считать его прямым прежним названием `LazyTTS` без
+захвата реального обмена нельзя.
+
+Обычный `AliceResponse.TResponse` имеет флаг `IsStreaming`. Для последующих частей
+ответа в AAPI существует `DeferredAliceResponse`: сообщение содержит
+`ResponsePartialNum`, `IsLast`, `RequestId`, а его `BaseResponse` — `Text` и
+`Directives`. Поэтому один логический ответ протокол может представить
+последовательностью частичных сообщений.
+
+Это само по себе **не означает**, что текст можно дописывать в уже открытый
+`TtsGenerate`. В опубликованной схеме `TTtsGenerate` текст передаётся обычным полем
+`Text`; прежнее поле с именем `RealtimeStreamer` зарезервировано, и его семантика из
+текущей схемы не восстанавливается ([`TTtsGenerate`][aapi-tts-generate]).
+
+На стороне прошивки наличие `TTS.Speak` с `lazy_tts_streaming` и следующего за ним
+бинарного аудиопотока по `streamId` независимо подтверждено статическим разбором
+`maind` на Station Mini 3 (`bergamot`, семейство прошивок 0.369)
+([разбор][yastationd-tts-re]). Подробности и protobuf-схемы:
+[TTS.Speak][aapi-tts-speak], [StreamControl][aapi-stream-control],
+[TtsUpdateState][aapi-tts-state], [AliceResponse][aapi-alice-response] и
+[DeferredAliceResponse][aapi-deferred-response].
+
+!!! example "Практический пример: `quasar-bridge`"
+    Это уже **реализация сообщества, а не доказанное штатное поведение облака**.
+    В `quasar-bridge` структура `oggSpeech` объединяет независимо синтезированные
+    Opus-сегменты в один Ogg-поток: сохраняет общую последовательность страниц и
+    временную шкалу, а Ogg EOS / `StreamControl.Close` откладывает до последнего
+    сегмента. Тест проекта отдельно проверяет, что финальный TTS не запускает второй
+    проигрыватель, а его аудио продолжает исходный stream. См. [реализацию
+    `oggSpeech`][quasar-bridge-ogg] и [тест deferred TTS][quasar-bridge-progress-test].
+
+[aapi-tts-speak]: https://github.com/v3rt3p/quasar-protos/blob/master/alice/protos/api/alicekit/events/tts_speak/tts_speak.proto
+[aapi-stream-control]: https://github.com/v3rt3p/quasar-protos/blob/master/alice/protos/api/alicekit/events/stream_control/stream_control.proto
+[aapi-tts-state]: https://github.com/v3rt3p/quasar-protos/blob/master/alice/protos/api/alicekit/events/tts_update_state/tts_update_state.proto
+[aapi-alice-response]: https://github.com/v3rt3p/quasar-protos/blob/master/alice/protos/api/alicekit/events/alice_response/alice_response.proto
+[aapi-deferred-response]: https://github.com/v3rt3p/quasar-protos/blob/master/alice/protos/api/alicekit/streaming/deffered_response.proto
+[aapi-tts-generate]: https://github.com/v3rt3p/quasar-protos/blob/master/alice/protos/api/alicekit/events/tts_generate/tts_generate.proto
+[yastationd-tts-re]: https://github.com/celebeing/yastationd/blob/main/docs/research/tts-decompile.md
+[quasar-bridge-ogg]: https://github.com/skrashevich/quasar-bridge/blob/main/internal/bridge/ogg.go
+[quasar-bridge-progress-test]: https://github.com/skrashevich/quasar-bridge/blob/main/internal/bridge/progress_test.go
+
 ## Звук активации { #activation-sound }
 
 Короткий сигнал на «Алису» прошивка проигрывает сама, на срабатывании: в логе через ~5 мс после
