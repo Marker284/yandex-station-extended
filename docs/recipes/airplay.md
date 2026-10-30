@@ -1,12 +1,96 @@
 # AirPlay (Shairport Sync)
 
-Станция как приёмник **AirPlay 2** для iPhone, iPad и Mac. Путей три, выберите свой.
+Станция как приёмник **AirPlay 2** для iPhone, iPad и Mac. Выберите способ для своей модели.
 
 | Колонка | Что делаем |
 |---|---|
 | Мини 3 с уже установленным пакетом `/data/shairport` | [чиним две известные проблемы скриптом](#fix) |
 | Лайт 2 (Plum) | [своя сборка, AirPlay виден Алисе как Bluetooth-телефон](#lite2) |
 | Станция 2 | [готовый набор из исходников](#station-2-bundle) |
+| Станция 1 с Android 6 и AliceBridge | [установка AirPlay 2 одним скриптом](#station-1) |
+
+## Станция 1: AirPlay 2 через AliceBridge { #station-1 }
+
+**Проверено на Станции 1 (tulip, Android 6.0.1 / SDK 23):**
+`shairport-sync-openssl 4.3.6-3` (AirPlay 2), `nqptp 1.2.4-1`,
+`avahi-dbus-daemon 0.8-10`, `dbus 1.16.2-3` из Entware.
+Владелец подтвердил приём и воспроизведение с iPhone 26 октября 2026.
+После последующей перезагрузки проверены запуск четырёх служб и ответ
+`RTSP/1.0 200 OK`. Новый установщик выполнен на этой настроенной Станции;
+повторная установка сохранила конфигурацию и не создала копий демонов.
+Установка всех отсутствующих пакетов на чистой Entware и другие модели
+пока не проверены.
+
+Нужны root и Entware, установленные через
+[AliceBridge](../start/root-android.md#station-1), доступ к интернету и iPhone,
+iPad или Mac в той же локальной сети. HDMI и ТВ-набор не требуются.
+Метрики и SoundCloud устанавливаются отдельно и для AirPlay не нужны.
+
+### Установка на Станцию 1 { #station-1-install }
+
+В терминале **Станции** в AliceBridge выполните:
+
+```sh
+/system/bin/curl -fL --cacert /system/vendor/quasar/ca-certificates.crt \
+  https://raw.githubusercontent.com/Marker284/yandex-station-extended/main/contrib/station1-airplay.sh \
+  -o /data/local/tmp/install-airplay.sh &&
+sh /data/local/tmp/install-airplay.sh
+```
+
+Один файл устанавливает отсутствующие пакеты, подготавливает dbus и Avahi,
+настраивает динамик `plughw:1,0` и добавляет запуск через
+`/data/dropbear/start.sh`. Изменяемые файлы сначала сохраняются в
+`/data/station1-airplay/backups/`. Существующая конфигурация рабочей сборки
+AirPlay 2 сохраняется. Скрипт не запускает музыку, не меняет громкость,
+не останавливает Алису и не блокирует метрики.
+
+На iPhone откройте «Пункт управления» → AirPlay → «Яндекс Станция».
+Громкость сначала уменьшите на телефоне.
+
+### Настройки Станции 1 { #station-1-config }
+
+В `/opt/etc/shairport-sync.conf` используются:
+
+```text
+general = {
+    name = "Яндекс Станция";
+    output_backend = "alsa";
+    mdns_backend = "avahi";
+    audio_backend_buffer_desired_length_in_seconds = 0.5;
+};
+alsa = {
+    output_device = "plughw:1,0";
+    use_precision_timing = "no";
+};
+```
+
+`plughw` пересчитывает 44,1 кГц AirPlay в 48 кГц динамика. Отключённый точный
+тайминг и буфер 0,5 секунды устранили прерывания на проверенной Станции.
+Лёгкая Entware-сборка `shairport-sync-mini` с mbedTLS на ней не прошла
+проверку `Apple-Challenge` у iPhone; используется сборка OpenSSL.
+
+Автозапуск идёт в порядке dbus → Avahi → nqptp → shairport-sync.
+Для проверки процессов используется `/sbin/busybox pidof`, поскольку
+системный `pidof` этой прошивки возвращает неверный результат.
+У Avahi отключается ограничение `rlimit-nproc`, мешающее запуску рядом
+с процессами Android. Системный `/etc/passwd` и учётная запись root не меняются.
+
+### Проверка и отключение { #station-1-control }
+
+```sh
+sh /data/station1-airplay/install.sh status
+sh /data/station1-airplay/install.sh disable
+sh /data/station1-airplay/install.sh enable
+```
+
+`disable` останавливает AirPlay и nqptp и запрещает их следующий запуск.
+Общие dbus и Avahi остаются запущенными. `enable` снимает запрет.
+Пакеты и резервные копии сохраняются.
+
+Если колонка не видна, проверьте одну Wi-Fi-сеть, изоляцию клиентов и multicast.
+Если подключение есть, а звука нет, остановите другую музыку: прямой ALSA-выход
+может быть занят Алисой. Этот вариант не добавляет смешивание нескольких плееров
+и управление AirPlay голосом Алисы.
 
 ## Починка готового пакета { #fix }
 
