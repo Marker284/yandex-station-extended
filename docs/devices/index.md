@@ -13,7 +13,7 @@ Amlogic-станций механизмы (прошивка, доступ, се�
 | Платформа | SoC | CPU / ядро | Прошивка | Примеры |
 |---|---|---|---|---|
 | **Amlogic A1 / Buildroot** | Amlogic A1 | Cortex-A35, **32-бит**, Linux 5.15 | нативный `maind` | Стрит (Mango) |
-| **Amlogic AXG / Buildroot** | Amlogic AXG (A113) | Cortex-A53, Linux 4.9 | нативный `maind` | Лайт, Мини, Мини 2, Станция 2 |
+| **Amlogic AXG / Buildroot** | Amlogic AXG (A113) | Cortex-A53, Linux 4.9 | нативный `maind` | Лайт, Fiero Hi, Мини, Мини 2, Станция 2 |
 | **Amlogic A5 / Buildroot** | Amlogic A5 | Cortex-A55 до 2 ГГц, Linux 5.4 | нативный `maind` | Миди (Cucumber) |
 | **Amlogic A4 / Buildroot** | Amlogic A4 | Cortex-A53 до 2 ГГц, Linux 5.4, NAND+UBI | нативный `maind` | Мини 3 Про (Pickle) |
 | **Amlogic / Android 9** | Amlogic (TV-класс) | Cortex-A53 @1.8 ГГц, Android 9 | quasar как APK | Станция Макс |
