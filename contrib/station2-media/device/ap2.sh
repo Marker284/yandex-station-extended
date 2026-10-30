@@ -4,7 +4,8 @@
 #   ap2.sh ssh        — поднять dropbear на 2222 (вход только по ключу)
 #   ap2.sh receiver   — поднять приёмник, если его нет (зовёт audio-owner.sh)
 #   ap2.sh spotify    — поднять librespot, если его нет (зовёт audio-owner.sh)
-#   ap2.sh run-sps | run-spotify — приёмник / librespot в переднем плане
+#   ap2.sh ytm        — поднять плеер YouTube Music, если его нет (зовёт audio-owner.sh)
+#   ap2.sh run-sps | run-spotify | run-ytm — приёмник / librespot / ytmd в переднем плане
 #   ap2.sh run-avahi  — avahi с перезапуском при падении
 . /data/local/opt/ap2/common.sh
 SELF=$AP/ap2.sh
@@ -115,6 +116,18 @@ start_spotify() {
   spawn /run/ap2-spotify.pid /bin/sh "$SELF" run-spotify
 }
 
+# YouTube Music (ytm-install.sh): Python из Entware, yt-dlp в ytm/lib, звук — ytm-sink.sh
+run_ytm() {
+  trim_log "$LOGD/ytm-err.log"
+  exec /opt/bin/python3 "$AP/ytm/ytmd.py" >>"$LOGD/ytm-err.log" 2>&1
+}
+
+start_ytm() {
+  [ -f "$AP/ytm/ytmd.py" ] && [ -d "$AP/ytm/lib" ] && [ -x /opt/bin/python3 ] || return 0
+  [ -n "$(pids_matching "$AP/ytm/ytmd.py")" ] && return 0
+  spawn /run/ap2-ytm.pid /bin/sh "$SELF" run-ytm
+}
+
 # Голосом в Spotify (voice-spotify.sh): только если есть ключи Web API
 start_voice() {
   [ -s "$E/spotify-webapi.json" ] || return 0
@@ -142,6 +155,7 @@ start_all() {
   fi
   start_receiver
   start_spotify
+  start_ytm
   start_voice
   [ -n "$(pids_matching "$AP/audio-owner.sh")" ] ||
     spawn /run/ap2-owner.pid /bin/sh "$AP/audio-owner.sh"
@@ -149,8 +163,8 @@ start_all() {
 
 stop_all() {
   for m in "$AP/audio-owner.sh" "$AP/voice-spotify.sh" "$B/alice-text" "$SELF run-avahi" \
-           "$B/shairport-sync" "$B/librespot" "$B/aplay -q -D spotify" avahi-daemon "$B/nqptp" \
-           "$B/dbus-daemon"; do
+           "$B/shairport-sync" "$B/librespot" "$B/aplay -q -D spotify" "$AP/ytm/ytmd.py" \
+           "$B/ytm-dec" "$B/aplay -q -D youtube" avahi-daemon "$B/nqptp" "$B/dbus-daemon"; do
     for p in $(pids_matching "$m"); do kill "$p" 2>/dev/null; done
   done
   sleep 1
@@ -161,8 +175,8 @@ stop_all() {
 
 show_status() {
   for m in "$B/dropbear" "$B/dbus-daemon" avahi-daemon "$B/nqptp" "$B/shairport-sync" \
-           "$B/librespot" "$B/aplay -q -D spotify" "$AP/audio-owner.sh" "$AP/voice-spotify.sh" \
-           "$MEDIAD_MATCH"; do
+           "$B/librespot" "$B/aplay -q -D spotify" "$AP/ytm/ytmd.py" "$B/aplay -q -D youtube" \
+           "$AP/audio-owner.sh" "$AP/voice-spotify.sh" "$MEDIAD_MATCH"; do
     printf '%-40s %s\n' "${m##*/}" "$(pids_matching "$m" | tr '\n' ' ')"
   done
   echo "--- порты:"
@@ -171,6 +185,10 @@ show_status() {
   tail -5 "$LOGD/sps.log" 2>/dev/null
   echo "--- spotify.log:"
   tail -5 "$LOGD/spotify.log" 2>/dev/null
+  if [ -f "$AP/ytm/ytmd.py" ]; then
+    echo "--- ytm.log:"
+    tail -5 "$LOGD/ytm.log" 2>/dev/null
+  fi
 }
 
 case "$1" in
@@ -181,8 +199,10 @@ case "$1" in
   ssh)       start_ssh ;;
   receiver)  start_receiver ;;
   spotify)   start_spotify ;;
+  ytm)       start_ytm ;;
   run-sps)   run_sps ;;
   run-spotify) run_spotify ;;
+  run-ytm)   run_ytm ;;
   run-avahi) run_avahi ;;
-  *) echo "usage: $0 start|stop|restart|status|ssh|receiver|spotify" >&2; exit 1 ;;
+  *) echo "usage: $0 start|stop|restart|status|ssh|receiver|spotify|ytm" >&2; exit 1 ;;
 esac

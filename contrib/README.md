@@ -115,9 +115,10 @@
   [Рецепт и проверка](../docs/recipes/airplay.md#station-1).
 * **[`bt-proxy/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bt-proxy)** — исходники (Rust) и автозапуск `bt-proxy`: любой MPRIS-плеер виден Алисе как Bluetooth-телефон. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/bt-proxy/).
 * **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — установщик `install.sh` (одна команда с компьютера, откат `--uninstall`), Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
-* **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`) и Spotify
-  одним каталогом с общей с Алисой громкостью, установка за окно ADB, сторож обновлений.
-  [Рецепт](https://hackalice.me/recipes/airplay/#station-2-bundle).
+* **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`), Spotify
+  и YouTube Music одним каталогом с общей с Алисой громкостью, установка за окно ADB, сторож обновлений.
+  [Рецепт](https://hackalice.me/recipes/airplay/#station-2-bundle),
+  [YouTube Music](https://hackalice.me/recipes/youtube-music/).
 * **[`spotify.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotify.sh)** —
   запуск с ПК комплектного `librespot-micro-installer.zip`: **только Лайт/Micro v1.2**,
   не Мини 2. По умолчанию проверяет, для установки нужен `--install` (см. ниже).

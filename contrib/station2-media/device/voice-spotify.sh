@@ -77,6 +77,8 @@ handle() {
     "@state 0") [ -f "$DUCK" ] && duck_off; return 0 ;;
     @state\ *) return 0 ;;
   esac
+  # «… в ютубе» — команда для ytmd.py (YouTube Music), не для Spotify
+  case "$t" in *ютуб*|*Ютуб*|*youtube*|*YouTube*) return 0 ;; esac
   case "$t" in
     *ыключи*|*стоп*|*хватит*|*ауза*|*аузу*) spotify_recent && run pause ;;
     *родолж*) spotify_recent && run resume ;;
