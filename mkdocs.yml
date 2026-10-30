@@ -160,6 +160,7 @@ nav:
       - Обработанный микрофон: recipes/microphone.md
       - Fastfetch: recipes/fastfetch.md
       - Подсветка: recipes/led.md
+      - Веб-панель: recipes/web-panel.md
       - YAM и BetterYAM: recipes/packagemanagers.md
       - Голосовой спутник Home Assistant: recipes/home-assistant.md
       - Своя LLM вместо Алисы: recipes/llm.md

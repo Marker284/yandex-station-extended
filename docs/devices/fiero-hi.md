@@ -47,6 +47,7 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 | Что | Состояние | Где описано |
 |---|---|---|
 | Root и SSH | работает | [подмена DNS](#root) |
+| Веб-панель | работает | [веб-панель](../recipes/web-panel.md) |
 | Подсветка (кольцо RGB) | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
 
 ## Получение root { #root }
