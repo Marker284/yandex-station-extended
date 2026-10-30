@@ -56,8 +56,10 @@ adb devices
     копии ничего не правит. Но сам каталог живёт на колонке: сразу после запуска скрипта
     заберите его к себе командой `adb pull /data/opt/backup ./backup-колонки`.
 
-Отправлять команду на отключение обновлений нужно из **корня репозитория**, иначе выдаст ошибку
-`adb shell rebootsh: can't open '/data/opt/yandex-noupdate.sh': No such file or directory`
+!!! note "Выполняйте команду из корня репозитория"
+    Скрипт `contrib/yandex-noupdate.sh` копируется с компьютера. Если текущий каталог в терминале
+    другой, `adb push` не найдёт файл и колонка выдаст ошибку `can't open '/data/opt/yandex-noupdate.sh'`.
+    Перед выполнением перейдите в корень клонированного репозитория.
 
 ```sh
 adb push contrib/yandex-noupdate.sh /data/opt/yandex-noupdate.sh
