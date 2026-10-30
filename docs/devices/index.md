@@ -30,6 +30,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Модель | Кодовое имя (DT) | SoC | Как получить root | Страница |
 |---|---|---|---|---|
 | Станция Лайт | `Yandex Station Micro v1.2` | Amlogic AXG (A113) | [подмена DNS](../start/root.md) | [Лайт](station-lite.md) |
+| Fiero Hi (партнёрская, бренд DNS) | `Yandex Station Micro v1.2` (`blackthorn`) | Amlogic AXG (A113) | [подмена DNS через factory](../start/root.md) | [Fiero Hi](fiero-hi.md) |
 | Станция Лайт 2 | `plum` | Amlogic AXG (A113X) | [сертификат из factory](../start/retail-ca.md) | [Лайт 2](station-lite2.md) |
 | Станция Мини 2 | `yandex,station-mini2` | Amlogic AXG | [подмена DNS](../start/root.md) | [Мини 2](station-mini2.md) |
 | Станция Мини (1 пок) | `amlogic, axg` | Amlogic AXG | [свой образ по USB](../start/root-mini1-usb.md) | [Мини](station-mini.md) |
