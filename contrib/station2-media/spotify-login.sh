@@ -31,8 +31,14 @@ SSH_PID=$!
 for _ in $(seq 1 30); do grep -q 'accounts.spotify.com' "$LOG" && break; sleep 1; done
 URL=$(grep -o 'https://accounts.spotify.com/authorize[^ ]*' "$LOG" | head -1)
 [ -n "$URL" ] || { cat "$LOG"; echo "ОШИБКА: librespot не выдал ссылку входа" >&2; exit 1; }
-open "$URL"
-echo "Войдите в Spotify в открывшемся браузере и нажмите «Принимаю»…"
+if command -v open >/dev/null && [ "$(uname)" = Darwin ]; then
+  open "$URL"
+elif command -v xdg-open >/dev/null; then
+  xdg-open "$URL" >/dev/null 2>&1 || true
+fi
+echo "Если браузер не открылся, откройте ссылку вручную:"
+echo "$URL"
+echo "Войдите в Spotify в браузере и нажмите «Принимаю»…"
 
 for _ in $(seq 1 300); do
   grep -q 'Authenticated as' "$LOG" && break

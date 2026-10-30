@@ -30,7 +30,12 @@ ssh_() {
       -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile="$HERE/known_hosts" \
       "root@$IP" "$@"
 }
-tar_() { COPYFILE_DISABLE=1 tar --format ustar --uid 0 --gid 0 "$@"; }
+# Владелец root в архиве: --uid/--gid у bsdtar (macOS), --owner/--group у GNU tar (Linux)
+if tar --version 2>/dev/null | grep -q 'GNU tar'; then
+  tar_() { tar --format ustar --owner=0 --group=0 "$@"; }
+else
+  tar_() { COPYFILE_DISABLE=1 tar --format ustar --uid 0 --gid 0 "$@"; }
+fi
 
 [ -x "$BUNDLE/bin/shairport-sync" ] || die "нет сборки $BUNDLE — сначала build/ap2-build.sh (см. docs/recipes/airplay.md)"
 mkdir -p "$BACKUP"
@@ -45,7 +50,13 @@ cp "$HERE/device/etc/"* "$TMP/ap2/etc/"
 [ -f "$KEY" ] || ssh-keygen -q -t ed25519 -N '' -C yandex-station2 -f "$KEY"
 cp "$KEY.pub" "$TMP/ap2/etc/authorized_keys"
 # Имя хоста для avahi — то, что колонка уже публикует по mDNS (hostname у неё другой)
-MDNS=$(dig +short +time=2 +tries=1 -x "$IP" @224.0.0.251 -p 5353 2>/dev/null | head -1 | sed 's/\.local\.$//')
+# dig есть в macOS; в Linux его часто нет (dnsutils), там пробуем avahi-resolve-address
+MDNS=
+if command -v dig >/dev/null; then
+  MDNS=$(dig +short +time=2 +tries=1 -x "$IP" @224.0.0.251 -p 5353 2>/dev/null | head -1 | sed 's/\.local\.$//' || true)
+elif command -v avahi-resolve-address >/dev/null; then
+  MDNS=$(avahi-resolve-address "$IP" 2>/dev/null | awk '{ print $2 }' | sed 's/\.local$//' || true)
+fi
 [ -n "$MDNS" ] && echo "$MDNS" > "$TMP/ap2/etc/hostname"
 echo "    mDNS-имя: ${MDNS:-не найдено, возьмём hostname колонки}"
 
@@ -67,7 +78,8 @@ ssh_ 'cat /proc/asound/cards; ls /dev/snd; echo "hostname: $(hostname)"; grep "^
   > "$BACKUP/probe-$(date +%Y%m%d-%H%M%S).txt"
 
 echo "==> этап 2: AirPlay 2 по SSH"
-tar_ -C "$TMP" -czf - ap2 | ssh_ "gzip -dc | tar -xf - -C /data/local/opt && echo ok" | grep -q ok ||
+# с --ssh-only этапа 1 не было, и каталога может не быть
+tar_ -C "$TMP" -czf - ap2 | ssh_ "mkdir -p /data/local/opt && gzip -dc | tar -xf - -C /data/local/opt && echo ok" | grep -q ok ||
   die "не распаковался пакет"
 
 echo "==> отключение обновлений"

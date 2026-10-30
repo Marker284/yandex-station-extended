@@ -19,7 +19,8 @@ export CARGO_TARGET_DIR=/work/cargo-target
 [ -x "$OUT/bin/shairport-sync" ] || { echo "нет $OUT — сначала ap2-build.sh"; exit 1; }
 
 echo "=== deps ==="
-apk add --no-cache build-base cargo rust pkgconf cmake perl linux-headers patchelf alsa-lib-dev >/dev/null
+apk add --no-cache build-base cargo rust pkgconf cmake perl linux-headers patchelf alsa-lib-dev \
+  git >/dev/null
 rustc --version
 
 [ -d "$SRC" ] || git clone -q --depth=1 -b "$LIBRESPOT_TAG" https://github.com/librespot-org/librespot.git "$SRC"
