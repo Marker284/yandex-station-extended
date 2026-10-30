@@ -26,7 +26,7 @@ def event(kind, tag=3):
 
 
 def fiero_event(kind):
-    """Event as seen on Fiero Hi (firmware .50): 253=210 and field 7 = AliceCapability."""
+    """Событие как на Fiero Hi (прошивка .50): 253=210 и поле 7 = AliceCapability."""
     remote = say.byte_field(7, b'AliceCapability') + say.byte_field(18, say.integer(1, kind))
     payload = say.byte_field(252, remote) + say.integer(253, 210)
     return len(payload).to_bytes(4, 'little') + payload

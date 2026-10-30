@@ -113,8 +113,8 @@ async def speak(host, text, timeout):
                 if not 0 < size <= 512 * 1024:
                     raise ValueError('Некорректный размер ответа колонки.')
                 envelope = fields(await proc.stdout.readexactly(size))
-                # Frames pushed back by aliced carry 253=3 (Plum). On Fiero Hi, firmware .50,
-                # AliceCapability events arrive with 253=210 and name the capability in field 7.
+                # События от aliced приходят с 253=3 (Plum). На Fiero Hi, прошивка .50, события
+                # AliceCapability приходят с 253=210 и именем AliceCapability в поле 7.
                 remote = fields(envelope.get(252, b''))
                 tag = envelope.get(253)
                 if tag != 3 and not (tag == 210 and remote.get(7) == b'AliceCapability'):
