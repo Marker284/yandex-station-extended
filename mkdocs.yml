@@ -168,6 +168,7 @@ nav:
       - Ограничить метрики (Станция 1): recipes/station1-privacy.md
       - ТВ-набор (Станция 1): recipes/station1-tv.md
       - Debian (Станция 1): recipes/station1-debian.md
+      - Управление голосом алисы: recipes/upravlenie-golosom-alisy.md
   - Устройства:
       - devices/index.md
       - Станция Лайт (Micro): devices/station-lite.md
