@@ -105,8 +105,9 @@
 
 * **[`alice-say.py`](alice-say.py)** — самостоятельный клиент озвучки текста через
   штатный `AliceCapability.START_VOCALIZE` по root-SSH. На ПК нужны Python 3.11+
-  и OpenSSH, на колонке — `socat`. Протокол проверен на Лайт 2 / Plum;
-  используется облачный TTS Яндекса. Ничего не устанавливает и не меняет в прошивке.
+  и OpenSSH, на колонке — `socat` (Entware в `/opt/bin` тоже подходит). Протокол проверен
+  на Лайт 2 / Plum, клиент целиком — на Fiero Hi; используется облачный TTS Яндекса.
+  Ничего не устанавливает и не меняет в прошивке.
   [Рецепт](https://hackalice.me/recipes/sounds/#native-tts), проверка пакетов и ошибок:
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.

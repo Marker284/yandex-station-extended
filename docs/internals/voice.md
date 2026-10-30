@@ -64,7 +64,10 @@ flowchart TD
 Движок `nnet`, признаки `cmn:lda`, модели в `spotter_models/` (обновляются с CDN Яндекса в
 `/data/quasar/data/spotter_model`, сборочные — fallback):
 
-Состав командных споттеров управляется аккаунтом: в `account_config` — `enabledCommandSpotters.music.{playAndPause,volume,navigation,feedback,bluetooth}`, `tv.{navigation,backToHome}`, `smartHome.{light,tv}` и `alwaysOnMicForShortcuts`; в приложении это ползунки категории «Ассистент». Поэтому набор быстрых команд у разных колонок отличается.
+Состав командных споттеров управляется аккаунтом: в `account_config` —
+`enabledCommandSpotters.music.{playAndPause,volume,navigation,feedback,bluetooth}`,
+`tv.{navigation,backToHome}`, `smartHome.{light,tv}` и `alwaysOnMicForShortcuts`; в приложении
+это ползунки категории «Ассистент». Поэтому набор быстрых команд у разных колонок отличается.
 
 | Модель | Задача |
 |---|---|
@@ -199,7 +202,8 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   *(одновременный захват не проверялся)*.
 - **Произнести свой текст** проще всего локально — через API glagol на порту 1961, как это
   делает интеграция YandexStation для Home Assistant — см. [Сеть → glagol](network.md#glagol).
-  Для Plum также проверен [вызов `START_VOCALIZE` через SSH](../recipes/sounds.md#native-tts).
+  Для Plum и Fiero Hi также проверен
+  [вызов `START_VOCALIZE` через SSH](../recipes/sounds.md#native-tts).
   Оба варианта используют облачный синтез; из облака ответ приходит как `AliceResponse.TtsSpeak`.
 - **Подмена адреса**: пиннинга сертификатов нет — см. [Подводные камни](gotchas.md).
   Параметр `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS.

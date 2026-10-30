@@ -143,6 +143,8 @@ AW9110. `cy8cmbr3108` и `sn3112` не отвечают по I2C — ошибк�
   SHA-256 на устройстве и на ПК совпали для всех разделов, кроме `bkupgrade`: он смонтирован на
   запись и меняется во время снятия. `bootloader` через MTD читается частично — сверены первые
   128 КиБ.
+- [Озвучивание своего текста](../recipes/sounds.md#native-tts) голосом Алисы через
+  `contrib/alice-say.py`: события `aliced` здесь приходят с `253=210`.
 - Полный вывод с устройства (модель, MTD, UBI, I2C, звук, LED, модули, `dmesg`) —
   [`contrib/dumps/fiero-hi-recon.txt`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/dumps/fiero-hi-recon.txt).
 

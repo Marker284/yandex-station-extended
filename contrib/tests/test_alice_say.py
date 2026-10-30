@@ -25,6 +25,13 @@ def event(kind, tag=3):
     return len(payload).to_bytes(4, 'little') + payload
 
 
+def fiero_event(kind):
+    """Событие как на Fiero Hi (прошивка .50): 253=210 и поле 7 = AliceCapability."""
+    remote = say.byte_field(7, b'AliceCapability') + say.byte_field(18, say.integer(1, kind))
+    payload = say.byte_field(252, remote) + say.integer(253, 210)
+    return len(payload).to_bytes(4, 'little') + payload
+
+
 class Input:
     def __init__(self):
         self.data = bytearray()
@@ -96,7 +103,7 @@ class Client(unittest.IsolatedAsyncioTestCase):
         args = spawn.call_args.args
         self.assertNotIn(text, ' '.join(args))
         self.assertIn('StrictHostKeyChecking=yes', args)
-        self.assertEqual(args[-1], 'exec socat STDIO TCP:127.0.0.1:9875,connect-timeout=2')
+        self.assertEqual(args[-1], 'PATH="$PATH:/opt/bin" exec socat STDIO TCP:127.0.0.1:9875,connect-timeout=2')
         self.assertIn(text.encode(), process.stdin.data)
         self.assertIn('подтвердила завершение', output.getvalue())
         self.assertTrue(process.stdin.closed)
@@ -109,6 +116,15 @@ class Client(unittest.IsolatedAsyncioTestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 with self.assertRaises(TimeoutError):
                     await say.speak('alice', 'test', .01)
+
+    async def test_fiero_hi_events_tagged_210_with_capability_name_are_read(self):
+        process = Process(fiero_event(6) + fiero_event(1))
+        with patch.object(say.asyncio, 'create_subprocess_exec',
+                          AsyncMock(return_value=process)):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                await say.speak('alice', 'test', 1)
+        self.assertIn('Озвучка началась', output.getvalue())
+        self.assertIn('подтвердила завершение', output.getvalue())
 
     async def test_native_error_does_not_dump_the_private_payload(self):
         process = Process(event(4))

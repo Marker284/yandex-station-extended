@@ -90,10 +90,11 @@ def vocalize_frame(text):
 def ssh_command(host):
     if not host or host.startswith('-') or any(char.isspace() for char in host):
         raise ValueError('Нужен настроенный SSH-псевдоним без пробелов.')
+    # /opt/bin — socat из Entware: в PATH команды по SSH его нет (Fiero Hi, Dropbear).
     return ['ssh', '-T', '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
             '-o', 'ConnectTimeout=6', '-o', 'ServerAliveInterval=5',
             '-o', 'ServerAliveCountMax=2', host,
-            'exec socat STDIO TCP:127.0.0.1:9875,connect-timeout=2']
+            'PATH="$PATH:/opt/bin" exec socat STDIO TCP:127.0.0.1:9875,connect-timeout=2']
 
 
 async def speak(host, text, timeout):
@@ -112,10 +113,12 @@ async def speak(host, text, timeout):
                 if not 0 < size <= 512 * 1024:
                     raise ValueError('Некорректный размер ответа колонки.')
                 envelope = fields(await proc.stdout.readexactly(size))
-                # Requests carry 253=210; frames pushed back by aliced carry 253=3.
-                if envelope.get(253) != 3:
-                    continue
+                # События от aliced приходят с 253=3 (Plum). На Fiero Hi, прошивка .50, события
+                # AliceCapability приходят с 253=210 и именем AliceCapability в поле 7.
                 remote = fields(envelope.get(252, b''))
+                tag = envelope.get(253)
+                if tag != 3 and not (tag == 210 and remote.get(7) == b'AliceCapability'):
+                    continue
                 if 18 not in remote:
                     continue
                 event = fields(remote[18]).get(1)
