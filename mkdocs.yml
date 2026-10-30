@@ -169,8 +169,8 @@ nav:
       - ТВ-набор (Станция 1): recipes/station1-tv.md
       - Debian (Станция 1): recipes/station1-debian.md
       - Управление голосом алисы: recipes/upravlenie-golosom-alisy.md
-  - Бэкенд (Self-hosted):
-      - Бэкенд: recipes/bekend-self-hosted.md
+  - Бэкенд:
+      - Бэкенд (Self-hosted): recipes/bekend-self-hosted.md
       - quasard: recipes/quasard.md
       - v3rt3p: recipes/v3rt3p.md
   - Устройства:
