@@ -1,4 +1,4 @@
-# station2-media — AirPlay 2 и Spotify для Станции 2
+# station2-media — AirPlay 2, Spotify и YouTube Music для Станции 2
 
 Набор для Станции 2 (`yandexmidi`): `shairport-sync` с AirPlay 2, `nqptp`, avahi, dbus,
 dropbear и распорядитель звука в одном каталоге `/data/local/opt/ap2` на колонке.
@@ -23,8 +23,15 @@ dropbear и распорядитель звука в одном каталоге
 | `device/voice-spotify.sh` | «Алиса, поставь …» → Spotify; приглушение музыки, пока Алиса слушает |
 | `spotify-login.sh <IP>` | вход `librespot` по OAuth через SSH-туннель |
 | `spotify-webapi-login.sh <Client ID> <IP>` | ключ Web API (PKCE) для голосовых команд |
+| `build/ytm-build.sh` | `ytm-dec` из `build/ytm/ytm-dec.c`: m4a/AAC → PCM на тех же статических ffmpeg |
+| `ytm-install.sh <IP> [--remove]` | YouTube Music: Python из Entware, свежий yt-dlp, плеер, перезапуск распорядителя |
+| `device/ytm/ytmd.py` | плеер YouTube Music: очередь, yt-dlp в памяти, голос из канала Алисы, сокет `/run/ytm.sock` |
+| `device/ytm/ytmusic.py` | поиск, исполнитель, альбом, плейлист и радио через InnerTube, без входа |
+| `device/ytm.sh` | `play`, `pause`, `next`, `status`, `update` (свежий yt-dlp) с консоли колонки |
+| `device/ytm-sink.sh` | вывод `ytm-dec`: забирает звук у медиа-демона Алисы на время игры |
 
-Spotify — [рецепт Spotify Connect](https://hackalice.me/recipes/spotify/).
+Spotify — [рецепт Spotify Connect](https://hackalice.me/recipes/spotify/), YouTube Music —
+[рецепт YouTube Music](https://hackalice.me/recipes/youtube-music/).
 
 Установщик кладёт рядом с собой `known_hosts` колонки и `backup/ota` с оригиналами файлов
 обновления — оба в `.gitignore`.

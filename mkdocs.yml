@@ -153,6 +153,7 @@ nav:
       - AirPlay: recipes/airplay.md
       - Плееры как Bluetooth (bt-proxy): recipes/bt-proxy.md
       - Spotify Connect: recipes/spotify.md
+      - YouTube Music: recipes/youtube-music.md
       - Свои звуки: recipes/sounds.md
       - Обработанный микрофон: recipes/microphone.md
       - Fastfetch: recipes/fastfetch.md

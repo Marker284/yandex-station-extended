@@ -40,6 +40,7 @@
 | USB Host (OTG) | работает | [USB Host](../recipes/usb-host.md) |
 | AirPlay | работает | [AirPlay 2 одним набором](../recipes/airplay.md#station-2-bundle) |
 | Spotify Connect | работает | [Spotify Connect](../recipes/spotify.md) |
+| YouTube Music | частично (голосом не проверялось) | [YouTube Music](../recipes/youtube-music.md) |
 | Плеер как Bluetooth-источник | не проверялось | — |
 | Свои звуки | не проверялось | — |
 | Обработанный микрофон | не проверялось | — |
