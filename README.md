@@ -23,7 +23,7 @@
 получить root без разборки, закрепить доступ и отключить обновления. Ещё — как поставить свой
 софт и подключить USB-периферию, и как устроены прошивка, сеть и железо каждой модели.
 
-Сейчас в вики — **15 разобранных моделей** и **13 рецептов**: от USB-периферии и AirPlay
+Сейчас в вики — **17 разобранных моделей** и **17 рецептов**: от USB-периферии и AirPlay
 до своей LLM вместо Алисы.
 
 <div align="center">
@@ -42,7 +42,7 @@
   DNS-метод, правка CA из factory mode, ADB по USB, приложение для Android.
 - 🔐 **[SSH и защита от обновлений](https://hackalice.me/start/ssh/)** — чтобы доступ не пропал.
 - 📦 **[Пакеты](https://hackalice.me/start/packages/)** — `yse` (Entware и `.yap`),
-  [YAM](https://hackalice.me/recipes/yam/) с веб-панелью и Lua-плагинами.
+  [YAM](https://hackalice.me/recipes/packagemanagers/) с веб-панелью и Lua-плагинами.
 - 🔌 **[USB Host](https://hackalice.me/recipes/usb-host/)** — флешки, USB-Ethernet, наушники и ЦАП.
 - 🎵 **[AirPlay](https://hackalice.me/recipes/airplay/)** и
   **[Spotify Connect](https://hackalice.me/recipes/spotify/)**,

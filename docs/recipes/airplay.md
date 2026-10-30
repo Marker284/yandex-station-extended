@@ -1,12 +1,97 @@
 # AirPlay (Shairport Sync)
 
-Станция как приёмник **AirPlay 2** для iPhone, iPad и Mac. Путей три, выберите свой.
+Станция как приёмник **AirPlay 2** для iPhone, iPad и Mac. Выберите способ для своей модели.
 
 | Колонка | Что делаем |
 |---|---|
 | Мини 3 с уже установленным пакетом `/data/shairport` | [чиним две известные проблемы скриптом](#fix) |
 | Лайт 2 (Plum) | [своя сборка, AirPlay виден Алисе как Bluetooth-телефон](#lite2) |
 | Станция 2 | [готовый набор из исходников](#station-2-bundle) |
+| Лайт 1 (Micro) | [самостоятельный приёмник AirPlay 2, без интеграции с Алисой](#lite1) |
+| Станция 1 с Android 6 и AliceBridge | [установка AirPlay 2 одним скриптом](#station-1) |
+
+## Станция 1: AirPlay 2 через AliceBridge { #station-1 }
+
+**Проверено на Станции 1 (tulip, Android 6.0.1 / SDK 23):**
+`shairport-sync-openssl 4.3.6-3` (AirPlay 2), `nqptp 1.2.4-1`,
+`avahi-dbus-daemon 0.8-10`, `dbus 1.16.2-3` из Entware.
+Владелец подтвердил приём и воспроизведение с iPhone 26 октября 2026.
+После последующей перезагрузки проверены запуск четырёх служб и ответ
+`RTSP/1.0 200 OK`. Новый установщик выполнен на этой настроенной Станции;
+повторная установка сохранила конфигурацию и не создала копий демонов.
+Установка всех отсутствующих пакетов на чистой Entware и другие модели
+пока не проверены.
+
+Нужны root и Entware, установленные через
+[AliceBridge](../start/root-android.md#station-1), доступ к интернету и iPhone,
+iPad или Mac в той же локальной сети. HDMI и ТВ-набор не требуются.
+Метрики и SoundCloud устанавливаются отдельно и для AirPlay не нужны.
+
+### Установка на Станцию 1 { #station-1-install }
+
+В терминале **Станции** в AliceBridge выполните:
+
+```sh
+/system/bin/curl -fL --cacert /system/vendor/quasar/ca-certificates.crt \
+  https://raw.githubusercontent.com/Marker284/yandex-station-extended/main/contrib/station1-airplay.sh \
+  -o /data/local/tmp/install-airplay.sh &&
+sh /data/local/tmp/install-airplay.sh
+```
+
+Один файл устанавливает отсутствующие пакеты, подготавливает dbus и Avahi,
+настраивает динамик `plughw:1,0` и добавляет запуск через
+`/data/dropbear/start.sh`. Изменяемые файлы сначала сохраняются в
+`/data/station1-airplay/backups/`. Существующая конфигурация рабочей сборки
+AirPlay 2 сохраняется. Скрипт не запускает музыку, не меняет громкость,
+не останавливает Алису и не блокирует метрики.
+
+На iPhone откройте «Пункт управления» → AirPlay → «Яндекс Станция».
+Громкость сначала уменьшите на телефоне.
+
+### Настройки Станции 1 { #station-1-config }
+
+В `/opt/etc/shairport-sync.conf` используются:
+
+```text
+general = {
+    name = "Яндекс Станция";
+    output_backend = "alsa";
+    mdns_backend = "avahi";
+    audio_backend_buffer_desired_length_in_seconds = 0.5;
+};
+alsa = {
+    output_device = "plughw:1,0";
+    use_precision_timing = "no";
+};
+```
+
+`plughw` пересчитывает 44,1 кГц AirPlay в 48 кГц динамика. Отключённый точный
+тайминг и буфер 0,5 секунды устранили прерывания на проверенной Станции.
+Лёгкая Entware-сборка `shairport-sync-mini` с mbedTLS на ней не прошла
+проверку `Apple-Challenge` у iPhone; используется сборка OpenSSL.
+
+Автозапуск идёт в порядке dbus → Avahi → nqptp → shairport-sync.
+Для проверки процессов используется `/sbin/busybox pidof`, поскольку
+системный `pidof` этой прошивки возвращает неверный результат.
+У Avahi отключается ограничение `rlimit-nproc`, мешающее запуску рядом
+с процессами Android. Системный `/etc/passwd` и учётная запись root не меняются.
+
+### Проверка и отключение { #station-1-control }
+
+```sh
+sh /data/station1-airplay/install.sh status
+sh /data/station1-airplay/install.sh disable
+sh /data/station1-airplay/install.sh enable
+```
+
+`disable` останавливает AirPlay и nqptp и запрещает их следующий запуск.
+Общие dbus и Avahi остаются запущенными. `enable` снимает запрет.
+Пакеты и резервные копии сохраняются.
+
+Если колонка не видна, проверьте одну Wi-Fi-сеть, изоляцию клиентов и multicast.
+Если подключение есть, а звука нет, остановите другую музыку: прямой ALSA-выход
+может быть занят Алисой. Этот вариант не добавляет смешивание нескольких плееров
+и управление AirPlay голосом Алисы.
 
 ## Починка готового пакета { #fix }
 
@@ -165,7 +250,7 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
   Станции 2, Мини, Мини 2, Мини 3 и Мини 3 Про: на Лайт 2 плагин по умолчанию забирает часы
   и подсветку, а ключ `--shared-audio` включает общий режим без своего интерфейса. В вики
   это не проверялось; плагин работает под демоном `yamd`, то есть под [старой версией
-  YAM](yam.md).
+  YAM](packagemanagers.md).
 
 ## Станция 2: AirPlay 2 одним набором { #station-2-bundle }
 
@@ -330,3 +415,18 @@ Content-Type: application/x-apple-binary-plist
 | [Починку готового пакета](#fix) | `./contrib/yandex-station-airplay-fix.sh <IP>:5555 --uninstall` — хуки снимаются, возвращается оригинальный `airplayd` |
 | [Набор для Лайт 2](#lite2) | тем же установщиком: `curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/main/contrib/airplay-lite2/install.sh \| sh -s -- <IP> --uninstall --reboot` |
 | [Набор для Станции 2](#station-2-bundle) | `./install.sh <IP> --uninstall --reboot` из клона репозитория, каталог `contrib/station2-media`; сторож обновлений `/etc/init.d/S96otaguard` удаляется отдельно, а штатные обновления возвращает `sh /data/opt/yandex-noupdate.sh restore` |
+
+## Станция Лайт 1 (Micro): AirPlay 2 самостоятельным приёмником { #lite1 }
+
+**Проверено на Станции Лайт (`yandexmicro`, device-tree `Yandex Station Micro`, усилитель `tas5825m`, ядро 4.9.68, userland armhf):** `shairport-sync 5.6.2` + `nqptp` + `avahi 0.8` из Entware. Готовая armhf-сборка для Лайт 2 ([`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz)) запускается на Лайт 1 без пересборки: userland и `libasound` те же (armhf, glibc 2.30). Звук идёт через штатную цепочку `default` → dmix 48 кГц, ответы Алисы звучат поверх музыки.
+
+Пакет `/data/shairport` не нужен. В отличие от Лайт 2, [bt-proxy](bt-proxy.md) подключить **нельзя**: в `maind` на Micro нет classic-Bluetooth-аудио (`strings maind` даёт `There is no bluetooth impl yet`, присутствует только `BluezBLEImpl`). Алиса не видит AirPlay как Bluetooth-телефон и не ставит его на паузу сама — AirPlay играет самостоятельно.
+
+### Отличия от Лайт 2
+
+- **avahi `host-name` = имя, которое публикует `maind`** (`yandexmicro-<deviceid>`, где `deviceid` из `/proc/cmdline`, параметр `androidboot.deviceid=…`), и **`publish-addresses=no`**. A-запись для этого имени отдаёт `maind`, а `_airplay._tcp`/`_raop._tcp` публикует avahi. Уникальное имя хоста или `publish-addresses=yes` отправляют avahi в бесконечную спираль переименований (из-за отражения mDNS-мультикаста в сети), и сервис не резолвится: устройство видно в списке AirPlay, но телефон не узнаёт его адрес и не подключается.
+- **`output_rate = 48000`** в `shairport-sync.conf`: карта `hw:0` играет только 48 кГц, 44100 принимает молча и дрейфует (иканье примерно раз в 0,5 с).
+- **`airplay_device_id`** — MAC `wlan0` без двоеточий (`interface = "wlan0"` его не подставляет).
+
+??? warning "Автозапуск: Entware-dbus и устаревший сокет"
+    avahi из Entware подключается к Entware-`dbus` по `/opt/var/run/dbus/system_bus_socket`. Этот путь лежит на разделе `/data` и переживает перезагрузку, а процесс `dbus-daemon` — нет. Скрипт автозапуска должен проверять **процесс** `dbus-daemon` (например, по `/opt/bin/dbus-daemon` в `/proc/*/cmdline`), а не наличие сокет-файла. Иначе после загрузки `dbus` не стартует, avahi падает с `Connection refused`, и AirPlay не публикуется — порт 7000 открыт, но устройства в сети нет.

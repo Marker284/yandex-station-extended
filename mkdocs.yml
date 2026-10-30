@@ -112,6 +112,7 @@ plugins:
   # старые адреса страниц (до реорганизации) продолжают работать
   - redirects:
       redirect_maps:
+        recipes/yam.md: recipes/packagemanagers.md
         platform/access.md: start/root.md
         platform/unbrick.md: start/recovery.md
         packages.md: start/packages.md
@@ -153,20 +154,24 @@ nav:
       - AirPlay: recipes/airplay.md
       - Плееры как Bluetooth (bt-proxy): recipes/bt-proxy.md
       - Spotify Connect: recipes/spotify.md
+      - SoundCloud голосом (Станция 1): recipes/station1-soundcloud.md
       - YouTube Music: recipes/youtube-music.md
       - Свои звуки: recipes/sounds.md
       - Обработанный микрофон: recipes/microphone.md
       - Fastfetch: recipes/fastfetch.md
       - Подсветка: recipes/led.md
       - YAM и BetterYAM: recipes/packagemanagers.md
+      - Голосовой спутник Home Assistant: recipes/home-assistant.md
       - Своя LLM вместо Алисы: recipes/llm.md
       - Колонка без Яндекса: recipes/standalone.md
       - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
+      - Ограничить метрики (Станция 1): recipes/station1-privacy.md
       - ТВ-набор (Станция 1): recipes/station1-tv.md
       - Debian (Станция 1): recipes/station1-debian.md
   - Устройства:
       - devices/index.md
       - Станция Лайт (Micro): devices/station-lite.md
+      - Fiero Hi (партнёрская Лайт): devices/fiero-hi.md
       - Станция Лайт 2 (Plum): devices/station-lite2.md
       - Станция Мини 3 (Bergamot): devices/station-mini3.md
       - Станция Мини 3 Про (Pickle): devices/station-mini3-pro.md
@@ -187,6 +192,7 @@ nav:
       - Звонки Алисы (порт 5081): internals/calls.md
       - Голосовой тракт Алисы: internals/voice.md
       - Телеметрия: internals/telemetry.md
+      - Zigbee на Миди с quasard: internals/zigbee.md
       - Директивы и capabilities: internals/directives.md
       - Подводные камни: internals/gotchas.md
       - Сборка софта: internals/toolchain.md

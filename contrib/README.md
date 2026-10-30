@@ -69,13 +69,19 @@
 ### Безопасность и блокировка обновлений:
 * **[`yandex-noupdate.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-noupdate.sh)** — полная блокировка OTA-обновлений, вырезание `updatesd` и подмена публичного ключа.
 * **[`station1-freeze-updatesd.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/station1-freeze-updatesd.sh)** — Станция 1 (Android, root через AliceBridge): фоновая заморозка `maind --updatesd` сигналом `SIGSTOP`, без правок `/system`. [Рецепт](https://hackalice.me/recipes/station1-disable-updates/).
-* **[`station1-tv/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-tv)** — Станция 1: веб-пульт (`lighttpd` + CGI на `sh`, порт 8080) и установщик `install.ps1`, который ставит его вместе с Couchy Launcher, SmartTube и v2rayNG 1.9.45. [Рецепт](https://hackalice.me/recipes/station1-tv/).
+* **[`station1-tv/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-tv)** —
+  Станция 1: веб-пульт с паролем и WebSocket, один `install.sh` для терминала AliceBridge.
+  Устанавливает пульт, недостающие Couchy, SmartTube и v2rayNG 1.9.45; исходники Java,
+  шаблоны и сборка находятся рядом. [Рецепт](https://hackalice.me/recipes/station1-tv/).
 * **[`killswitch.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/killswitch.sh)** — аварийный киллсвич для мгновенной изоляции колонки от облачных серверов Яндекса.
 * **[`rollback.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/rollback.sh)** —
   непроверенная запись собственных дампов Мини 2 через root ADB в среде восстановления.
   Требует явных адреса, каталога и `--write`; отказывает при подключённом system UBI.
   Не очищает `/data` и не восстанавливает отдельные конфиги. См. [восстановление](../docs/start/recovery.md).
 * **[`yandex-station-privacy.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-privacy.sh)** — отключение отправки логов и телеметрии (`telemetryd`, `fluent-bitd`).
+* **[`station1-privacy.sh`](station1-privacy.sh)** — Станция 1: обратимая блокировка
+  известных узлов метрик без удаления Алисы.
+  [Рецепт и ограничения](../docs/recipes/station1-privacy.md).
 
 ### Доступ и ADB:
 * **[`install-s97adb.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-s97adb.sh)** —
@@ -85,8 +91,17 @@
 * **[`patch_boot.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_boot.py)** — модификация boot-образа ядра для снятия флага `rh_unlock=0` (UART-консоль).
 * **[`patch_max_adb_candidate.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_max_adb_candidate.py)** — патчер для включения отладки на Станции Макс.
 * **[`decrypt_ota.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/decrypt_ota.py)** — распаковка и расшифровка OTA-пакетов прошивки.
+* **[`spotter_nnet.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotter_nnet.py)** —
+  разбор моделей слова вызова и команд (`spotter_models/*/acoustic_model.nnet`, Kaldi nnet3
+  со слоями Яндекса) на компьютере: граф сети и слои. Только чтение. Проверен на моделях
+  Станции 2. [Формат](https://hackalice.me/internals/voice/#nnet-format), тест:
+  `python3 -m unittest discover -s contrib/tests -p test_spotter_nnet.py`.
 
 ### Звук, медиа и стриминг:
+
+* **[`station1-soundcloud/`](station1-soundcloud/)** — Станция 1: SoundCloud голосом,
+  первый трек и фоновый плеер без HDMI; один скрипт в AliceBridge.
+  ТВ-набор не нужен. [Рецепт](../docs/recipes/station1-soundcloud.md).
 
 * **[`alice-say.py`](alice-say.py)** — самостоятельный клиент озвучки текста через
   штатный `AliceCapability.START_VOCALIZE` по root-SSH. На ПК нужны Python 3.11+
@@ -95,6 +110,9 @@
   [Рецепт](https://hackalice.me/recipes/sounds/#native-tts), проверка пакетов и ошибок:
   `python3 -m unittest discover -s contrib/tests -v`.
 * **[`yandex-station-airplay-fix.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-airplay-fix.sh)** — автоустановка и фикс Shairport Sync (AirPlay 2) с решением конфликта ALSA.
+* **[`station1-airplay.sh`](station1-airplay.sh)** — Станция 1: отдельный скрипт
+  AirPlay 2 для AliceBridge/Entware, автозапуск и откат.
+  [Рецепт и проверка](../docs/recipes/airplay.md#station-1).
 * **[`bt-proxy/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bt-proxy)** — исходники (Rust) и автозапуск `bt-proxy`: любой MPRIS-плеер виден Алисе как Bluetooth-телефон. Проверен на Лайт 2. [Рецепт](https://hackalice.me/recipes/bt-proxy/).
 * **[`airplay-lite2/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/airplay-lite2)** — установщик `install.sh` (одна команда с компьютера, откат `--uninstall`), Dockerfile сборки shairport-sync 5.6.2 (AirPlay 2, MPRIS) и nqptp под штатную libc Лайт 2, конфиги и автозапуск. [Рецепт](https://hackalice.me/recipes/airplay/#lite2).
 * **[`station2-media/`](station2-media/)** — Станция 2: AirPlay 2 (`shairport-sync` + `nqptp`), Spotify
@@ -133,3 +151,10 @@ sh contrib/spotify.sh <IP>:5555 --install   # проверка, затем ус�
 * **[`install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh)** — управление 6 RGB-зонами Станции Мини 2.
 * **[`smiley_editor.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/smiley_editor.py)** — визуальный редактор пиксельных смайликов и анимаций часов.
 * **[`ring.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/ring.sh)** — прямое управление кольцевой подсветкой через `/dev/fb0` на Станции Мини 3.
+
+### Zigbee через quasard
+
+* **[`quasard-zigbee-operator.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/quasard-zigbee-operator.py)** —
+  пример серверного расширения quasard для сопряжения Zigbee на одной Миди через бинарный
+  Alice API. Установка, ограничения и примеры команд —
+  [Zigbee на Миди с quasard](https://hackalice.me/internals/zigbee/).

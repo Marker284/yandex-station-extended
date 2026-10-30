@@ -116,12 +116,24 @@ framebuffer:
 ### Прямое управление { #direct-control }
 
 Кадр — 356 байт в `/dev/fb0`, светодиод `index` — байты с `index * 4` по `index * 4 + 3`.
-Вся панель на небольшой яркости (нужен Python — `yse install python3`):
+Вся панель на небольшой яркости:
 
-```python
-with open("/dev/fb0", "wb", buffering=0) as fb:
-    fb.write(bytes([0x10, 0x10, 0x10, 0x00]) * 89)
-```
+=== "sh"
+
+    ```sh
+    i=0; while [ $i -lt 89 ]; do printf '\020\020\020\000'; i=$((i+1)); done > /dev/fb0
+    ```
+
+    Байты в `printf` записываются восьмеричными кодами: `\020` — это `0x10`, `\377` — `0xFF`.
+
+=== "Python"
+
+    Нужен Python — `yse install python3`.
+
+    ```python
+    with open("/dev/fb0", "wb", buffering=0) as fb:
+        fb.write(bytes([0x10, 0x10, 0x10, 0x00]) * 89)
+    ```
 
 Порядок каналов в пикселе — **R, G, B, W**, по байту на канал (`0x00`–`0xFF`).
 
@@ -227,6 +239,8 @@ xhci-hcd xhci-hcd.0.auto: HC died; cleaning up
 - Фразы вызова — `/system/vendor/quasar/spotter_models/activation/`: `alisa`, `yandex` и
   `yasmina`. Каждая — отдельная нейросеть на одно слово (`spotter-type chen14`, в `words.txt`
   два класса: `filler` и само слово), поэтому своё слово вызова текстом не задать.
+  Формат моделей и режим своего слова в движке — в
+  [голосовом тракте](../internals/voice.md#nnet-format).
 - Короткие команды без обращения («громче», «пауза», «дальше» — `spotter_models/command`)
   включены, только пока играет собственный плеер Алисы. Иначе колонка их слышит, но в
   `maind.log` пишет `Phrase … is disabled in commandPhrasesConfig`.

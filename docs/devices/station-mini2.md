@@ -40,7 +40,7 @@ RTC и выход на наушники.
 | Свои звуки | не проверялось | — |
 | Обработанный микрофон | не проверялось | — |
 | Подсветка | работает | [Подсветка](../recipes/led.md) |
-| YAM | работает | [профиль mini2](../recipes/yam.md) |
+| YAM | работает | [профиль mini2](../recipes/packagemanagers.md) |
 | Своя LLM | не проверялось | — |
 
 ## Получение root { #root }
@@ -80,7 +80,9 @@ RTC и выход на наушники.
 ## Разделы флеша { #partitions }
 
 ```text
-mtd0 "bootloader" 2 MB   mtd1 "tpl" 2 MB   mtd2 "boot" 10 MB
+mtd0 "bootloader" 2 MB   
+mtd1 "tpl" 2 MB   
+mtd2 "boot" 10 MB
 mtd3 "system" ~80 MB -> ubi0:rootfs (ubifs, RO)
 mtd4 "nv" 1 MB -> /tee (vfat, RO)
 mtd5 "bkupgrade" 105 MB -> ubi1 (RW) = /bkupgrade (+ /data)
@@ -105,6 +107,8 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
 | `1-0x53` | **LTR-308** (ltr308als01) | датчик освещённости |
 
 ## Индикация { #led }
+
+Розничный код модели — **YNDX-00020**; существует вариант с часами, в облаке он значится как `yandexmini_2` («Мини 2 с часами»). Яркость часов прошивка хранит в `/data/quasar/data/clock_display_settings.dat` (`brightness` 0..1, `clockEnabled`, `isClockOn`, `showClockDuringDnd`) и **перерисовывает время каждые ~30–60 секунд** — своё изображение через sysfs живёт до следующего тика maind. YAM умеет писать часы напрямую: `PUT /api/clock {"time":"12:34","brightness":0..255}` (6 диодов, профиль `mini2`).
 
 - **Кольцо, 6 RGB-зон**: `/sys/class/leds/mini2:{red,green,blue}:ring{1..6}` (18 каналов).
 - **LED-часы**: `/sys/class/leds/mini2:white:clock*` — сегменты `clockA1`…`clockG4`, `clockDEGREE`,

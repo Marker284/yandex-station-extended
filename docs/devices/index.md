@@ -13,7 +13,7 @@ Amlogic-станций механизмы (прошивка, доступ, се�
 | Платформа | SoC | CPU / ядро | Прошивка | Примеры |
 |---|---|---|---|---|
 | **Amlogic A1 / Buildroot** | Amlogic A1 | Cortex-A35, **32-бит**, Linux 5.15 | нативный `maind` | Стрит (Mango) |
-| **Amlogic AXG / Buildroot** | Amlogic AXG (A113) | Cortex-A53, Linux 4.9 | нативный `maind` | Лайт, Мини, Мини 2, Станция 2 |
+| **Amlogic AXG / Buildroot** | Amlogic AXG (A113) | Cortex-A53, Linux 4.9 | нативный `maind` | Лайт, Fiero Hi, Мини, Мини 2, Станция 2 |
 | **Amlogic A5 / Buildroot** | Amlogic A5 | Cortex-A55 до 2 ГГц, Linux 5.4 | нативный `maind` | Миди (Cucumber) |
 | **Amlogic A4 / Buildroot** | Amlogic A4 | Cortex-A53 до 2 ГГц, Linux 5.4, NAND+UBI | нативный `maind` | Мини 3 Про (Pickle) |
 | **Amlogic / Android 9** | Amlogic (TV-класс) | Cortex-A53 @1.8 ГГц, Android 9 | quasar как APK | Станция Макс |
@@ -30,6 +30,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Модель | Кодовое имя (DT) | SoC | Как получить root | Страница |
 |---|---|---|---|---|
 | Станция Лайт | `Yandex Station Micro v1.2` | Amlogic AXG (A113) | [подмена DNS](../start/root.md) | [Лайт](station-lite.md) |
+| Fiero Hi (партнёрская, бренд DNS) | `Yandex Station Micro v1.2` (`blackthorn`) | Amlogic AXG (A113) | [подмена DNS через factory](../start/root.md) | [Fiero Hi](fiero-hi.md) |
 | Станция Лайт 2 | `plum` | Amlogic AXG (A113X) | [сертификат из factory](../start/retail-ca.md) | [Лайт 2](station-lite2.md) |
 | Станция Мини 2 | `yandex,station-mini2` | Amlogic AXG | [подмена DNS](../start/root.md) | [Мини 2](station-mini2.md) |
 | Станция Мини (1 пок) | `amlogic, axg` | Amlogic AXG | [свой образ по USB](../start/root-mini1-usb.md) | [Мини](station-mini.md) |
@@ -40,7 +41,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | [ADB до перезагрузки](../start/adb-max.md) | [Макс с Zigbee](station-max-zigbee.md) |
 | Станция (1-го поколения) | `tulip-d1` | Allwinner R18 (sun50iw1) | [AliceBridge](../start/root-android.md#station-1) | [Станция gen1](station-gen1.md) |
 | Умный хаб Яндекса (не колонка) | `yandex,saturn` | Amlogic AXG | [подмена DNS](../start/root.md) | [Умный хаб](yandex-hub.md) |
-| Станция Мини 3 | `yandex,station-mini3` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |
+| Станция Мини 3 | `yandex,bergamot` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |
 | Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | только на заводской [factory-12](station-mini3-pro.md#factory-12) | [Мини 3 Про](station-mini3-pro.md) |
 | JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | [ADB по USB](../start/root-jbl-link-music.md) | [JBL Link Music](jbl-link-music.md) |
 | Станция 3 | `yandex,orion-pvt` (orion) | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Станция 3](station-3.md) |

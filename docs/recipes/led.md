@@ -6,6 +6,7 @@
 |---|---|---|
 | Лайт | 3 RGB-зоны кольца через sysfs | [управление через sysfs](#lite-led) |
 | Лайт 2 / Plum | 3 RGB-зоны через sysfs; штатный trigger `led_ring_fb` | [временное управление](#plum-led) |
+| Мини (1 пок.) | 6 RGB-зон кольца на LED-драйвере SN3236 (I2C); штатный проигрыватель `led_util` | [`led_util` и SN3236](#mini1-led), [страница модели](../devices/station-mini.md#led) |
 | Мини 2 | 6 RGB-зон + LED-часы через sysfs | [`contrib/install-rgb-alice-mini2.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-rgb-alice-mini2.sh), [страница модели](../devices/station-mini2.md) |
 | Станция 2 | панель из 88 светодиодов через framebuffer `/dev/fb0` (`89×1`) | [страница модели](../devices/station-2.md#led) |
 | Мини 3 | кольцо через framebuffer `/dev/fb0` | [страница модели](../devices/station-mini3.md), [`contrib/ring.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/ring.sh) |
@@ -111,6 +112,83 @@ ssh alice 'rm /data/opt/alice-led/indicator.sh && rmdir /data/opt/alice-led'
 [led-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/tests/test_voice_controls.py
 
 [native-led]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/native/native/effects.hpp
+
+## Станция Мини (1-е поколение): `led_util` и SN3236 { #mini1-led }
+
+**Проверено на:** Станция Мини (1 пок.), quasar 3.21, прошивка `1.305.4.16.3237824040.20250721`,
+октябрь 2026. Нужен root и SSH.
+
+Самый простой путь — штатный проигрыватель анимаций прошивки
+`/system/vendor/quasar/led_util` (симлинк на `maind`). Он сам переставляет цвета,
+раскладывает зоны и применяет гамму, как это делает Алиса. Красное кольцо на 5 секунд:
+
+```sh
+Q=/system/vendor/quasar
+printf 'FF0000 FF0000 FF0000 FF0000 FF0000 FF0000 1000\n' > /tmp/red.led
+printf '000000 000000 000000 000000 000000 000000 100\n'  > /tmp/off.led
+$Q/led_util /tmp/red.led & sleep 5; kill -INT $!   # играет до SIGINT/SIGTERM
+$Q/led_util /tmp/off.led & sleep 1; kill -INT $!   # последний кадр остаётся гореть — гасим
+rm /tmp/red.led /tmp/off.led
+```
+
+- Аргумент — **путь к файлу** `.led`, не имя анимации: штатные лежат в
+  `/system/vendor/quasar/ledpatterns/`, например `$Q/led_util $Q/ledpatterns/mute_mics.led`.
+- `led_util файл.led --dump-raw` печатает разобранные кадры (`RRGGBB00` на зону) и выходит.
+- `led_util` при запуске сам инициализирует драйвер и пишет параллельно с Алисой.
+  Запускайте, когда штатная анимация не идёт, иначе кадры будут перемешиваться.
+
+### Как устроено кольцо Мини 1 { #mini1-led-protocol }
+
+Кольцо — 6 RGB-светодиодов на LED-драйвере **SN3236** (`0-0x3c`), 18 каналов из 36.
+Узел `ledring` (`1-0x1f`) в этом не участвует: это узел device tree
+`compatible = "aml,ledring"` без драйвера, `/dev/i2c-1` никто не открывает.
+
+`maind` рисует кольцо через библиотеку `libwmlighteffect.so`. Записи на шину сняты
+трассировкой `i2c:i2c_write` во время работы `led_util`:
+
+| Шаг | Запись в `0x3c` | Смысл |
+|---|---|---|
+| инициализация | `0x00 = 0x01` | выход из shutdown |
+| | `0x26…0x37 = 0x03` ×18 | включить OUT1–18, ток Imax/2 (OUT19–36 не включаются) |
+| | `0x4B = 0x01` | частота ШИМ 22 кГц |
+| кадр | `0x01` + 18 байт | яркость OUT1–18 |
+| | `0x25 = 0xaa` | применить кадр |
+
+Порядок байт кадра: в каждой тройке **B, G, R**, тройки идут в порядке
+зон `.led` **1, 6, 5, 4, 3, 2**:
+
+| Каналы | OUT1–3 | OUT4–6 | OUT7–9 | OUT10–12 | OUT13–15 | OUT16–18 |
+|---|---|---|---|---|---|---|
+| Зона `.led` | 1 | 6 | 5 | 4 | 3 | 2 |
+
+Зоны `.led` 1–6 идут по кругу подряд по часовой стрелке; зона 1 — ближайшая к разъёму
+питания справа. Без заголовка значения из `.led` уходят на шину как есть; с заголовком
+`gammacorrection` — через гамму ≈2,8 (`40`→`06`, `80`→`26`, `C0`→`74`, `FF`→`FF`;
+ненулевое значение не ниже `01`).
+
+Тот же красный кадр напрямую, без `led_util` (низкая яркость `0x20`). Регистры
+пишутся **по одному** и **в hex**:
+
+```sh
+put() {   # put <первый регистр> <значения…>
+    r=$1; shift
+    for v in "$@"; do i2cset -y 0 0x3c "$(printf 0x%02x "$r")" "$v" || return 1; r=$((r+1)); done
+}
+put 1 0 0 0x20 0 0 0x20 0 0 0x20 0 0 0x20 0 0 0x20 0 0 0x20 && i2cset -y 0 0x3c 0x25 0xaa
+# погасить:
+put 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 && i2cset -y 0 0x3c 0x25 0xaa
+```
+
+!!! warning "Блочная запись `i2cset … i` на Мини 1 портит кадр"
+    BusyBox 1.26.2 на этой прошивке в режиме `i` (I2C block) отправляет на шину на три
+    байта больше: перед данными идут три случайных байта. Первый светодиод (OUT1–3)
+    получает мусор, остальной кадр сдвигается на одну зону, после «погасить» на кольце
+    остаётся зелёный или жёлтый свет. Номер регистра BusyBox `i2cset` читает как hex:
+    `10` — это `0x10`, поэтому регистры лучше передавать как `0x0a`.
+
+Алиса перерисует кольцо при следующей смене состояния. Индикация выключенных
+микрофонов — это штатная анимация `mute_mics.led` (`FF0000` на всех зонах, `background`,
+`loop`): `maind` включает её по состоянию аппаратной кнопки.
 
 ## Анимации прошивки: формат `.led`
 

@@ -1,0 +1,426 @@
+===== MODEL =====
+Yandex Station Micro v1.2
+compatible:
+yandex,station-micro amlogic, axg 
+
+===== KERNEL =====
+Linux Fiero-Hi 4.9.68 #1 SMP PREEMPT Wed Oct 21 11:42:47 MSK 2026 aarch64 GNU/Linux
+
+===== CPU =====
+processor	: 0
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU part	: 0xd03
+processor	: 1
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU part	: 0xd03
+processor	: 2
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU part	: 0xd03
+processor	: 3
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU part	: 0xd03
+Hardware	: Amlogic
+cores:
+4
+maxfreq /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq = 1200000
+maxfreq /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq = 1200000
+
+===== MEM =====
+MemTotal:         243956 kB
+MemFree:           85396 kB
+MemAvailable:     139236 kB
+
+===== FLASH_MTD =====
+dev:    size   erasesize  name
+mtd0: 00200000 00020000 "bootloader"
+mtd1: 00200000 00020000 "tpl"
+mtd2: 00a00000 00020000 "boot"
+mtd3: 05000000 00020000 "system"
+mtd4: 00100000 00020000 "nv"
+mtd5: 06940000 00020000 "bkupgrade"
+mtd6: 031c0000 00020000 "recovery"
+
+===== UBI =====
+UBI version:                    1
+Count of UBI devices:           2
+UBI control device major/minor: 10:57
+Present UBI devices:            ubi0, ubi1
+
+ubi0
+Volumes count:                           1
+Logical eraseblock size:                 126976 bytes, 124.0 KiB
+Total amount of logical eraseblocks:     640 (81264640 bytes, 77.5 MiB)
+Amount of available logical eraseblocks: 0 (0 bytes)
+Maximum count of volumes                 128
+Count of bad physical eraseblocks:       0
+Count of reserved physical eraseblocks:  40
+Current maximum erase counter value:     12
+Minimum input/output unit size:          2048 bytes
+Character device major/minor:            241:0
+Present volumes:                         0
+
+Volume ID:   0 (on ubi0)
+Type:        dynamic
+Alignment:   1
+Size:        596 LEBs (75677696 bytes, 72.1 MiB)
+State:       OK
+Name:        rootfs
+Character device major/minor: 241:1
+
+===================================
+
+ubi1
+Volumes count:                           1
+Logical eraseblock size:                 126976 bytes, 124.0 KiB
+Total amount of logical eraseblocks:     840 (106659840 bytes, 101.7 MiB)
+Amount of available logical eraseblocks: 0 (0 bytes)
+Maximum count of volumes                 128
+Count of bad physical eraseblocks:       2
+Count of reserved physical eraseblocks:  38
+Current maximum erase counter value:     73
+Minimum input/output unit size:          2048 bytes
+Character device major/minor:            240:0
+Present volumes:                         0
+
+Volume ID:   0 (on ubi1)
+Type:        dynamic
+Alignment:   1
+Size:        798 LEBs (101326848 bytes, 96.6 MiB)
+State:       OK
+Name:        bkupgrade
+Character device major/minor: 240:1
+
+===== MOUNTS =====
+ubi0:rootfs on / type ubifs (ro,relatime)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=108728k,nr_inodes=27182,mode=755)
+proc on /proc type proc (rw,relatime)
+/dev/ubi1_0 on /bkupgrade type ubifs (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,gid=5,mode=620,ptmxmode=666)
+tmpfs on /dev/shm type tmpfs (rw,relatime,mode=777)
+tmpfs on /tmp type tmpfs (rw,relatime)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
+sysfs on /sys type sysfs (rw,relatime)
+none on /sys/kernel/debug type debugfs (rw,relatime)
+pstore on /sys/fs/pstore type pstore (rw,relatime)
+/dev/mtdblock4 on /tee type jffs2 (ro,relatime)
+tmpfs on /etc/unbound type tmpfs (rw,relatime)
+tmpfs on /etc/wifi/w1 type tmpfs (rw,relatime)
+
+===== I2C =====
+0-0012
+0-0037
+0-0050
+1-002a
+1-002c
+1-0054
+1-005b
+i2c-0
+i2c-1
+/sys/bus/i2c/devices/0-0012/name = aw9610x_sar_0
+/sys/bus/i2c/devices/0-0037/name = cy8cmbr3108
+/sys/bus/i2c/devices/0-0050/name = 24c02
+/sys/bus/i2c/devices/1-002a/name = ntp8910a
+/sys/bus/i2c/devices/1-002c/name = tas5825m
+/sys/bus/i2c/devices/1-0054/name = sn3112
+/sys/bus/i2c/devices/1-005b/name = aw9110
+/sys/bus/i2c/devices/i2c-0/name = Meson I2C adapter
+/sys/bus/i2c/devices/i2c-1/name = Meson I2C adapter
+
+===== SPI =====
+
+===== SOUND =====
+ 0 [AMLAUGESOUND   ]: AML-AUGESOUND - AML-AUGESOUND
+                      AML-AUGESOUND
+--- pcm ---
+00-00: TDM-B-ntp8910a-amplifier ntp8910a-amplifier-0 :  : playback 1 : capture 1
+00-01: PDM-dummy dummy-1 :  : capture 1
+--- asound.conf ---
+pcm.!default {
+  type asym
+  playback.pcm "soft_volume"
+  capture.pcm "multi_capture"
+}
+
+pcm.soft_volume {
+  type softvol
+  slave.pcm "dmix_spk_plug"
+
+  control {
+    name "Master Playback Volume"
+  }
+}
+
+pcm.multi_capture {
+  type multi
+  slaves {
+    mics     { pcm "hw:0,1"; channels 8 }
+    loopback { pcm "hw:0,0"; channels 2 }
+  }
+  bindings {
+    0 { slave mics;     channel 0 }
+    1 { slave mics;     channel 2 }
+    2 { slave mics;     channel 4 }
+    3 { slave mics;     channel 6 }
+    4 { slave loopback; channel 0 }
+    5 { slave loopback; channel 1 }
+  }
+}
+
+pcm.dmix_spk_plug {
+  type plug
+  slave.pcm "dmix_spk"
+}
+
+pcm.dmix_spk {
+  type dmix
+  ipc_key 1024
+  ipc_key_add_uid false
+  ipc_perm 0666
+  slave {
+    pcm "hw:0,0"
+    channels 2
+    buffer_size 7680
+    period_size 960
+  }
+}
+
+===== INPUT_BUTTONS =====
+I: Bus=0019 Vendor=0001 Product=0001 Version=0000
+N: Name="gpio-keys-filter"
+P: Phys=gpio-keys-filter/input0
+S: Sysfs=/devices/platform/gpio-keys-filter/input/input0
+U: Uniq=
+H: Handlers=kbd event0 
+B: PROP=0
+B: EV=3
+B: KEY=20000 0 0 0
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="sar0_pad0"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input1
+U: Uniq=
+H: Handlers=kbd event1 
+B: PROP=0
+B: EV=3
+B: KEY=40 0 0 0 0 0 0 0 0 0 0 0 0 0 0 c0000 0 0 0
+
+
+===== LEDS =====
+micro:blue:ring1
+micro:blue:ring2
+micro:blue:ring3
+micro:green:ring1
+micro:green:ring2
+micro:green:ring3
+micro:red:ring1
+micro:red:ring2
+micro:red:ring3
+
+===== DT_NODES =====
+#address-cells
+#size-cells
+adc_power
+aliases
+aml-sensor@0
+aml_dma
+aml_info
+aml_reboot
+aml_snd_iomap
+amlogic-dt-id
+arm_pmu
+auge_sound
+bt-dev
+chosen
+compatible
+cpu_info
+cpu_iomap
+cpus
+custom_maps
+dummy
+dwc2_a
+dwc3@ff500000
+efuse
+efusekey
+emmc@ffe07000
+fixedregulator-3v3
+fixedregulator-3v3-wlan
+fixedregulator-5v
+gpio-keys-filter
+i2c_slave@ff806000
+interrupt-controller@2c001000
+interrupt-parent
+memory
+mhu@c883c400
+model
+mtd_nand
+name
+partitions
+pcba_ids
+pinctrl@ff634480
+pinctrl@ff800014
+pm
+psci
+pwm@ff802000
+pwm@ff807000
+pwm@ffd1a000
+pwm@ffd1b000
+rc@0xff808040
+reserved-memory
+rng
+rtc
+saradc
+scpi_clocks
+sdio@ffe05000
+secmon
+securitykey
+serial@ffd23000
+serial@ffd24000
+soc
+spicc_a
+spicc_b
+thermal-zones
+timer
+timer_bc
+unifykey
+usb2phy@ffe09000
+usb3phy@ffe09080
+watchdog@0xffd0f0d0
+wifi
+wifi_pwm_conf
+xtal-clk
+--- sound node ---
+
+
+===== NET =====
+    inet 127.0.0.1/8 scope host lo
+5: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast qlen 1000
+    link/ether <REDACTED> brd ff:ff:ff:ff:ff:ff
+    inet <REDACTED>/24 brd <REDACTED> scope global dynamic wlan0
+    link/ether <REDACTED> brd ff:ff:ff:ff:ff:ff
+    inet <REDACTED>/16 brd <REDACTED> scope global p2p0
+--- wifi driver ---
+aml_sdio               28672  2 sdio_bt,vlsicomm
+aml_info               16384  0 
+
+===== MODULES =====
+Module                  Size  Used by    Tainted: G  
+sdio_bt                20480  0 
+optee_armtz            24576  1 
+optee                  24576  2 optee_armtz
+vlsicomm             1708032  0 
+aml_sdio               28672  2 sdio_bt,vlsicomm
+aml_info               16384  0 
+
+===== QUASAR =====
+version_full:
+0.369.1.50.4794652826.20261021.126
+VERSION:
+3.21
+--- quasar.cfg ---
+(не приводится)
+
+===== DMESG_HW =====
+[    0.000000@0] Kernel command line: androidboot.serialno=<REDACTED> androidboot.deviceid=<REDACTED> androidboot.localization=RU.RU androidboot.rpmb_state=0 androidboot.rh_unlock=0 ubi.mtd=system root=ubi0:rootfs rootfstype=ubifs ubi.mtd=bkupgrade otg_device=1  no_console_suspend printk_no_block ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 
+[    0.000000@0] irq_meson_gpio: 100 to 8 gpio interrupt mux initialized
+[    0.000000@0] axg_aoclkc_init: register ao clk ok!
+[    0.000000@0] axg_amlogic_init_sdemmc: register amlogic sdemmc clk
+[    0.000000@0] axg_amlogic_init_sdemmc: register amlogic sdemmc clk
+[    0.000000@0] axg_amlogic_init_media: register meson media clk
+[    0.000000@0] axg_amlogic_init_misc: register amlogic axg misc clks
+[    0.000000@0] axg_amlogic_init_misc: register amlogic sdemmc clk
+[    0.000000@0] axg_clkc_init initialization complete
+[    0.000035@0] meson_bc_timer: mclk->mux_reg =ffffff800800a190,mclk->reg =ffffff800800c194
+[    0.001126@0] console [tty0] enabled
+[    0.032598@0] Meson chip version = RevB (25:B - 43:0)
+[    0.157237@0] DMA: preallocated 256 KiB pool for atomic allocations
+[    0.162641@0] aml_iomap: amlogic iomap probe done
+[    0.170896@0] amlogic auge_snd_iomap probe done
+[    0.203231@1] dmi: Firmware registration failed.
+[    0.205117@2] NetLabel:  protocols = UNLABELED CIPSOv4
+[    0.205202@2] NetLabel:  unlabeled traffic allowed by default
+[    0.218864@2] wifi: power_on_pin_OD = 0;
+[    0.218903@2] aml_wifi wifi: [wifi_dev_probe] no power_on_pin2
+[    0.219018@2] aml_wifi wifi: [pwm_double_channel_conf_dt] wifi pwm dt ok
+[    0.219049@2] aml_wifi wifi: [pwm_double_channel_conf] wifi pwm conf ok
+[    0.219071@2] aml_wifi wifi: [wifi_dev_probe] dhd_static_buf setup
+[    0.219378@2] aml_wifi wifi: [wifi_dev_probe] interrupt_pin=480
+[    0.219399@2] aml_wifi wifi: [wifi_dev_probe] irq_num=0, irq_trigger_type=1
+[    0.219420@2] aml_wifi wifi: [wifi_dev_probe] power_on_pin=464
+[    0.219439@2] aml_wifi wifi: [wifi_dev_probe] clock_32k_pin=0
+[    0.219715@2] aml_wifi wifi: [wifi_setup_dt] wifi_setup_dt
+[    0.219835@2] aml_wifi wifi: [wifi_setup_dt] irq num is:(32)
+[    0.219857@2] aml_wifi wifi: [wifi_setup_dt] interrupt_pin(480)
+[    0.219890@2] aml_wifi wifi: [wifi_setup_dt] power_on_pin(464)
+[    0.220652@2] hw perfevents: enabled with armv8_pmuv3 PMU driver, 7 counters available
+[    0.221976@2] audit: initializing netlink subsys (disabled)
+[    0.231634@0] jffs2: version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
+[    0.260775@3] meson_uart ff803000.serial: ==uart0 reg addr = ffffff8008348000
+[    0.260848@3] ff803000.serial: ttyS0 at MMIO 0xff803000 (irq = 16, base_baud = 1500000) is a meson_uart
+[    0.261486@3] meson_uart ffd24000.serial: ==uart1 reg addr = ffffff800834a000
+[    0.261570@3] ffd24000.serial: ttyS1 at MMIO 0xffd24000 (irq = 30, base_baud = 1500000) is a meson_uart
+[    0.267934@0] amlogic-new-usb2 ffe09000.usb2phy: USB2 phy probe:phy_mem:0xffe09000, iomap phy_base:0xffffff800836d000
+[    0.268174@0] amlogic-new-usb3 ffe09080.usb3phy: This phy has no usb port
+[    0.268217@0] amlogic-new-usb3 ffe09080.usb3phy: USB3 phy probe:phy_mem:0xffe09080, iomap phy_base:0xffffff8008371080
+[    0.269537@0] cy8cmbr31xx 0-0037: read block from i2c failed
+[    0.269572@0] cy8cmbr31xx 0-0037: read device id failed, ret: -5
+[    0.269604@0] cy8cmbr31xx: probe of 0-0037 failed with error -5
+[    0.270979@0] sn3112 1-0054: i2c write failed, addr: 0x16, data: 0x00, ret: -6
+[    0.281084@0] sn3112 1-0054: i2c write failed, addr: 0x16, data: 0x00, ret: -6
+[    0.291174@0] sn3112 1-0054: i2c write failed, addr: 0x16, data: 0x00, ret: -6
+[    0.301244@0] sn3112: probe of 1-0054 failed with error -5
+[    0.307466@0] efusekeyname:        mac_wifi	offset:    12	size:     6
+[    0.308936@1] meson-mmc: mmc driver version: 3.02, 2017-05-15: New Emmc Host Controller
+[    0.349979@0] meson-mmc: meson_mmc_probe() : success!
+[    0.350164@0] amlogic mtd driver init
+[    0.350829@0] prase_get_dtb_nand_parameter:124,parse dts start
+[    0.350983@0] nand_clk_ctrl 0xffe07000
+[    0.350999@0] prase_get_dtb_nand_parameter:230,parse dts end
+[    0.351057@0] nand_clk_ctrl 0xffe07000
+[    0.351078@0] nand register base ffffff8008384800, nand clock register ffffff8008386000
+[    0.351515@0] plat->aml_nand_device ffffff8009d15040
+[    0.351537@0] m3_nand_probe() aml_nand_device ffffff8009d15040
+[    0.351826@0] nand: device found, Manufacturer ID: 0x98, Chip ID: 0xda
+[    0.351846@0] nand: Toshiba NAND 256MiB 3,3V 8-bit
+[    0.351865@0] nand: 256 MiB, SLC, erase size: 128 KiB, page size: 2048, OOB size: 128
+[    0.351899@0] nand: NAND_ECC_NONE selected by board driver. This is not recommended!
+[    0.352091@0] NAND device id: 98 da 90 15 76 16
+[    0.352111@0] NAND device: Manufacturer ID: 
+[    0.352124@0]  0x98, Chip ID: 0x98 (Toshiba A revision NAND 2Gib TC58NVG1S3HBAI4 )
+[    0.352167@0] nand: NAND_ECC_NONE selected by board driver. This is not recommended!
+[    0.352361@0] aml_nand_init 2189: plat-name:bootloader
+[    0.354235@0] plat->aml_nand_device ffffff8009d15040
+[    0.354256@0] m3_nand_probe() aml_nand_device ffffff8009d15040
+[    0.354568@0] nand: device found, Manufacturer ID: 0x98, Chip ID: 0xda
+[    0.354588@0] nand: Toshiba NAND 256MiB 3,3V 8-bit
+[    0.354606@0] nand: 256 MiB, SLC, erase size: 128 KiB, page size: 2048, OOB size: 128
+[    0.354641@0] nand: NAND_ECC_NONE selected by board driver. This is not recommended!
+[    0.354830@0] NAND device id: 98 da 90 15 76 16
+[    0.354850@0] NAND device: Manufacturer ID: 
+[    0.354863@0]  0x98, Chip ID: 0x98 (Toshiba A revision NAND 2Gib TC58NVG1S3HBAI4 )
+[    0.354905@0] nand: NAND_ECC_NONE selected by board driver. This is not recommended!
+[    0.355095@0] aml_nand_init 2189: plat-name:nandnormal
+[    0.356059@0] aml_nand_scan_rsv_info 1081: page_num=1
+[    0.356076@0] aml_nand_scan_rsv_info 1084
+[    0.356446@0] aml_nand_bbt_check 1221 bbt is valid, reading.
+[    0.356465@0] aml_nand_read_rsv_info:414,read nbbt info to 280000
+[    0.358386@0] aml_nand_scan_rsv_info 1081: page_num=32
+[    0.358403@0] aml_nand_scan_rsv_info 1084
+[    0.365694@0] aml_nand_scan_rsv_info 1081: page_num=16
+[    0.365711@0] aml_nand_scan_rsv_info 1084
+[    0.372142@0] aml_nand_scan_rsv_info 1081: page_num=64
+[    0.372158@0] aml_nand_scan_rsv_info 1084
+[    0.433545@0]  NAND bbt detect factory Bad block at c000000
+[    0.433571@0] aml_nand_add_partition:447 factory bad addr=600
+[    0.433620@0]  NAND bbt detect factory Bad block at c020000
+[    0.433644@0] aml_nand_add_partition:447 factory bad addr=601
+[    0.451464@0] Creating 6 MTD partitions on "nandnormal":
+[    0.507865@0]  NAND bbt detect factory Bad block at c000000
+[    0.507929@0]  NAND bbt detect factory Bad block at c020000
+[    0.513586@0] mtd: partition "recovery" extends beyond the end of device "nandnormal" -- size truncated to 0x31c0000
+[    0.529157@0] nandnormal initialized ok
+[    0.530087@0] mtd_nand_probe 263 , err = 0
+[    0.532815@0] meson_wdt ffd0f0d0.watchdog: AML Watchdog Timer probed done
+
+===== DONE =====
+ok
