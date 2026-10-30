@@ -80,7 +80,9 @@ RTC и выход на наушники.
 ## Разделы флеша { #partitions }
 
 ```text
-mtd0 "bootloader" 2 MB   mtd1 "tpl" 2 MB   mtd2 "boot" 10 MB
+mtd0 "bootloader" 2 MB   
+mtd1 "tpl" 2 MB   
+mtd2 "boot" 10 MB
 mtd3 "system" ~80 MB -> ubi0:rootfs (ubifs, RO)
 mtd4 "nv" 1 MB -> /tee (vfat, RO)
 mtd5 "bkupgrade" 105 MB -> ubi1 (RW) = /bkupgrade (+ /data)
