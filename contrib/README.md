@@ -82,6 +82,9 @@
 * **[`station1-privacy.sh`](station1-privacy.sh)** — Станция 1: обратимая блокировка
   известных узлов метрик без удаления Алисы.
   [Рецепт и ограничения](../docs/recipes/station1-privacy.md).
+* **[`fiero-hi-privacy.sh`](fiero-hi-privacy.sh)** — Fiero Hi: обратимая блокировка тех же
+  узлов метрик строками в `/etc/hosts`; `apply`, `check`, `restore` с проверкой SHA-256.
+  [Рецепт и ограничения](../docs/recipes/fiero-hi-privacy.md).
 
 ### Доступ и ADB:
 * **[`install-s97adb.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-s97adb.sh)** —
