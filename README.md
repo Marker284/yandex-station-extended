@@ -42,7 +42,7 @@
   DNS-метод, правка CA из factory mode, ADB по USB, приложение для Android.
 - 🔐 **[SSH и защита от обновлений](https://hackalice.me/start/ssh/)** — чтобы доступ не пропал.
 - 📦 **[Пакеты](https://hackalice.me/start/packages/)** — `yse` (Entware и `.yap`),
-  [YAM](https://hackalice.me/recipes/yam/) с веб-панелью и Lua-плагинами.
+  [YAM](https://hackalice.me/recipes/packagemanagers/) с веб-панелью и Lua-плагинами.
 - 🔌 **[USB Host](https://hackalice.me/recipes/usb-host/)** — флешки, USB-Ethernet, наушники и ЦАП.
 - 🎵 **[AirPlay](https://hackalice.me/recipes/airplay/)** и
   **[Spotify Connect](https://hackalice.me/recipes/spotify/)**,
