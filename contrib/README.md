@@ -96,6 +96,10 @@
 
 ### Звук, медиа и стриминг:
 
+* **[`station1-soundcloud/`](station1-soundcloud/)** — Станция 1: SoundCloud голосом,
+  первый трек и фоновый плеер без HDMI; один скрипт в AliceBridge.
+  ТВ-набор не нужен. [Рецепт](../docs/recipes/station1-soundcloud.md).
+
 * **[`alice-say.py`](alice-say.py)** — самостоятельный клиент озвучки текста через
   штатный `AliceCapability.START_VOCALIZE` по root-SSH. На ПК нужны Python 3.11+
   и OpenSSH, на колонке — `socat`. Протокол проверен на Лайт 2 / Plum;
