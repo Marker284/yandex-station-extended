@@ -115,12 +115,24 @@ framebuffer:
 ### Прямое управление { #direct-control }
 
 Кадр — 356 байт в `/dev/fb0`, светодиод `index` — байты с `index * 4` по `index * 4 + 3`.
-Вся панель на небольшой яркости (нужен Python — `yse install python3`):
+Вся панель на небольшой яркости:
 
-```python
-with open("/dev/fb0", "wb", buffering=0) as fb:
-    fb.write(bytes([0x10, 0x10, 0x10, 0x00]) * 89)
-```
+=== "sh"
+
+    ```sh
+    i=0; while [ $i -lt 89 ]; do printf '\020\020\020\000'; i=$((i+1)); done > /dev/fb0
+    ```
+
+    Байты в `printf` записываются восьмеричными кодами: `\020` — это `0x10`, `\377` — `0xFF`.
+
+=== "Python"
+
+    Нужен Python — `yse install python3`.
+
+    ```python
+    with open("/dev/fb0", "wb", buffering=0) as fb:
+        fb.write(bytes([0x10, 0x10, 0x10, 0x00]) * 89)
+    ```
 
 Порядок каналов в пикселе — **R, G, B, W**, по байту на канал (`0x00`–`0xFF`).
 
