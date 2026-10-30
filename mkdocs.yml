@@ -163,13 +163,16 @@ nav:
       - YAM и BetterYAM: recipes/packagemanagers.md
       - Голосовой спутник Home Assistant: recipes/home-assistant.md
       - Своя LLM вместо Алисы: recipes/llm.md
-      - Свой бэкенд (quasard, v3rt3p): recipes/selfhosted-backend.md
       - Колонка без Яндекса: recipes/standalone.md
       - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
       - Ограничить метрики (Станция 1): recipes/station1-privacy.md
       - ТВ-набор (Станция 1): recipes/station1-tv.md
       - Debian (Станция 1): recipes/station1-debian.md
       - Управление голосом алисы: recipes/upravlenie-golosom-alisy.md
+- Бэкенд (Self-hosted):
+      - Бэкенд: recipes/bekend-self-hosted.md
+      - quasard: recipes/quasard.md
+      - v3rt3p: recipes/v3rt3p.md
   - Устройства:
       - devices/index.md
       - Станция Лайт (Micro): devices/station-lite.md
