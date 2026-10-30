@@ -145,6 +145,8 @@ AW9110. `cy8cmbr3108` и `sn3112` не отвечают по I2C — ошибк�
   128 КиБ.
 - Полный вывод с устройства (модель, MTD, UBI, I2C, звук, LED, модули, `dmesg`) —
   [`contrib/dumps/fiero-hi-recon.txt`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/dumps/fiero-hi-recon.txt).
+- [Ограничение отправки метрик](../recipes/fiero-hi-privacy.md): узлы AppMetrica и clickdaemon
+  через `/etc/hosts`, блокировка сохраняется после перезагрузки.
 
 Подробности методов — в разделе [«Как это устроено»](../internals/architecture.md), железо —
 на странице [Станции Лайт](station-lite.md).

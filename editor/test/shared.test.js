@@ -102,8 +102,8 @@ describe('paths', () => {
 
   it('разделы nav из настоящего mkdocs.yml', () => {
     const s = navSections(mkdocs);
-    expect(s.map((x) => x.title)).toEqual(['Начало работы', 'Рецепты', 'Устройства', 'Как это устроено']);
-    expect(s.map((x) => x.dir)).toEqual(['start', 'recipes', 'devices', 'internals']);
+    expect(s.map((x) => x.title)).toEqual(['Начало работы', 'Рецепты', 'Бэкенд', 'Устройства', 'Как это устроено']);
+    expect(s.map((x) => x.dir)).toEqual(['start', 'recipes', 'recipes', 'devices', 'internals']);
   });
 
   it('вставка страницы в конец раздела', () => {
