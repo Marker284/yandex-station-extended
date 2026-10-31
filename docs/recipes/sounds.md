@@ -106,6 +106,23 @@ sync; mount -o remount,ro /
 `spotter_cancel.opus`, `volume_sound.opus`, `notification_sound.opus`, `timer.opus`,
 `calls_*`…) и `ru-RU/` (фразы). Формат — Ogg Opus.
 
+### Флаги звуков голосового диалога { #dialog-earcons }
+
+На Станции Лайт 1 / Micro v1.2 с прошивкой
+`0.369.1.46.4778262442.20261013.297` в секции `aliced` файла `quasar.cfg` подтверждены
+отдельные переключатели штатных сигналов:
+
+```text
+playStartVoiceInputEarcon: true
+playCancelEarcon: true
+playStopRecognitionEarcon: false
+playRecognitionErrorEarcon: true
+```
+
+Это показывает, что старт ввода, отмена, остановка распознавания и ошибка распознавания
+управляются раздельно. Соответствие этих флагов конкретным файлам `*.opus` здесь не заявляется:
+по одному имени параметра его надёжно установить нельзя.
+
 Конвертировать свой файл:
 
 ```sh
