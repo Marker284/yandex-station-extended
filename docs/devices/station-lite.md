@@ -53,7 +53,7 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 | Spotify Connect | не проверялось | — |
 | Плеер как Bluetooth-источник | работает | [bt-proxy](../recipes/bt-proxy/) |
 | Свои звуки | работает | [Свои звуки](../recipes/sounds.md) |
-| Обработанный микрофон | не проверялось | — |
+| Обработанный микрофон | работает | [VQE и full-duplex](#vqe) |
 | Подсветка | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
 | YAM | работает | [YAM и BetterYAM](../recipes/packagemanagers.md#betteryam) |
 | Своя LLM | не проверялось | — |
@@ -156,6 +156,45 @@ RRGGBB  RRGGBB  RRGGBB   1000   # цвет ring1 ring2 ring3  +  длитель�
 - Утилиты: `aplay`, `arecord` (запись с микрофонов), `alsamixer`, `alsactl`.
 - Громкость: `/system/vendor/quasar/set_volume.sh N` = `amixer set Master N%`.
 
+### VQE и full-duplex { #vqe }
+
+**Проверено на:** `Yandex Station Micro v1.2`, прошивка
+`0.369.1.46.4778262442.20261013.297`, октябрь 2026.
+
+В `quasar.cfg` для этой сборки `audiod.audioDevice` задаёт `inRate: 48000`,
+`micChannels: 4`, `spkChannels: 2`, `outRate: 16000`, `mainChannel: vqe_0` и VQE
+`type: yandex`, `preset: yandexmicro`. `audiosender.spotterChannelName` также равен
+`vqe_0`.
+
+`audiosender.availableChannels` содержит восемь каналов:
+`raw_mic_0..3`, `raw_spk_0..1`, `vqe_0` и `vqe_bnr`; в `speechkitLogChannels`
+перечислены `vqe_0` и `vqe_bnr`. Назначение `vqe_bnr` здесь не интерпретируется —
+фиксируется только его наличие в конфигурации.
+
+Обработанный `vqe_0` проверен с внешним realtime-ассистентом: поток нёс речь пользователя
+и продолжал поступать во время воспроизведения ответа самой колонкой. Речь поверх ответа
+распознавалась и использовалась для перебивания воспроизведения (barge-in). Это подтверждает
+практическую пригодность штатного VQE для full-duplex на этой конфигурации; количественное
+подавление эха в дБ не измерялось.
+
+SHA-256 проверенных бинарников:
+
+```text
+2dad0ffc61ba73d15ea813b754d7a56866d0477c321dcad9138b8d06e14ddbf1  /system/vendor/quasar/maind
+df67c7ad9fb9f2f9c473ba2aaed7663a0e898a2c6622993e65d3b8834a0b3646  /system/vendor/quasar/libs/libyandex_evil.so
+```
+
+### Потоковое воспроизведение { #stream-playback }
+
+На той же сборке в `quasar.cfg` подтверждены локальные сервисы `mediad` на порту `9900`
+и `audioclient` на `9906`. У `audioclient` заданы потоковые профили `OPUS_STREAM`,
+`PCM_STREAM` и `PCM_STREAM_WITH_BUFFER`; общий ALSA-выход — устройство `default`.
+`OPUS_STREAM` использует GStreamer-цепочку `appsrc ! opusparse ! opusdec ! ... ! alsasink`,
+а `PCM_STREAM_WITH_BUFFER` отличается от `PCM_STREAM` включённым буферизующим `multiqueue`.
+
+Это именно конфигурация прошивки, а не API-обещание: формат управляющих IPC-сообщений и
+совместимость между версиями quasar нужно проверять отдельно.
+
 ## Прочее железо { #hardware }
 
 - **GPIO**: `gpiochip0` (AO, 497–511), `gpiochip1` (EE, 411–496). Именованные:
@@ -172,6 +211,8 @@ RRGGBB  RRGGBB  RRGGBB   1000   # цвет ring1 ring2 ring3  +  длитель�
 - Отключение OTA тремя правками rootfs — работает после перезагрузки.
 - Сетевой ADB поднимается по маркерам `/data/quasar/activate_adb_*` + `activate_network_adb`.
 - `maind --gst-launch` играет через родной GStreamer.
+- Обработанный `vqe_0` проверен с внешним realtime-ассистентом, включая речь поверх
+  собственного воспроизведения колонки и barge-in.
 - USB Host (OTG) через хаб с питанием: флешки/SSD, Ethernet RTL8153, USB-звук —
   описано в [рецепте USB Host](../recipes/usb-host.md).
 

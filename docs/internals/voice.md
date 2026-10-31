@@ -43,21 +43,33 @@ flowchart TD
 
 ## 1. Захват звука — `audiod`
 
-Внутри `maind --platformd`. ALSA card 0, device 2 (`PDM-dummy`, в конфиге `dmicarray`),
-`inRate` 48000, `micChannels` 4, `spkChannels` 2, `outRate` 16000. Каналы
-(`audiosender.availableChannels`): `raw_mic_0..3`, `raw_spk_0..1` (что играет динамик) и `vqe_0`.
-`brokenMicDetector` следит за RMS микрофонов.
+Внутри `maind --platformd`. В исходном снятом профиле ALSA card 0, device 2 (`PDM-dummy`,
+в конфиге `dmicarray`), `inRate` 48000, `micChannels` 4, `spkChannels` 2, `outRate` 16000.
+Каналы (`audiosender.availableChannels`): `raw_mic_0..3`, `raw_spk_0..1` (что играет
+динамик) и `vqe_0`. `brokenMicDetector` следит за RMS микрофонов.
+
+Набор каналов зависит от модели и сборки. На Станции Лайт 1 / Micro v1.2 с прошивкой
+`0.369.1.46.4778262442.20261013.297` при тех же 4 микрофонных и 2 опорных каналах в
+`audiosender.availableChannels` есть ещё `vqe_bnr`, то есть всего восемь каналов;
+`speechkitLogChannels` содержит `vqe_0` и `vqe_bnr`. Назначение `vqe_bnr` не установлено.
+Подробности проверки — на [странице Лайт 1](../devices/station-lite.md#vqe).
 
 ## 2. Обработка — Yandex VQE
 
-`vqe.type: yandex`, `preset: yandexmini`, `omniMode: true`. Эхоподавление по `raw_spk_*` (Алиса
-слышит вас поверх своей музыки), формирование луча, шумоподавление *(вывод по набору каналов)*.
-Выход — канал **`vqe_0`**: его слушают спотеры (`spotterChannelName`) и его же отправляют в
-облако (`speechkitLogChannels`).
+Тип VQE и preset зависят от модели. В исходном снятом профиле: `vqe.type: yandex`,
+`preset: yandexmini`, `omniMode: true`. На проверенной Лайт 1 / Micro v1.2 —
+`vqe.type: yandex`, `preset: yandexmicro`; `mainChannel` и `spotterChannelName` равны
+`vqe_0`. Эхоподавление идёт по `raw_spk_*` (Алиса слышит вас поверх своей музыки),
+формирование луча и шумоподавление определяются конкретным профилем VQE.
+
+Основной обработанный выход — канал **`vqe_0`**: его слушают спотеры и его же отправляют
+в облако. На Лайт 1 этот поток дополнительно проверен внешним realtime-ассистентом, в том
+числе во время собственного воспроизведения колонки: речь поверх ответа продолжала поступать
+и использовалась для barge-in. Количественное качество эхоподавления не измерялось.
 
 Для Лайт 2 / Plum проверен [захват обработанного `vqe_0`](../recipes/microphone.md)
-через экспортированный интерфейс VQE. Конфигурация Plum отличается от приведённого выше
-профиля `yandexmini`: два микрофонных канала и один опорный, выход — моно 16 кГц.
+через экспортированный интерфейс VQE. Конфигурация Plum отличается от приведённых выше:
+два микрофонных канала и один опорный, выход — моно 16 кГц.
 
 ## 3. Локальные нейросети
 
@@ -166,6 +178,21 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
   `appsrc ! opusparse ! opusdec ! volume ! alsasink`. Музыка — в `maind --mediad`.
 - Текстовые запросы (из приложения) идут как `Vins.TextInput` и **минуют ASR**.
 
+### Потоковые профили `audioclient` { #audioclient-streams }
+
+На проверенной Лайт 1 / Micro v1.2 (`0.369.1.46.4778262442.20261013.297`) в `quasar.cfg`
+у `audioclient.controller.playbackParams` есть три потоковых режима:
+
+| Режим | Пайплайн / отличие |
+|---|---|
+| `OPUS_STREAM` | `appsrc ! opusparse ! opusdec ! ... ! alsasink` |
+| `PCM_STREAM` | `appsrc` с `input_media_type` → `audioresample` → `alsasink` |
+| `PCM_STREAM_WITH_BUFFER` | тот же PCM-путь, но `MULTIQUEUE` заменён на буферизующий `multiqueue` |
+
+Общий `deviceName` для этих пайплайнов — ALSA `default`; на этой же сборке `mediad`
+слушает локальный порт `9900`, `audioclient` — `9906`. Это подтверждённая конфигурация
+конкретной прошивки, а не обещание стабильного публичного API между версиями.
+
 ## Звук активации { #activation-sound }
 
 Короткий сигнал на «Алису» прошивка проигрывает сама, на срабатывании: в логе через ~5 мс после
@@ -184,7 +211,8 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
 
 ## Отправка аудио помимо запросов
 
-`audiosender` держит кольцевой буфер `historySeconds: 10` по всем 7 каналам.
+`audiosender` держит кольцевой буфер `historySeconds: 10` по настроенным каналам. В исходном
+профиле их семь; на проверенной Лайт 1 — восемь, включая дополнительный `vqe_bnr`.
 `cachingSoundLogSender` / `logsound/*` (`SoundLogStorage`, `UniProxyLogSender`,
 `random_sound_logger`) отправляют «звуковые логи» срабатываний; случайная запись включена для
 групп `allowedForRandomLoggingQuasmodromGroups: ["beta"]`.
@@ -194,9 +222,11 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
 Это прямо отвечает на вопросы из [«Своя LLM вместо Алисы»](../recipes/llm.md):
 
 - **Текст запроса без uniproxy не получить** — ASR облачный. Нужно либо перехватить поток на
-  `uni.ws` (TLS + protobuf, как с quasar-бэкендом), либо забирать звук самостоятельно: каналы
-  `vqe_0`/`raw_mic_*` живут внутри `maind`, ALSA-устройство `hw:0,2` занято `audiod`
-  *(одновременный захват не проверялся)*.
+  `uni.ws` (TLS + protobuf, как с quasar-бэкендом), либо забирать звук самостоятельно.
+  Каналы `vqe_0`/`raw_mic_*` живут внутри `maind`; прямой параллельный захват штатного ALSA-
+  устройства не является универсальным способом. Захват `vqe_0` через интерфейс VQE проверен
+  на [Лайт 2](../recipes/microphone.md) и отдельно на [Лайт 1](../devices/station-lite.md#vqe);
+  на Лайт 1 он продолжал работать и во время собственного воспроизведения колонки.
 - **Произнести свой текст** проще всего локально — через API glagol на порту 1961, как это
   делает интеграция YandexStation для Home Assistant — см. [Сеть → glagol](network.md#glagol).
   Для Plum также проверен [вызов `START_VOCALIZE` через SSH](../recipes/sounds.md#native-tts).
