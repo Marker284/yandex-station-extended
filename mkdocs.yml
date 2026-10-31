@@ -169,6 +169,7 @@ nav:
       - ТВ-набор (Станция 1): recipes/station1-tv.md
       - Debian (Станция 1): recipes/station1-debian.md
       - Управление голосом алисы: recipes/upravlenie-golosom-alisy.md
+      - MidiPult — веб-панель: recipes/midipult.md
   - Бэкенд:
       - Бэкенд (Self-hosted): recipes/bekend-self-hosted.md
       - v3rt3p: recipes/v3rt3p.md

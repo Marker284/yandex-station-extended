@@ -54,6 +54,7 @@
 | Подсветка | работает | [Индикация](#led) |
 | YAM | работает (профиль midi) | [профиль midi](../recipes/packagemanagers.md) |
 | Своя LLM | не проверялось | — |
+| Своя веб-панель (MidiPult) | работает | [MidiPult](../recipes/midipult.md) |
 
 ## Получение root { #root }
 
