@@ -51,12 +51,12 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 | USB Host (OTG) | работает | [USB Host](../recipes/usb-host.md) |
 | AirPlay | не проверялось | — |
 | Spotify Connect | не проверялось | — |
-| Плеер как Bluetooth-источник | работает | [bt-proxy](../recipes/bt-proxy/) |
+| Плеер как Bluetooth-источник | работает | [bt-proxy](../recipes/bt-proxy.md) |
 | Свои звуки | работает | [Свои звуки](../recipes/sounds.md) |
 | Обработанный микрофон | не проверялось | — |
 | Подсветка | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
 | YAM | работает | [YAM и BetterYAM](../recipes/packagemanagers.md#betteryam) |
-| Своя LLM | не проверялось | — |
+| Своя LLM | есть нативный GPT; результаты автора адаптации | [Alisa Voice](../recipes/llm.md#chatgpt-web) |
 
 ## Получение root { #root }
 
