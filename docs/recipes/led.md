@@ -92,6 +92,11 @@ Esc возвращает прежний.
 после выхода возвращается штатное управление. В нативном клиенте кадры формирует
 [C++-модуль][native-led], ПК для анимации не нужен.
 
+На нативном клиенте Лайт 1/2 в паузах можно включить голубую волну отдельной галочкой
+«Настройки → Подсветка в паузах GPT». В версии 0.3.2 она выключена по умолчанию;
+переключение применяется без перезапуска разговора. Цвет «Выключена» гасит всю
+GPT-подсветку, включая волну. Демо показывает выбранную анимацию ответа.
+
 На устройстве проверены 30 цветовых кадров, подавление штатной анимации во время
 удержания LED и её возврат после освобождения. Проверка запускала голосовой ввод
 через IPC, а не акустическое произнесение слова «Алиса».
@@ -107,11 +112,11 @@ ssh alice 'rm /data/opt/alice-led/indicator.sh && rmdir /data/opt/alice-led'
 Системные файлы и автозапуск этот пример не меняет.
 
 [led-project]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant
-[plum-indicator]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/station/indicator.sh
-[rainbow-controller]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/indicator.py
-[led-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/bridge/tests/test_voice_controls.py
+[plum-indicator]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.2/engines/bridge/station/indicator.sh
+[rainbow-controller]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.2/engines/bridge/indicator.py
+[led-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.2/engines/bridge/tests/test_voice_controls.py
 
-[native-led]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.2.0/engines/native/native/effects.hpp
+[native-led]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.2/engines/native/native/effects.hpp
 
 ## Станция Мини (1-е поколение): `led_util` и SN3236 { #mini1-led }
 
