@@ -148,6 +148,7 @@ nav:
       - 2. SSH и обновления: start/ssh.md
       - 3. Пакеты yse: start/packages.md
       - 4. Если что-то сломалось: start/recovery.md
+      - UART SHELL: start/uart-shell.md
   - Рецепты:
       - recipes/index.md
       - USB Host (OTG): recipes/usb-host.md
