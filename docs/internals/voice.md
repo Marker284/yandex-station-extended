@@ -76,7 +76,10 @@ flowchart TD
 Движок `nnet`, признаки `cmn:lda`, модели в `spotter_models/` (обновляются с CDN Яндекса в
 `/data/quasar/data/spotter_model`, сборочные — fallback):
 
-Состав командных споттеров управляется аккаунтом: в `account_config` — `enabledCommandSpotters.music.{playAndPause,volume,navigation,feedback,bluetooth}`, `tv.{navigation,backToHome}`, `smartHome.{light,tv}` и `alwaysOnMicForShortcuts`; в приложении это ползунки категории «Ассистент». Поэтому набор быстрых команд у разных колонок отличается.
+Состав командных споттеров управляется аккаунтом: в `account_config` —
+`enabledCommandSpotters.music.{playAndPause,volume,navigation,feedback,bluetooth}`,
+`tv.{navigation,backToHome}`, `smartHome.{light,tv}` и `alwaysOnMicForShortcuts`; в приложении это
+ползунки категории «Ассистент». Поэтому набор быстрых команд у разных колонок отличается.
 
 | Модель | Задача |
 |---|---|
@@ -258,7 +261,7 @@ SpeechKit-протоколе есть отдельное действие `ACTIO
 
 Флаг живёт в конфиге станции, а не в ответах uniproxy, поэтому со своим сервером на месте облака
 звук работает так же. Проверено на Станции Лайт (quasar 0.369.1.46.4778262442.20261013.297)
-с подменённым `uniProxyUrl` на эмулятор uniproxy ([quasard](../recipes/llm.md#quasard)
+с подменённым `uniProxyUrl` на эмулятор uniproxy ([quasard](../recipes/quasard.md)
 с бэкендом своего ассистента). Какой файл при этом играет, не проверялось.
 
 ## Отправка аудио помимо запросов
@@ -285,7 +288,7 @@ SpeechKit-протоколе есть отдельное действие `ACTIO
   Оба варианта используют облачный синтез; из облака ответ приходит как `AliceResponse.TtsSpeak`.
 - **Подмена адреса**: пиннинга сертификатов нет — см. [Подводные камни](gotchas.md).
   Параметр `uniProxyUrl` можно увести на свой сервер, в том числе по `ws://` без TLS.
-- **Рабочий пример** — [quasard](../recipes/llm.md#quasard): свой uniproxy (JSON и protobuf
+- **Рабочий пример** — [quasard](../recipes/quasard.md): свой uniproxy (JSON и protobuf
   `AAPI`), ASR, LLM и TTS вместо облака.
 
 !!! warning "Колонка может отправлять фрагменты звука в облако"
