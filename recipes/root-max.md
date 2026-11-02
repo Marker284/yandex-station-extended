@@ -1,7 +1,7 @@
-# Станция Макс — ADB Max
+# Станция Макс — ROOT Max
 
 Сервисная отладка и выполнение административных команд на Яндекс Станции Макс (`yandexstation_2`,
-YNDX-0008) через стандартный сетевой сеанс ADB без изменения системных разделов.
+YNDX-0008) через стандартный сетевой сеанс ADB.
 
 ## Особенности платформы
 
@@ -9,9 +9,6 @@ YNDX-0008) через стандартный сетевой сеанс ADB бе�
 В отличие от моделей на Buildroot, здесь действует заводская защита целостности
 (Android Verified Boot, dm-verity). Системный сервис `adbd` собран в режиме production,
 а команда `adb root` возвращает `adbd cannot run as root in production builds`.
-
-Обычный [DNS-метод](root.md) на Максе неприменим, так как служебные скрипты `activate_adb.sh` и
-`onboot.sh` на этой платформе отсутствуют.
 
 Здесь используется отдельный сервисный подход — выполнение команд с повышенными привилегиями
 в оперативной памяти через существующую сессию ADB.
@@ -22,7 +19,7 @@ YNDX-0008) через стандартный сетевой сеанс ADB бе�
 ## Что понадобится
 
 - Станция Макс на прошивке **`PPR1.180610.011.20220415`**, ядро `4.9.113-g985a1e6b`;
-- Сетевой доступ к порту 5555;
+- Сетевой доступ к порту 5555 (через dns или другой способ);
 - Компьютер с установленной утилитой `adb`;
 - **Android NDK** (проверено на r26d) и Python 3 — для сборки вспомогательной утилиты.
 
@@ -132,7 +129,7 @@ adb shell cat /data/local/tmp/tool.log
 - **Действие в рамках одной команды:** повышенные права предоставляются только для процесса,
   запущенного утилитой. После его завершения консоль остаётся в обычном режиме `uid=2000(shell)`.
 - **Защита накопителя:** разделы `/system` и `/vendor` защищены проверками целостности dm-verity
-  на уровне ядра и загрузчика. Запись на системные разделы не сохраняется.
+  на уровне ядра и загрузчика. Запись на системные разделы не сохраняется. Но для `/product` и `/odm` нет защиты
 - **Временный характер:** все изменения происходят исключительно в оперативной памяти и не
   затрагивают постоянную прошивку.
 
@@ -163,14 +160,93 @@ adb shell rm -f /data/local/tmp/app_tool /data/local/tmp/tool.log
 - Не запускайте процедуру повторно без предварительной перезагрузки устройства.
 - Не используйте исполняемые файлы, собранные под другие версии ядра или устройства.
 
-## Отличия от DNS-метода
+## Постоянный рут (Требуется подтверждение пробуйте на свой страх и риск)
 
-| Параметр | [DNS-метод](root.md) | Метод Станции Макс |
-|---|---|---|
-| **Модели** | Лайт, Мини, Миди, Станция 2 | **Станция Макс (YNDX-0008)** |
-| **Платформа** | Buildroot / quasar | **Android 9 (YaOS_X)** |
-| **Принцип** | Ответ облачной синхронизации | **Локальная сервисная утилита** |
-| **Результат** | Сетевой ADB постоянно | Выполнение команд в сессии ADB |
-| **Заводской сброс** | Требуется | Не требуется |
-| **Изменение разделов** | Маркеры в `/data/quasar` | Не производится |
-| **После перезагрузки** | Сохраняется | Возврат в штатный режим |
+В `/odm` можно смонтировать loop ext с своими бинарниками, так как `$PATH` содержит `*/odm/bin*`.
+
+Примерно так:
+
+```sh
+mount -o loop /data/local/tmp/fs.ext4 /odm
+```
+
+Если заглянуть в раздел `product`, который не проверяется при запуске, можно увидеть:
+
+```
+app  build.prop  lib  lib64  lost+found  media
+```
+
+Можно поправить `build.prop` или добавить свои приложения в `app` или `priv-app` (предварительно создав каталог).
+
+**При создании новых файлов нужно назначить им правильный контекст SELinux:**
+
+```sh
+chcon -R u:object_r:system_file:s0 /product/"новые файлы"
+```
+
+Также можно попробовать отредактировать build.prop для отключения selinux и запуска adb с root:
+
+```sh
+PROP=/product/build.prop
+BAK=/data/local/tmp/build.prop.bak.$(date +%s)
+
+echo "Backup: $BAK"
+cp "$PROP" "$BAK"
+
+echo "Remount /product rw"
+mount -o remount,rw /product
+
+read -r -d '' BLOCK <<'EOF'
+
+ro.build.type=userdebug
+ro.build.tags=test-keys
+ro.debuggable=1
+ro.force.debuggable=1
+service.adb.root=1
+persist.sys.usb.config=adb
+persist.service.adb.enable=1
+persist.adb.tcp.port=5555
+service.adb.tcp.port=5555
+ro.adb.secure=0
+ro.secure=0
+
+ro.boot.selinux=permissive
+androidboot.selinux=permissive
+ro.build.selinux=0
+persist.sys.selinux=permissive
+EOF
+
+echo "Appending block to $PROP"
+printf '%s\n' "$BLOCK" >> "$PROP"
+
+echo "Sync + remount ro"
+sync
+mount -o remount,ro /product 2>/dev/null || true
+
+echo "Backup at: $BAK"
+echo "Done. Reboot to apply."
+```
+
+Вернуть обратно:
+
+```sh
+PROP=/product/build.prop
+
+BAK=$(ls -1t /data/local/tmp/build.prop.bak.* 2>/dev/null | head -n1)
+
+if [ -z "$BAK" ]; then
+  echo "Backup not found in /data/local/tmp"
+  exit 1
+fi
+
+echo "Restore from: $BAK"
+mount -o remount,rw /product
+
+cp "$BAK" "$PROP"
+
+echo "Sync + remount ro"
+sync
+mount -o remount,ro /product 2>/dev/null || true
+
+echo "Done. Reboot to apply: reboot"
+```
