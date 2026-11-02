@@ -512,13 +512,27 @@ Content-Type: application/x-apple-binary-plist
 
 **Проверено на Станции Лайт (`yandexmicro`, device-tree `Yandex Station Micro`, усилитель `tas5825m`, ядро 4.9.68, userland armhf):** `shairport-sync 5.6.2` + `nqptp` + `avahi 0.8` из Entware. Готовая armhf-сборка для Лайт 2 ([`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz)) запускается на Лайт 1 без пересборки: userland и `libasound` те же (armhf, glibc 2.30). Звук идёт через штатную цепочку `default` → dmix 48 кГц, ответы Алисы звучат поверх музыки.
 
-Пакет `/data/shairport` не нужен. В отличие от Лайт 2, [bt-proxy](bt-proxy.md) подключить **нельзя**: в `maind` на Micro нет classic-Bluetooth-аудио (`strings maind` даёт `There is no bluetooth impl yet`, присутствует только `BluezBLEImpl`). Алиса не видит AirPlay как Bluetooth-телефон и не ставит его на паузу сама — AirPlay играет самостоятельно.
+Пакет `/data/shairport` не нужен. В отличие от Лайт 2, [bt-proxy](bt-proxy.md) подключить
+**нельзя**: в `maind` на Micro нет classic-Bluetooth-аудио (`strings maind` даёт `There is no
+bluetooth impl yet`, присутствует только `BluezBLEImpl`). Алиса не видит AirPlay как
+Bluetooth-телефон и не ставит его на паузу сама — AirPlay играет самостоятельно.
 
 ### Отличия от Лайт 2
 
-- **avahi `host-name` = имя, которое публикует `maind`** (`yandexmicro-<deviceid>`, где `deviceid` из `/proc/cmdline`, параметр `androidboot.deviceid=…`), и **`publish-addresses=no`**. A-запись для этого имени отдаёт `maind`, а `_airplay._tcp`/`_raop._tcp` публикует avahi. Уникальное имя хоста или `publish-addresses=yes` отправляют avahi в бесконечную спираль переименований (из-за отражения mDNS-мультикаста в сети), и сервис не резолвится: устройство видно в списке AirPlay, но телефон не узнаёт его адрес и не подключается.
-- **`output_rate = 48000`** в `shairport-sync.conf`: карта `hw:0` играет только 48 кГц, 44100 принимает молча и дрейфует (иканье примерно раз в 0,5 с).
+- **avahi `host-name` = имя, которое публикует `maind`** (`yandexmicro-<deviceid>`, где `deviceid`
+  из `/proc/cmdline`, параметр `androidboot.deviceid=…`), и **`publish-addresses=no`**. A-запись для
+  этого имени отдаёт `maind`, а `_airplay._tcp`/`_raop._tcp` публикует avahi. Уникальное имя хоста
+  или `publish-addresses=yes` отправляют avahi в бесконечную спираль переименований (из-за отражения
+  mDNS-мультикаста в сети), и сервис не резолвится: устройство видно в списке AirPlay, но телефон не
+  узнаёт его адрес и не подключается.
+- **`output_rate = 48000`** в `shairport-sync.conf`: карта `hw:0` играет только 48 кГц, 44100
+  принимает молча и дрейфует (иканье примерно раз в 0,5 с).
 - **`airplay_device_id`** — MAC `wlan0` без двоеточий (`interface = "wlan0"` его не подставляет).
 
 ??? warning "Автозапуск: Entware-dbus и устаревший сокет"
-    avahi из Entware подключается к Entware-`dbus` по `/opt/var/run/dbus/system_bus_socket`. Этот путь лежит на разделе `/data` и переживает перезагрузку, а процесс `dbus-daemon` — нет. Скрипт автозапуска должен проверять **процесс** `dbus-daemon` (например, по `/opt/bin/dbus-daemon` в `/proc/*/cmdline`), а не наличие сокет-файла. Иначе после загрузки `dbus` не стартует, avahi падает с `Connection refused`, и AirPlay не публикуется — порт 7000 открыт, но устройства в сети нет.
+    avahi из Entware подключается к Entware-`dbus` по `/opt/var/run/dbus/system_bus_socket`. Этот
+    путь лежит на разделе `/data` и переживает перезагрузку, а процесс `dbus-daemon` — нет. Скрипт
+    автозапуска должен проверять **процесс** `dbus-daemon` (например, по `/opt/bin/dbus-daemon` в
+    `/proc/*/cmdline`), а не наличие сокет-файла. Иначе после загрузки `dbus` не стартует, avahi
+    падает с `Connection refused`, и AirPlay не публикуется — порт 7000 открыт, но устройства в сети
+    нет.
