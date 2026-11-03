@@ -41,6 +41,7 @@ RTC и выход на наушники.
 | Обработанный микрофон | не проверялось | — |
 | Подсветка | работает | [Подсветка](../recipes/led.md) |
 | YAM | работает | [профиль mini2](../recipes/packagemanagers.md) |
+| YouTube Music | работает | [YouTube Music](../recipes/youtube-music.md) |
 | Своя LLM | работает | [Своя LLM](../recipes/llm.md) |
 
 ## Получение root { #root }

@@ -24,7 +24,7 @@
 | [Spotify Connect](spotify.md) | колонка как приёмник Spotify и «Алиса, поставь …» через Spotify | Станция 2 |
 | [Spotify голосом на Станции 1](station1-spotify.md) | Spotify TV и голосовой мост, Free или Premium; установка из AliceBridge или с Windows | проверено на Станции 1, Android 6.0.1 |
 | [SoundCloud голосом на Станции 1](station1-soundcloud.md) | первый трек голосом, пауза и перемотка; установка из AliceBridge | проверено на Станции 1, Android 6.0.1 |
-| [YouTube Music](youtube-music.md) | «Алиса, поставь …» из YouTube Music без входа в Google и без сервера | Станция 2 |
+| [YouTube Music](youtube-music.md) | ytm-alice: YouTube Music голосом, из веб-панели и трансляцией с телефона | Лайт 1, Мини 2 |
 | [Debian на Станции 1](station1-debian.md) | Debian 13 со своим ядром Linux 7.3 рядом с Алисой или вместо неё, одной командой; удаление возвращает сток | проверено на Станции 1, прошивка 2.369.5.46 |
 | [ТВ-набор для Станции 1](station1-tv.md) | веб-пульт в браузере телефона, ТВ-лаунчер, YouTube (SmartTube) и VPN (v2rayNG) на HDMI | проверено на Станции 1, Android 6.0.1 |
 | [MidiPult — веб-панель](midipult.md) | дисплей, кольцо, плеер, радио, нейросеть, VPN и сценарии в браузере | проверено на Станции Миди, прошивка 0.369.1.46.4778262955.20261013 |
