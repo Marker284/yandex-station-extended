@@ -42,7 +42,7 @@
 | Spotify Connect | работает | [Spotify Connect](../recipes/spotify.md) |
 | YouTube Music | частично (голосом не проверялось) | [YouTube Music](../recipes/youtube-music.md) |
 | Плеер как Bluetooth-источник | не проверялось | — |
-| Свои звуки | не проверялось | — |
+| Свои звуки | работает | — | [Свои звуки] (https://hackalice.me/recipes/sounds/) |
 | Обработанный микрофон | частично: в нативном GPT, по данным автора адаптации; передача на ПК не проверена | [Alisa Voice](../recipes/llm.md#chatgpt-web) |
 | Подсветка | работает | [Индикация](#led) |
 | YAM | не проверялось | — |
