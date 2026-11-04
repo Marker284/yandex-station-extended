@@ -1,8 +1,12 @@
 Станция 3 (orion) — доказательства к разделу "remount rw на system"
 docs/devices/station-3.md#remount-rw
 
-Снято с двух колонок: заводская factory-13 (23.08.2025) и отдельно
-сборка от 30.10.2026. Серийники/cpu_id заменены на <DEVICE_ID>/<REDACTED>.
+Снято с двух колонок:
+  A: softwareVersion 0.13.1.36.3322101745.20250823.factory-13
+     (заводской образ, 23.08.2025, BUILD_ID 3322101745)
+  B: softwareVersion 0.372.1.21.4818307898.20261030.79
+     (retail-сборка, НЕ factory, 30.10.2026, BUILD_ID 4818307898)
+Серийники/cpu_id заменены на <DEVICE_ID>/<REDACTED>.
 
 ===== U-BOOT ENV: ключевые переменные (идентичны на обеих прошивках) =====
 
@@ -90,14 +94,14 @@ power-only для USB2-данных, но не доказано до конца 
 /etc/hackalice-test-marker -> sync; sync -> adb reboot -> после возврата:
 сверка содержимого и md5, проверка /proc/mounts на ошибки.
 
-Колонка A (factory-13, 23.08.2025):
+Колонка A (0.13.1.36.3322101745.20250823.factory-13):
   remount: exit 0, дмесг "EXT4-fs (mmcblk0p10): re-mounted", без ошибок
   маркер записан: 319 байт, md5 4bbbc3db39ef048a0249275a02d99d9e
   после ребута: md5 4bbbc3db39ef048a0249275a02d99d9e (совпадает)
   mount после ребута: /dev/root on / type ext4 (ro,relatime)
   dmesg после ребута: ни одной ошибки ext4/fsck/corrupt
 
-Колонка B (сборка 30.10.2026):
+Колонка B (0.372.1.21.4818307898.20261030.79, retail, не factory):
   remount: exit 0, дмесг "EXT4-fs (mmcblk0p10): re-mounted", без ошибок
   маркер записан: 317 байт, md5 7cae569073bb3eb932256ede665acf45
   после ребута: md5 7cae569073bb3eb932256ede665acf45 (совпадает)
