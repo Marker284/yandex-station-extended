@@ -39,11 +39,15 @@ U-Boot `01.01.250823.213609`. Совпадает с заводским User-Agen
 | Радио | **Unisoc** (`vlsicomm` + `aml_sdio` + `sdio_bt`), BT-пульт (`input_btrcu`); в образе есть и драйвер Amlogic `w2l` |
 | Безопасность | SELinux `enforcing`, JTAG `disable`, `rh_unlock=0`, verified boot `green`, OP-TEE + keymaster (`/dev/keymaster_svc`) |
 
+`verifiedbootstate=green` отражает проверку цепочки `bootloader` → `boot`
+(Amlogic Secure Boot, корень в efuse SoC), не содержимого `system` —
+подробности и доказательства в разделе [Разделы флеша](#partitions).
+
 ## Что работает { #features }
 
 | Что | Состояние | Где описано |
 |---|---|---|
-| Root и SSH | работает (на заводской `factory-13`) | [подмена DNS](../start/root.md) |
+| Root и SSH | работает (на заводской `factory-13` и отдельно на сборке 30.10.2026) | [подмена DNS](../start/root.md) |
 | USB Host (OTG) | не проверялось | — |
 | AirPlay | не проверялось | — |
 | Spotify Connect | не проверялось | — |
@@ -121,6 +125,30 @@ Amlogic-моделях (проверено на заводской `factory-13` 
 обновлении (`ota`), `4` — `data`. Фиксированные `bootloader`/`reserved`/`env`/
 `cache` в этот узел не входят — их создаёт прошивальщик Amlogic до таблицы.
 
+### `remount rw` на `system` { #remount-rw }
+
+- **`bootloader` и `boot` защищены Amlogic Secure Boot** (корень доверия —
+  efuse SoC): `bootloader_wp=1`, образ `bootloader` — зашифрованный контейнер
+  `@AMLBOOT`. Неподписанная правка туда не загрузится.
+- **В `system` нет активного dm-verity.** В ядре он скомпилирован
+  (`CONFIG_DM_VERITY=y`), но не используется: `avb2=0` в u-boot env,
+  boot-скрипт `storeboot` читает ядро только из раздела `boot`
+  (`imgread kernel boot`) и не обращается к `system`, в cmdline нет `dm=`,
+  `dmsetup`/`/proc/mounts` пусты. После `mount -o remount,rw /` и `sync`
+  правки остаются на флеше и переживают перезагрузку. **Проверено живым
+  тестом** на двух колонках — заводская `factory-13` (23.08.2025) и сборка
+  от 30.10.2026: маркер-файл пережил перезагрузку байт-в-байт на обеих, без
+  ошибок файловой системы. Полный разбор и цитаты —
+  [`contrib/dumps/station-3-verified-boot.txt`][dump-verified-boot].
+- **OTA перезапишет `system` целиком, не проверяя текущее содержимое:**
+  `yandex-apply-ota` кладёт `.swu` в `/ota` и уходит в `reboot_mode=update`,
+  запись делает `S01swupdate` из раздела `recovery`. Правки `/etc`, скорее
+  всего, не переживут OTA — в отличие от обычной перезагрузки *(вывод по
+  статическому анализу `yandex-apply-ota`/`recovery`, не проверено живой
+  установкой обновления)*.
+
+[dump-verified-boot]: https://github.com/Marker284/yandex-station-extended/blob/main/contrib/dumps/station-3-verified-boot.txt
+
 !!! warning "Личные данные"
     Не публикуйте дампы `data`, `ota`, `env`, `reserved`, `tee`.
     В cmdline есть `androidboot.serialno`; в `/proc/cpuinfo` — поле `Serial`.
@@ -141,6 +169,13 @@ Amlogic-моделях (проверено на заводской `factory-13` 
 | `2-0x51` | 24C02 | EEPROM |
 | `3-0x2c`, `3-0x2d`, `3-0x2e` | **ACM8625S** | Class-D — **колонки** (`fr1`/`fr2`) |
 | `3-0x50` | 24C02 | EEPROM |
+
+Расхождение: DT-узел называет чип `husb251@08`, но сам драйвер в dmesg
+идентифицирует себя строкой `ya_pd_controllers 2-0008: ya_pd_probe:
+husb238_pd` (как и в таблице платформы выше, где указан `husb238`). Не
+проверено, что это означает — либо на плате физически HUSB238, либо
+драйвер исторически общий для линейки Hynetek HUSB238/251 и просто не
+переименован.
 
 Контроллеры всех четырёх шин — в блоке APB4, по device-tree aliases:
 
@@ -380,9 +415,16 @@ OTA-демон `updatesd` применяет пакет через `device_ota_u
   `raw_mic_0..5`) и безопасная частота захвата параллельно с Алисой.
 - Формат кадра `/dev/fb0` (48 bpp) и `/dev/fb1` (21×12).
 - Модель Zigbee-чипа. Порт UART известен — `/dev/ttyS2`, подробности в разделе [Zigbee](#zigbee).
-- Сохраняются ли правки `/etc` после OTA (корень ro, своё — в `/data`).
+- Переживают ли правки `/etc` реальную установку OTA — по статическому
+  анализу `yandex-apply-ota`/`recovery` скорее нет (см.
+  [раздел про `remount rw`](#remount-rw)), но живой проверки не было.
 - Профиль YAM для кольца Orion (36 LED, `orion:` + `ledfb-ring`); из коробки
   в YAM профиля нет.
+- USB download-режим (`adnl`) с внешнего порта: в живом тесте не
+  подтверждён — UDC-контроллер (`fdd00000.crgudc2`) не видит хост ни на
+  одной из опробованных комбинаций ПК/кабель/питание, хотя USB-C PD
+  (`husb238`/`husb251`) договаривается нормально. Похоже на power-only
+  порт без проброса USB2-данных, но не доказано до конца.
 
 
 Железо снято с рутованной Станции 3 по SSH, корпус не вскрывали.
