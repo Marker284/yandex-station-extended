@@ -60,6 +60,7 @@
 | Станция 1-го поколения | [AliceBridge](start/root-android.md#station-1) с Android-телефона |
 | Станция Макс (YNDX-0008) | [доступ по ADB](start/adb-max.md): права действуют до перезагрузки |
 | JBL Link Music (с Алисой) | [ADB по USB на старте](start/root-jbl-link-music.md) |
+| JBL Link Portable (с Алисой) | [ADB по USB-C, OTA и SSH](start/root-jbl-link-portable.md) |
 | Мини 3 Про (pickle) | только на заводской [factory-12](devices/station-mini3-pro.md#factory-12) — [подмена DNS](start/root.md) |
 
 Все способы проверены на живых колонках. Подробности по каждой модели — в

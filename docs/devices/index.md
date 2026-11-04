@@ -17,7 +17,7 @@ Amlogic-станций механизмы (прошивка, доступ, се�
 | **Amlogic A5 / Buildroot** | Amlogic A5 | Cortex-A55 до 2 ГГц, Linux 5.4 | нативный `maind` | Миди (Cucumber) |
 | **Amlogic A4 / Buildroot** | Amlogic A4 | Cortex-A53 до 2 ГГц, Linux 5.4, NAND+UBI | нативный `maind` | Мини 3 Про (Pickle) |
 | **Amlogic / Android 9** | Amlogic (TV-класс) | Cortex-A53 @1.8 ГГц, Android 9 | quasar как APK | Станция Макс |
-| **MediaTek MT8516 / Yocto** | MediaTek MT8516 (MT8167) | Cortex-A35, **32-бит**, Linux 4.4, NAND+UBI | `maind` на Yocto + systemd | JBL Link Music |
+| **MediaTek MT8516 / Yocto** | MediaTek MT8516 (MT8167) | Cortex-A35, **32-бит**, Linux 4.4, NAND+UBI | `maind` на Yocto + systemd | JBL Link Music, JBL Link Portable |
 | **Allwinner / Android** | Allwinner R18 (sun50iw1) | Cortex-A53, Android 6 | quasar как APK | Станция (1 пок) |
 
 Раздел [«Как это устроено»](../internals/architecture.md) описывает преимущественно
@@ -44,6 +44,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция Мини 3 | `yandex,bergamot` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |
 | Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | только на заводской [factory-12](station-mini3-pro.md#factory-12) | [Мини 3 Про](station-mini3-pro.md) |
 | JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | [ADB по USB](../start/root-jbl-link-music.md) | [JBL Link Music](jbl-link-music.md) |
+| JBL Link Portable (с Алисой) | `MT8167` | MediaTek, aud8516 (A35, 32-бит) | [ADB и SSH](../start/root-jbl-link-portable.md) | [JBL Link Portable](jbl-link-portable.md) |
 | Станция 3 | `yandex,orion-pvt` (orion) | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Станция 3](station-3.md) |
 | Станция Дуо Макс | ? | ? | нужны данные | — |
 | Станция Про | ? | ? | нужны данные | — |
