@@ -120,20 +120,33 @@ my      https://raw.githubusercontent.com/<you>/<repo>/registry/index.json
 На Станции 3 `/data` — отдельный раздел eMMC ~2.7 ГБ, свободного места под Entware и пакеты
 заметно больше.
 
-!!! warning "`opkg` и `.yap` не ставятся: сломанный `curl` в репозитории Entware"
-    На архитектуре `aarch64-k3.10` канал Entware на 04.11.2026 рассинхронизирован: свежий
-    `opkg` (`2025.11.05~80503d94-1`) и единственная доступная версия `curl`
-    (`8.15.0-2`) собраны под более новую glibc, а пакет `libc` в том же канале остался на
-    `2.27` — другой версии `libc` там нет. Симптом:
+!!! warning "`yse update`/`opkg update` ломает системный `wget` — не только проблема репозитория"
+    На архитектуре `aarch64-k3.10` до 05.11.2026 в самом `yse` была обёртка
+
+    ```sh
+    opkg(){ PATH="$OPT/bin:$OPT/sbin:$PATH" LD_LIBRARY_PATH="$OPT/lib" "$OPKG" "$@"; }
+    ```
+
+    `LD_LIBRARY_PATH=/opt/lib` здесь не нужен самому `opkg` (он работает и без
+    него), но утекает в дочерний `wget`, которого `opkg` вызывает внутри себя
+    для HTTP-загрузок. Системный `wget` (`/usr/bin/wget`, busybox) динамически
+    линкован на системную glibc — а `LD_LIBRARY_PATH=/opt/lib` подсовывает ему
+    старую glibc из пакета Entware `libc` (`2.27`), в которой не хватает нужных
+    символов. Симптом:
 
     ```text
     wget: /opt/lib/libc.so.6: version `GLIBC_2.28' not found (required by wget)
     ```
 
-    `yse bootstrap` в этом случае доходит до конца, но `yse update`/`opkg update` и
-    установка любого пакета (в том числе `.yap` — ей самой нужен `curl`) падают с этой
-    ошибкой. Починка — положить статический `curl`, собранный под `musl` (без зависимости
-    от glibc колонки), прямо туда, где его ищут `yse` и `opkg`:
+    `yse bootstrap` в этом случае доходит до конца (использует `curl` напрямую,
+    без этой обёртки), но `yse update` и `yse install ent:<pkg>` падают с этой
+    ошибкой независимо от состояния репозитория Entware — **прямой** `opkg
+    update`/`opkg install <pkg>` (без обёртки `yse`) при этом работает
+    нормально. `yse install yap:<pkg>` падает по отдельной причине — ему для
+    HTTPS нужен `curl`, а в репозитории на 04.11.2026 единственная версия
+    `curl` (`8.15.0-2`) тоже собрана под glibc новее, чем `2.27` из того же
+    канала. Починка обёртки (убрать `LD_LIBRARY_PATH`) и статический `curl` —
+    два независимых исправления, нужны оба:
 
     ```sh
     adb push curl /opt/bin/curl   # статическая aarch64-musl сборка, не из Entware
@@ -144,9 +157,12 @@ my      https://raw.githubusercontent.com/<you>/<repo>/registry/index.json
     [stunnel/static-curl](https://github.com/stunnel/static-curl), файл
     `curl-linux-aarch64-musl-<версия>.tar.xz` (собирается в открытом GitHub Actions из
     официальных исходников `curl/curl` и `openssl/openssl`, проверяйте `sha256` из релиза).
-    После этого `opkg update` и `yse install` (оба источника, `ent:` и `yap:`) проходят без
-    ошибок. Проверено на Станции 3 (`factory-13`, 04.11.2026) — установка `tmux` (`ent:`) и
-    `htop`/`jq` (`yap:`) прошла полностью.
+    Обёртка `opkg()` в `yse` исправлена (убран лишний `LD_LIBRARY_PATH`) начиная
+    с версии после 05.11.2026 — обновите `yse` установщиком ещё раз. После
+    обоих исправлений `yse update` и `yse install` (оба источника, `ent:` и
+    `yap:`) проходят без ошибок. Проверено на Станции 3 (`factory-13`,
+    04-05.11.2026, обе колонки) — установка `tmux` (`ent:`) и `htop`/`jq`
+    (`yap:`) прошла полностью на обеих.
 
 ## Удалить { #uninstall }
 

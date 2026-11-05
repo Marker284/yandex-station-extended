@@ -48,7 +48,7 @@ if [ -n "${YSE_ARCH:-}" ]; then ARCH="$YSE_ARCH"; else
 fi
 ent_arch(){ case "$ARCH" in aarch64) echo aarch64-k3.10 ;; armv7) echo armv7sf-k3.2 ;; *) echo "" ;; esac; }
 ent_ready(){ [ -x "$OPKG" ]; }
-opkg(){ PATH="$OPT/bin:$OPT/sbin:$PATH" LD_LIBRARY_PATH="$OPT/lib" "$OPKG" "$@"; }
+opkg(){ PATH="$OPT/bin:$OPT/sbin:$PATH" "$OPKG" "$@"; }
 
 # ---------- утилиты ----------
 msg(){ echo "[yse] $*"; }
