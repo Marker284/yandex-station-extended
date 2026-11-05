@@ -65,6 +65,11 @@ RTC и выход на наушники.
   (`Deactivate adb by quasmodrom config`), SSH остаётся — см.
   [шаг 7](../start/root.md#restore-dns).
 
+При повторном обновлении после отката с `0.372.1.21` проверена настройка с
+[передачей OAuth через свой сервер](../start/root.md#local-oauth) при закрытом прямом
+интернете колонки. Результат: factory-3 → `0.369.1.46.4778262943.20261013.299`, root,
+сохранение доступа после возврата обычной сети и перезагрузки, 5 ноября 2026.
+
 ## Чем отличается { #differences }
 
 - **Звук:** отдельный ЦАП **ES8156** + усилитель **SY6045S** (на Лайте —
@@ -109,7 +114,12 @@ NAND 256 МБ SLC, page 2048, erase 128 КБ. Две ревизии: Toshiba `TC
 
 ## Индикация { #led }
 
-Розничный код модели — **YNDX-00020**; существует вариант с часами, в облаке он значится как `yandexmini_2` («Мини 2 с часами»). Яркость часов прошивка хранит в `/data/quasar/data/clock_display_settings.dat` (`brightness` 0..1, `clockEnabled`, `isClockOn`, `showClockDuringDnd`) и **перерисовывает время каждые ~30–60 секунд** — своё изображение через sysfs живёт до следующего тика maind. YAM умеет писать часы напрямую: `PUT /api/clock {"time":"12:34","brightness":0..255}` (6 диодов, профиль `mini2`).
+Розничный код модели — **YNDX-00020**; существует вариант с часами, в облаке он значится как
+`yandexmini_2` («Мини 2 с часами»). Яркость часов прошивка хранит в
+`/data/quasar/data/clock_display_settings.dat` (`brightness` 0..1, `clockEnabled`, `isClockOn`,
+`showClockDuringDnd`) и **перерисовывает время каждые ~30–60 секунд** — своё изображение через
+sysfs живёт до следующего тика maind. YAM умеет писать часы напрямую: `PUT /api/clock
+{"time":"12:34","brightness":0..255}` (6 диодов, профиль `mini2`).
 
 - **Кольцо, 6 RGB-зон**: `/sys/class/leds/mini2:{red,green,blue}:ring{1..6}` (18 каналов).
 - **LED-часы**: `/sys/class/leds/mini2:white:clock*` — сегменты `clockA1`…`clockG4`, `clockDEGREE`,
