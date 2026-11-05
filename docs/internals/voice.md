@@ -91,6 +91,11 @@ flowchart TD
 
 Подтверждено логом: `command_spotter_capability.cpp: Command phrase spotted: ^ дизлайк`.
 
+На указанной Лайт 1 включена `bio_capability`; в `bio_lingware` есть модели
+ECAPA-TDNN и локальные классификаторы. Пороги `guest` и `confidence`
+в конфиге — 0,66 и 0,815. Получение результата распознавания сторонним
+приложением не проверялось.
+
 ### Формат моделей { #nnet-format }
 
 **Проверено на:** Станция 2, прошивка 0.369.1.46, октябрь 2026.
@@ -166,6 +171,12 @@ python3 contrib/spotter_nnet.py acoustic_model.nnet
   *(вывод по названию)*.
 - `vadEnabled: false` → конец фразы определяет **сервер**, а не локальный VAD.
 
+На Лайт 1 с прошивкой `0.369.1.46.4778262442.20261013.297` в `maind` также
+найдены `VoiceActivityDetectorCapability`, `SetVadActionDirective` и типы событий
+`SpeechStartedRawEventType` / `SpeechFinishedRawEventType`.
+Это подтверждает наличие внутренних механизмов VAD, **но не доказывает**,
+что сторонний процесс может подписаться на эти события. Способ подключения не проверен.
+
 ### Проверенный uplink `VoiceInput` на Лайт 1 { #voiceinput-uplink }
 
 **Проверено 2 ноября 2026** на Станции Лайт 1, прошивка
@@ -240,6 +251,8 @@ SpeechKit и получает финальный `AsrResult`, но прокси 
 уходит в облако Яндекса, а поведение серверного API может измениться. Локальные activation- и
 command-spotter при этом остаются отдельным слоем на колонке.
 
+
+
 ## 5. Облако
 
 ASR: `shortRecognizerModel: quasar-general`, промежуточные гипотезы (`enable_partials`).
@@ -254,6 +267,11 @@ ASR: `shortRecognizerModel: quasar-general`, промежуточные гипо
 - Речь: `TtsSpeak` → `audio_client_tts_player.cpp` → GStreamer:
   `appsrc ! opusparse ! opusdec ! volume ! alsasink`. Музыка — в `maind --mediad`.
 - Текстовые запросы (из приложения) идут как `Vins.TextInput` и **минуют ASR**.
+
+В `maind` также обнаружены `IntonationSpottingCapability`,
+`CancelRequest.ReasonUserStop`, `CancelRequest.ReasonInterruption` и обработка
+прерывания TTS. Это полезные ориентиры для исследования штатного перебивания,
+но подключение их к ответам стороннего ассистента пока не проверено.
 
 ### Потоковый TTS и частичные ответы { #tts-streaming }
 
@@ -322,6 +340,14 @@ SpeechKit-протоколе есть отдельное действие `ACTIO
 слушает локальный порт `9900`, `audioclient` — `9906`. Это подтверждённая конфигурация
 конкретной прошивки, а не обещание стабильного публичного API между версиями.
 
+В `maind` есть `AudioFocusDispatcher` — штатное согласование приоритетов
+воспроизведения. Для своего плеера этот слой важно учитывать, чтобы речь,
+музыка и системные звуки не конфликтовали. Стабильный внешний API не установлен.
+
+В конфиге той же Лайт 1 включён `smart_volume.enabled: true`; присутствуют
+пороги и правила восстановления громкости. Реальное поведение этих правил
+отдельно не измерялось.
+
 ## Звук активации { #activation-sound }
 
 Короткий сигнал на «Алису» прошивка проигрывает сама, на срабатывании: в логе через ~5 мс после
@@ -337,6 +363,22 @@ SpeechKit-протоколе есть отдельное действие `ACTIO
 звук работает так же. Проверено на Станции Лайт (quasar 0.369.1.46.4778262442.20261013.297)
 с подменённым `uniProxyUrl` на эмулятор uniproxy ([quasard](../recipes/quasard.md)
 с бэкендом своего ассистента). Какой файл при этом играет, не проверялось.
+
+На этой же Лайт 1 в живом `quasar.cfg` обнаружена настройка отдельного
+механизма быстрого звука пробуждения (`Seam Activation Feedback`):
+
+```text
+enableSeamActivationFeedback: true
+useSeamActivationFeedbackAsJingle: true
+useFilePlayerJingle: false
+seamActivationFeedbackAsJingleDelayMs: 0
+```
+
+В данных устройства присутствуют девять файлов
+`seam_activation_feedback_1.opus` … `seam_activation_feedback_9.opus`.
+Это не отменяет наблюдение выше о `local_audio_file_play`:
+какая ветка реально выдаёт слышимый звук и когда происходит переключение,
+требует отдельного замера и трассировки.
 
 ## Отправка аудио помимо запросов
 

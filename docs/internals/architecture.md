@@ -96,6 +96,12 @@ flowchart LR
 | `/data/quasar/daemons_logs/` | логи: `maind.log`, `mediad.log`, `yiod.log`, `wifid.log`, `updatesd.log` … |
 | `/etc/asound.conf` | маршрутизация звука ALSA |
 
+На Лайт 1 с прошивкой `0.369.1.46.4778262442.20261013.297`
+в `quasar.cfg` присутствует параметр `configuration_patch.patch_dir`
+со значением `${DATA}/quasar_patches` (на проверенном устройстве каталог был пуст).
+Это только находка в конфиге: формат патчей и возможность безопасно
+менять настройки таким способом **не проверены**.
+
 ## Хелпер `q`
 
 Скрипт `/system/vendor/quasar/q` оборачивает вызовы `maind` и системные утилиты:
