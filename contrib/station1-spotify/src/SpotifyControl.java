@@ -103,10 +103,40 @@ public final class SpotifyControl {
         }
         throw new IllegalStateException("No pairing code: account may already be linked, or Spotify shows an account/region error. Check the saved country and the Station's network, then use logout/login if needed.");
     }
+    static String title()throws Exception{
+        MediaController controller=session();
+        if(controller==null)return null;
+        android.media.MediaMetadata metadata=controller.getMetadata();
+        return metadata==null?null:metadata.getString(android.media.MediaMetadata.METADATA_KEY_TITLE);
+    }
+    static boolean waitForTrack(String previous,long timeout)throws Exception{
+        long deadline=android.os.SystemClock.elapsedRealtime()+timeout;
+        while(android.os.SystemClock.elapsedRealtime()<deadline){
+            String current=title();
+            if(current!=null&&(previous==null||!previous.equals(current)))return true;
+            Thread.sleep(500);
+        }
+        return false;
+    }
+    static void play(String query)throws Exception{
+        MediaController controller=session();
+        if(controller!=null){
+            PlaybackState state=controller.getPlaybackState();
+            if(state!=null&&state.getState()==PlaybackState.STATE_PLAYING)controller.getTransportControls().pause();
+        }
+        String previous=title();
+        String uri="spotify:search:"+java.net.URLEncoder.encode(query,"UTF-8").replace("+","%20");
+        open(Intent.ACTION_VIEW,uri);
+        if(waitForTrack(previous,8000))return;
+        // Клиент показал выдачу и молчит. Холодный старт надёжен, но идёт 21-24 секунды.
+        run("/system/bin/am","force-stop",PACKAGE);
+        Thread.sleep(1000);
+        open(Intent.ACTION_VIEW,uri);
+    }
     static void dispatch(String command,String query,long seconds)throws Exception{
         if("play".equals(command)||"search".equals(command)){
             if(query==null||query.trim().length()==0||query.length()>180)throw new IllegalArgumentException("Invalid search query");
-            open(Intent.ACTION_VIEW,"spotify:search:"+java.net.URLEncoder.encode(query,"UTF-8").replace("+","%20"));
+            play(query);
             return;
         }
         MediaController controller=session();
