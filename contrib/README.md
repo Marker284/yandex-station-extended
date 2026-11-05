@@ -89,6 +89,9 @@
 * **[`panel/install-panel.sh`](panel/install-panel.sh)** — Веб-панель колонки по HTTPS (порт 8443) для Fiero Hi. [Руководство](../docs/devices/fiero-hi.md#web-panel).
 
 ### Доступ и ADB:
+- **[`lite-kit-oauth.py`](lite-kit-oauth.py)**: запуск своего сервера lite-kit с передачей
+  OAuth выбранной колонки при закрытом прямом интернете. Исходники кита не меняются.
+  [Настройка для Мини 2](../docs/start/root.md#local-oauth).
 * **[`install-s97adb.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-s97adb.sh)** —
   закрепление штатных маркеров ADB в `/data/quasar` с компьютера. Историческое имя сохранено;
   отдельный `S97adb` не нужен, `/etc/init.d` не меняется, перезагрузка не выполняется.
