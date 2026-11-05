@@ -66,6 +66,13 @@
 
 ## 📜 Индекс скриптов автоматизации (каталог `contrib/`)
 
+### JBL Link Portable с Алисой
+
+- **[`jbl-link-portable/`](jbl-link-portable/)** — закрепление ADB, блокировка известного
+  каталога OTA и key-only SSH. Автозапуск из `/data` через штатный Fluent Bit 1.4.6;
+  исходник ARMv7-плагина и сборка рядом. Корень и размеры томов не меняются.
+  [Инструкция](../docs/start/root-jbl-link-portable.md).
+
 ### Безопасность и блокировка обновлений:
 * **[`yandex-noupdate.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-noupdate.sh)** — полная блокировка OTA-обновлений, вырезание `updatesd` и подмена публичного ключа.
 * **[`station1-freeze-updatesd.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/station1-freeze-updatesd.sh)** — Станция 1 (Android, root через AliceBridge): фоновая заморозка `maind --updatesd` сигналом `SIGSTOP`, без правок `/system`. [Рецепт](https://hackalice.me/recipes/station1-disable-updates/).

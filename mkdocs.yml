@@ -145,6 +145,7 @@ nav:
           - Станция Макс — доступ через ADB: start/adb-max.md
           - Мини 1 (2019) — ADB по USB: start/root-mini1-usb.md
           - JBL Link Music — ADB по USB: start/root-jbl-link-music.md
+          - JBL Link Portable — ADB и SSH: start/root-jbl-link-portable.md
       - 2. SSH и обновления: start/ssh.md
       - 3. Пакеты yse: start/packages.md
       - 4. Если что-то сломалось: start/recovery.md
@@ -193,6 +194,7 @@ nav:
       - Станция (1 поколения): devices/station-gen1.md
       - Умный хаб (Saturn): devices/yandex-hub.md
       - JBL Link Music: devices/jbl-link-music.md
+      - JBL Link Portable: devices/jbl-link-portable.md
   - Как это устроено:
       - Архитектура прошивки: internals/architecture.md
       - Сеть и порты: internals/network.md

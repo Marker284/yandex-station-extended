@@ -1,0 +1,14 @@
+[Unit]
+Description=Local JBL startup hooks
+After=network.target droproot_setup.service
+RequiresMountsFor=/data
+ConditionPathExists=/data/jbl-autostart/managed-by-jbl-link-portable
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh /data/jbl-autostart/run.sh
+TimeoutStartSec=30
+UMask=0077
+StandardOutput=journal
+StandardError=journal

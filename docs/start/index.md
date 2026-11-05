@@ -25,6 +25,7 @@
 | **Станция Макс (YNDX-0008)** | [доступ по ADB](adb-max.md) сервисной утилитой: права действуют до перезагрузки, сброс не нужен |
 | Станция 3 (orion) | [DNS-метод](root.md), как на других Amlogic; свой сертификат колонка не примет — [почему](../devices/station-3.md#tls) |
 | **JBL Link Music** (с Алисой) | [ADB по USB на старте](root-jbl-link-music.md) — маркеры сетевого ADB через сервисный Micro-USB |
+| **JBL Link Portable** (с Алисой) | [ADB, OTA и SSH](root-jbl-link-portable.md) — внешний USB-C, без вскрытия |
 
 Без компьютера, с Android-телефона: [AliceBridge](root-android.md) — проверен на Лайт, Мини,
 Миди и Лайт 2; для Станции 1 — отдельный путь через образ `boot`.
