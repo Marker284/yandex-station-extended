@@ -40,7 +40,7 @@ Android Debug Bridge — утилита, которой колонкой упр�
 === "Windows"
     1. Скачайте официальный архив: [Google SDK Platform-Tools for Windows](https://dl.google.com/android/repository/platform-tools-latest-windows.zip).
     2. Распакуйте папку `platform-tools` (например, в `C:\platform-tools`).
-    3. Запустите командную строку (CMD или PowerShell) из этой папки и выполните `adb.exe version`.
+    3. Запустите командную строку (CMD или PowerShell) из этой папки и выполните `adb.exe version` (в PowerShell — `.\adb.exe version`).
 
 Проверка связи с колонкой, когда ADB на ней уже поднят:
 
