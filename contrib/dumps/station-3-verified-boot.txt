@@ -1,0 +1,124 @@
+Станция 3 (orion) — доказательства к разделу "remount rw на system"
+docs/devices/station-3.md#remount-rw
+
+Снято с двух колонок:
+  A: softwareVersion 0.13.1.36.3322101745.20250823.factory-13
+     (заводской образ, 23.08.2025, BUILD_ID 3322101745)
+  B: softwareVersion 0.372.1.21.4818307898.20261030.79
+     (retail-сборка, НЕ factory, 30.10.2026, BUILD_ID 4818307898)
+Серийники/cpu_id заменены на <DEVICE_ID>/<REDACTED>.
+
+===== U-BOOT ENV: ключевые переменные (идентичны на обеих прошивках) =====
+
+avb2=0
+
+bootcmd=run storeboot
+
+storeboot=if test "${rabbit_hole_debug}" = 1; then rh_unlock=1;else rh_unlock=0;fi;setenv bootargs ${bootargs} androidboot.rh_unlock=${rh_unlock};run switch_bootmode;run storage_param;if imgread kernel boot ${loadaddr_kernel}; then bootm ${loadaddr_kernel};fi
+
+storeargs=get_bootloaderversion;setenv bootargs ${initargs} otg_device=${otg_device} androidboot.selinux=${EnableSelinux} androidboot.firstboot=${firstboot} jtag=${jtag} androidboot.bootloader=${bootloader_version} androidboot.hardware=amlogic;run cmdline_keys;
+
+initargs=console=ttyS0,921600 no_console_suspend loglevel=9  loop.max_part=4 root=PARTLABEL=system ro rootwait skip_initramfs
+
+forUpgrade_secureBoot=true
+bootloader_wp=1
+
+Вывод: storeboot читает ядро только из раздела boot (imgread kernel boot)
+и передаёт управление bootm — к разделу system не обращается. avb2=0 на
+обеих прошивках — AVB-проверка не используется.
+
+===== CMDLINE: нет dm-verity параметров =====
+
+root=PARTLABEL=system ro rootwait skip_initramfs androidboot.verifiedbootstate=green
+
+Параметров dm= / dm-mod.create= нет. skip_initramfs — initramfs,
+который мог бы поднять dm-verity, не используется вообще.
+
+===== GREP dm-verity ПО ВСЕМУ ROOTFS (1 ГБ, 3 совпадения, все безобидные) =====
+
+offset ~21900097: строка "DM_verity_hash" — часть таблицы сигнатур blkid
+  (универсальный список имён ФС для автоопределения, не признак
+  активного verity).
+offset ~34469506: "kernel/drivers/md/dm-verity.ko" — имя файла модуля в
+  modules.dep. Модуль НЕ загружен (см. ниже dmsetup/mounts).
+offset ~463038608: совпадение по "severity_key" внутри строки fluent-bit
+  (ложное совпадение, не имеет отношения к verity).
+
+===== dmsetup / /proc/mounts — device-mapper не используется =====
+
+$ dmsetup ls
+No devices found
+
+$ grep dm- /proc/mounts
+(пусто)
+
+===== PARTED/MOUNT: / смонтирован ro обычным ядерным mount, не dm =====
+
+/dev/root on / type ext4 (ro,relatime)
+
+===== dmesg: USB-C PD чип идентифицирует себя как husb238_pd =====
+
+ya_pd_controllers 2-0008: ya_pd_probe: husb238_pd
+power_supply ya_pd: Select voltage: 20000 mV
+power_supply ya_pd: Select voltage: 15000 mV
+power_supply ya_pd: Select voltage: 12000 mV
+power_supply ya_pd: Select voltage: 9000 mV
+
+DT-узел называет чип husb251@08 (см. таблицу I2C на странице модели) —
+расхождение с этой строкой драйвера не объяснено.
+
+===== dmesg: OTG-контроллер форсирован в device mode =====
+
+amlogic-crg-otg-v2 soc:crg20otg@fe03a000: controller_type is 3
+amlogic-crg-otg-v2 soc:crg20otg@fe03a000: crg_force_device_mode is 1
+amlogic-crg-otg-v2 soc:crg20otg@fe03a000: otg is 1
+amlogic-crg-otg-v2 soc:crg20otg@fe03a000: udc_name: fdd00000.crgudc2
+
+===== USB download-режим (adnl): UDC не видит хост =====
+
+$ cat /sys/class/udc/fdd00000.crgudc2/state
+not attached
+
+Проверено в нескольких комбинациях: два разных ПК, кабель, который
+штатно гоняет ADB-данные на телефоне (данные заведомо исправны), разные
+источники питания (обычный порт ПК, 140W USB-C монитора). USB-C PD
+договаривается нормально в последнем случае (жалоба "незнакомый блок
+питания" пропадает), но UDC остаётся not attached. Порт похож на
+power-only для USB2-данных, но не доказано до конца — не проверялось,
+действительно ли 140W-порт монитора пробрасывает данные на хост (флешка
+проверялась в другом порту того же монитора).
+
+===== ЖИВОЙ ТЕСТ: remount rw + маркер-файл, обе колонки =====
+
+Процедура (идентична на обеих): mount -o remount,rw / -> запись
+/etc/hackalice-test-marker -> sync; sync -> adb reboot -> после возврата:
+сверка содержимого и md5, проверка /proc/mounts на ошибки.
+
+Колонка A (0.13.1.36.3322101745.20250823.factory-13):
+  remount: exit 0, дмесг "EXT4-fs (mmcblk0p10): re-mounted", без ошибок
+  маркер записан: 319 байт, md5 4bbbc3db39ef048a0249275a02d99d9e
+  после ребута: md5 4bbbc3db39ef048a0249275a02d99d9e (совпадает)
+  mount после ребута: /dev/root on / type ext4 (ro,relatime)
+  dmesg после ребута: ни одной ошибки ext4/fsck/corrupt
+
+Колонка B (0.372.1.21.4818307898.20261030.79, retail, не factory):
+  remount: exit 0, дмесг "EXT4-fs (mmcblk0p10): re-mounted", без ошибок
+  маркер записан: 317 байт, md5 7cae569073bb3eb932256ede665acf45
+  после ребута: md5 7cae569073bb3eb932256ede665acf45 (совпадает)
+  mount после ребута: /dev/root on / type ext4 (ro,relatime)
+  dmesg после ребута: ни одной ошибки ext4/fsck/corrupt
+
+===== OTA: поток перезаписи system (статический анализ, не live-tested) =====
+
+/usr/bin/yandex-apply-ota (shell-скрипт):
+  mv "$1" /ota/yandex_io_ota.swu
+  sync
+  umount /data
+  yandex-reboot update
+
+Комментарий в скрипте: "Keep destination in sync with S01swupdate in
+recovery filesystem" — реальную запись делает S01swupdate из раздела
+recovery при загрузке в reboot_mode=update, не сам yandex-apply-ota.
+Отсюда вывод, что OTA перезаписывает system целиком, а не проверяет его
+текущее содержимое — но реальная установка OTA не прогонялась, вывод
+статический.
