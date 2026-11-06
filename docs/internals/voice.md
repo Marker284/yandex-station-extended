@@ -10,6 +10,17 @@
     распознавание речи (ASR) и понимание (VINS/Megamind) — **в облаке** (`withLocalVins: false`).
     Без доступа к `uniproxy` колонка не превращает речь в текст.
 
+!!! note "Исключение на Станции 3 (orion, factory-13)"
+    На этой модели/сборке живой лог (`maind.log`) показал полноценный **локальный** ASR:
+    `local_recognizer.cpp: LocalRecognizedPhrase` отдаёт текст, слово в слово совпадающий со
+    сказанной фразой (`alice_state_machine.cpp: onRequestStateChanged: LISTENING,
+    recognizedPhrase='...'`), полностью без интернета (проверено на изолированной от сети
+    колонке). То есть на `withLocalVins: false` в целом полагаться нельзя — хотя бы на этой
+    сборке локальный распознаватель существует и реально работает; дальше результат всё равно
+    уходит на облачную классификацию (`VoiceServiceState.cpp` → `ErrorClassifierFailed`/
+    `ErrorClassifierIrrelevant` без сети) — см. livelock-баг при полном провале диалога в
+    [«Подводных камнях»](gotchas.md).
+
 ```mermaid
 flowchart TD
     subgraph capture["Захват и очистка звука"]

@@ -16,6 +16,8 @@
 | [SoundCloud голосом](station1-soundcloud.md) | воспроизведение треков и плейлистов через AliceBridge без HDMI | Станция 1 |
 | [ТВ-набор и веб-пульт](station1-tv.md) | быстрый веб-пульт с паролем и управление HDMI-выходом | Станция 1 |
 | [Ограничение метрик](station1-privacy.md) | отключение AppMetrica без удаления Quasar с гарантированным откатом | Станция 1 |
+| [Отключение телеметрии](station3-disable-telemetry.md) | полная остановка AppMetrica/clickdaemon/fluent-bit (убраны роли `maind`, не только DNS) | проверено на Станции 3, факт. `factory-13`, два устройства |
+| [Отключение begemot/bulbik](station3-disable-wizard.md) | убраны роли поискового wizard и сценариев умного дома — чисто облачные, освобождают ~250MB RSS | проверено на Станции 3, факт. `factory-13`, два устройства |
 | [Бэкенд (Self-hosted)](bekend-self-hosted.md) | собственный сервер вместо облака Яндекса (quasard, v3rt3p) | Станция 2, Мини 1/2 |
 | [Своя LLM вместо Алисы](llm.md) | гибрид с LLM и Home Assistant ([Quasar Bridge](llm.md#quasar-bridge)), свой бэкенд ([quasard](quasard.md)) или [ChatGPT Voice: нативно или через ПК](llm.md#chatgpt-web) | Quasar Bridge — Станция 2, Миди, Лайт по данным проекта; quasard — ~1.56 и 3.x; ChatGPT — Лайт 1/2 и Станция 2, мост — Лайт 2 |
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |

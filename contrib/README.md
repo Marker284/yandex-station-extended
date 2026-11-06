@@ -86,6 +86,8 @@
   Требует явных адреса, каталога и `--write`; отказывает при подключённом system UBI.
   Не очищает `/data` и не восстанавливает отдельные конфиги. См. [восстановление](../docs/start/recovery.md).
 * **[`yandex-station-privacy.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-station-privacy.sh)** — отключение отправки логов и телеметрии (`telemetryd`, `fluent-bitd`).
+* **[`yandex-disable-telemetry.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-disable-telemetry.sh)** — Станция 3 (orion): убирает роли `maind --telemetry`/`maind --fluent-bitd` из `launch.json` целиком (не только DNS-адреса), с бэкапом и откатом. [Рецепт](https://hackalice.me/recipes/station3-disable-telemetry/).
+* **[`yandex-disable-wizard.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/yandex-disable-wizard.sh)** — Станция 3 (orion): убирает чисто облачные роли `begemot`/`bulbik` из `launch.json`, освобождает ~250MB RSS, с бэкапом и откатом независимым от телеметрии. [Рецепт](https://hackalice.me/recipes/station3-disable-wizard/).
 * **[`station1-privacy.sh`](station1-privacy.sh)** — Станция 1: обратимая блокировка
   известных узлов метрик без удаления Алисы.
   [Рецепт и ограничения](../docs/recipes/station1-privacy.md).

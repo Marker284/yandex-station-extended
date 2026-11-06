@@ -233,6 +233,17 @@ backend-метрики — `SetraceReqId` / `SetraceClientReqId`.
       (см. [Подводные камни](gotchas.md)). Нужны правки hosts/маршрутов или keylog.
     - До отправки всё лежит локально (таблица выше) — можно читать, не трогая сеть.
 
+    !!! note "Станция 3 (orion, `factory-13`): статический fallback-IP есть только у бэкенда"
+        В `quasar.cfg` только два хоста: `quasar.yandex.net`/`quasar.yasmina.yango.com` (это сам
+        **бэкенд** Алисы, не телеметрия). Хостов телеметрии (`clck.yandex.net`,
+        `report.appmetrica.yandex.net`, `startup.mobile.yandex.net`,
+        `startup.appmetrica.yandex.net`) в этой таблице вообще нет — `appmetricaFallbackHosts`
+        (`metricad.appmetricaFallbackHosts`) — это просто альтернативный URL, не IP, ему всё
+        равно нужен DNS. То есть именно для телеметрии (в отличие от бэкенда) блокировки DNS
+        было бы достаточно — просто у нас уже есть файрвол на уровне MAC, который сильнее. На
+        других моделях/сборках состав `DnsFallbackMap` может отличаться — проверяйте свой
+        `quasar.cfg`.
+
 ## Как отключить { #disable }
 
 **Штатно (без рута), запись голоса:** Яндекс ID → [Доступы к данным](https://id.yandex.ru/personal/data-access)
@@ -250,3 +261,19 @@ backend-метрики — `SetraceReqId` / `SetraceClientReqId`.
 локального `quasar.cfg` может переопределяться при следующем `Config updated`.
 
 Полностью изолировать от облака одной подменой DNS не выйдет — см. блок про fallback-хосты выше.
+
+!!! success "Проверенный способ (не только факты): убрать роли из `launch.json`"
+    На Станции 3 (orion) есть протестированный живьём рецепт —
+    [«Отключение телеметрии»](../recipes/station3-disable-telemetry.md) и
+    `contrib/yandex-disable-telemetry.sh`: роли `maind --telemetry`/`--fluent-bitd` убираются
+    из `launch.json` целиком, без правок `quasar.cfg` и без риска, что их включит обратно
+    онлайн-конфиг (`launch.json` облако не трогает). Подтверждено на двух устройствах:
+    остальные роли штатно переживают отсутствие телеметрии (таймаут и warning в лог вместо
+    падения) — ожидаемо, раз сама роль `telemetry` и так штатно переживает падения
+    (`allowedRestartIntervalSeconds: 600` в `launch.json`).
+
+!!! tip "Firewall на уровне MAC обычно не блокирует ICMP"
+    Если изолируете колонку на роутере правилом по MAC-адресу — проверьте, что оно матчит не
+    только `tcp`/`udp` (частый дефолт у готовых правил), иначе пинг `monitord` на
+    `quasar.yandex.ru` (раз в 10 с, см. [конвейер](#pipeline)) продолжит доходить, пусть и без
+    payload.

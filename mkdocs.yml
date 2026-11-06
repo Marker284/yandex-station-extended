@@ -170,6 +170,8 @@ nav:
       - Колонка без Яндекса: recipes/standalone.md
       - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
       - Ограничить метрики (Станция 1): recipes/station1-privacy.md
+      - Отключение телеметрии (Станция 3): recipes/station3-disable-telemetry.md
+      - Отключение begemot/bulbik (Станция 3): recipes/station3-disable-wizard.md
       - ТВ-набор (Станция 1): recipes/station1-tv.md
       - Debian (Станция 1): recipes/station1-debian.md
       - Управление голосом алисы: recipes/upravlenie-golosom-alisy.md

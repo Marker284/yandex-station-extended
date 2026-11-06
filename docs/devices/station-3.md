@@ -80,7 +80,10 @@ Amlogic-моделях (проверено на заводской `factory-13` 
 - Усилители **ACM8625S**, не FS2105. В микшере полосы `fr1` / `fr2` / `us`.
 - LED-матрица дисплея — модуль **`gowin_led_device`** (не только AW21036).
 - quasar: `quasar_launcher2` + `maind --platformd/--mediad/--loggerd/--telemetry/--fluent-bitd`,
-  плюс `begemot` и `bulbik` (кольцо Алисы через `ledfb-ring`).
+  плюс `begemot` и `bulbik` (кольцо Алисы через `ledfb-ring`; `begemot` —
+  поисковый wizard, `bulbik` — сценарии умного дома/Megamind, оба облачные
+  и [отключаемы](../recipes/station3-disable-wizard.md) без потери базовой
+  LED-реакции на физические кнопки — [проверено](../recipes/station3-disable-wizard.md#led-check)).
 
 ## Свой сервер обновлений и сертификаты { #tls }
 
@@ -110,7 +113,7 @@ Amlogic-моделях (проверено на заводской `factory-13` 
 | env | `mmcblk0p4` `/dev/env` | 8M | U-Boot env |
 | misc | `mmcblk0p5` `/dev/misc` | 4M | |
 | tee | `mmcblk0p6` `/dev/tee` | 48M | ext4, `/tee` (ro) |
-| aml_sysrecovery | `mmcblk0p7` `/dev/aml_sysrecovery` | 1.5G | |
+| aml_sysrecovery | `mmcblk0p7` `/dev/aml_sysrecovery` | 1.5G | заводской burn-пакет, embedded `system`/`boot`/`bootloader` ([используется при factory reset](#remount-rw)) |
 | boot | `mmcblk0p8` `/dev/boot` | 64M | ядро |
 | recovery | `mmcblk0p9` `/dev/recovery` | 192M | |
 | system | `mmcblk0p10` `/dev/system` | 1G | rootfs ext4, `/` **ro** |
@@ -147,6 +150,25 @@ Amlogic-моделях (проверено на заводской `factory-13` 
   всего, не переживут OTA — в отличие от обычной перезагрузки *(вывод по
   статическому анализу `yandex-apply-ota`/`recovery`, не проверено живой
   установкой обновления)*.
+- **Аппаратный factory reset (кнопками на корпусе) перезаписывает `system`,
+  `boot` и `bootloader` ещё более основательно, чем OTA — проверено живьём.**
+  U-Boot переменная `switch_bootmode` при `reboot_mode=factory_reset` вызывает
+  команду `fr`, которая восстанавливает эти три раздела из embedded-образов
+  внутри `aml_sysrecovery` (1.5G, один и тот же заводской burn-пакет на всех
+  устройствах этой платформы — не зависит от текущей версии прошивки). На
+  живом устройстве до сброса был установленный retail-образ
+  (`0.372.1.21.4818307898.20261030.79`) — после сброса `softwareVersion`,
+  версия U-Boot и git-хэш в `/etc/os-release` побайтово совпали с заводской
+  `factory-13` другого устройства той же модели. Похожий механизм уже
+  документирован в [шаге 1](../start/root.md#dns-unlock) для Лайт 1/Мини 2
+  («сброс грузит factory-образ из раздела `recovery`») — для Orion источник
+  восстановления другой (`aml_sysrecovery`, не `recovery`), но суть та же:
+  сброс откатывает прошивку из embedded заводского образа, а не просто
+  чистит `/data`.
+  **Следствие:** правки `system`/`boot` (включая [отключение OTA](../start/ssh.md#kill-ota)
+  и [телеметрии](../recipes/station3-disable-telemetry.md)) переживают обычную
+  перезагрузку, но **не** переживут ни OTA, ни аппаратный сброс — после
+  любого из них процедуры нужно повторить.
 
 [dump-verified-boot]: https://github.com/Marker284/yandex-station-extended/blob/main/contrib/dumps/station-3-verified-boot.txt
 
@@ -222,6 +244,20 @@ Framebuffers (`yandex,ledfb` / Gowin):
 громкости: снять кадр `/dev/fb2` (108 байт), нарисовать шкалу, через ~1.6 с
 вернуть `ledfb-ring` и старый кадр.
 
+!!! note "Это не вся правда про `bulbik` и кольцо"
+    Описанный выше оверлей — не единственный путь к кольцу. На живых
+    устройствах после полного отключения `bulbik`
+    ([рецепт](../recipes/station3-disable-wizard.md)) базовая LED-реакция
+    на физические кнопки (mute, свайп громкости, ambient, кнопка
+    `activate`/play-pause) продолжает работать как обычно — проверено
+    нажатием кнопок на двух колонках, а mute, громкость и микрофон
+    дополнительно проверены живым звуком (не только LED). Судя по всему,
+    `bulbik` рисует именно такой оверлей
+    (отдельный от штатной реакции на кнопки, которую обрабатывает,
+    вероятно, `platformd`/ядерный LED-класс напрямую) только для сценариев,
+    которые всё равно требуют облака. Подробности и ограничения проверки —
+    в [рецепте](../recipes/station3-disable-wizard.md#led-check).
+
 Драйверы: `leds_yandex_aw21036`, `quasar_led_ring`, `gowin_led_device`.
 
 ## Звук { #audio }
@@ -265,6 +301,17 @@ VAD: `vad_keypad`, устройство `/dev/vad`.
 - `aw933xx` (`AW93312`) — сенсорные кнопки: `KEY_VOICECOMMAND` (582),
   `KEY_VOLUMEUP` (115), `KEY_VOLUMEDOWN` (114).
 - `vad_keypad` — VAD-клавиатура.
+
+!!! bug "`KEY_VOICECOMMAND` на деле запускает play/pause, не слушает"
+    Живой тест: нажатие этой кнопки (в логе — именованное событие
+    `activate`, `ButtonIdx 0`) вызывает `buttons_actions.cpp: Toggle
+    play/pause`, а не начало голосового диалога. Без играющей музыки это
+    уходит в `alice_request.music_play_semantic_frame` — **текстовый**
+    запрос к облаку (`Vins.TextInput`), не голосовой. Офлайн кольцо
+    15 секунд показывает анимацию `alice_thinking.led`, но **не слушает**
+    (нет `onAliceStateChanged: LISTENING`, нет событий `local_recognizer`)
+    — сказанное в это окно никуда не записывается. Подробности —
+    в [рецепте](../recipes/station3-disable-wizard.md#led-check).
 - `mute` (`gpio-keys`) — отключение микрофона (`KEY_MUTE` + `SW_MUTE_DEVICE`).
 - `input_btrcu` — Bluetooth-пульт.
 
