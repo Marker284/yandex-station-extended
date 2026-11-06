@@ -44,7 +44,7 @@
 | Плеер как Bluetooth-источник | не проверялось | — |
 | Свои звуки | работает | — | [Свои звуки] (https://hackalice.me/recipes/sounds/) |
 | Обработанный микрофон | частично: в нативном GPT, по данным автора адаптации; передача на ПК не проверена | [Alisa Voice](../recipes/llm.md#chatgpt-web) |
-| Подсветка | работает | [Индикация](#led) |
+| Подсветка | работает (включая GPT по отчёту автора адаптации) | [Индикация](#led), [Alisa Voice](../recipes/led.md#plum-led-rainbow) |
 | YAM | не проверялось | — |
 | Своя LLM | работает: Quasar Bridge; нативный ChatGPT — по данным автора адаптации | [Quasar Bridge](../recipes/llm.md#quasar-bridge), [Alisa Voice](../recipes/llm.md#chatgpt-web) |
 
