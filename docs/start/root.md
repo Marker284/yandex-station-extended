@@ -188,6 +188,55 @@ DNS-метод.
             uci commit firewall && /etc/init.d/firewall reload
             ```
 
+    === "MikroTik"
+
+        Когда DHCP раздаёт сам MikroTik, задайте DNS в `/ip dhcp-server network`
+        (штатная настройка RouterOS, этим способом не проверялась). Ниже — случай,
+        когда MikroTik работает чистым L2-мостом, а DNS колонке раздаёт вышестоящий
+        роутер: раздачу DNS не поменять, зато запросы колонки, идущие через мост,
+        перехватываются NAT-ом. Перехват должен закрывать **весь** порт 53, UDP и TCP:
+        у колонки локальный `unbound`, который спрашивает DNS Яндекса напрямую
+        (см. [Сеть и порты](../internals/network.md)), статикой по доменам активации
+        тут не обойтись. Колонка должна быть подключена к Wi-Fi/AP самого MikroTik.
+
+        **1.** Уберите WAN-порт из списка `WAN`: после включения `use-ip-firewall`
+        встроенное правило «drop all from WAN not DSTNATed» начнёт резать DNS-ответы
+        для всей локальной сети:
+
+        ```routeros
+        /interface list member remove [find where list="WAN"]
+        ```
+
+        **2.** Включите IP-firewall для моста, соберите IP колонки в address-list и
+        добавьте два NAT-правила на адрес выбранного варианта: `179.254.167.126` для
+        варианта 1 или IP компьютера с сервером обновлений для варианта 2. Slave-порты
+        в матчерах использовать нельзя — только мост или адрес-лист:
+
+        ```routeros
+        /interface bridge settings set use-ip-firewall=yes
+        /ip firewall address-list add list=station-dns-hijack address=192.168.1.150
+        /ip firewall nat add chain=dstnat src-address-list=station-dns-hijack protocol=udp dst-port=53 action=dst-nat to-addresses=179.254.167.126 to-ports=53 comment="station-dns-hijack"
+        /ip firewall nat add chain=dstnat src-address-list=station-dns-hijack protocol=tcp dst-port=53 action=dst-nat to-addresses=179.254.167.126 to-ports=53 comment="station-dns-hijack-tcp"
+        ```
+
+        Проверка: в логе сервера обновлений (`log\dns.log` у lite-kit) появляются
+        DNS-запросы с IP колонки. Bridge fast-path на время перехвата отключается —
+        это ожидаемо.
+
+        Откат после шага 2:
+
+        ```routeros
+        /ip firewall nat remove [find where comment="station-dns-hijack"]
+        /ip firewall nat remove [find where comment="station-dns-hijack-tcp"]
+        /ip firewall address-list remove [find where list="station-dns-hijack"]
+        /interface bridge settings set use-ip-firewall=no
+        /interface list member add list=WAN interface=ether1 comment="defconf"
+        ```
+
+        Проверено на RB951G-2HnD (RouterOS 7.19.4) со Станцией Мини 2
+        (`0.369.1.46.4778262943.20261013.299`), ноябрь 2026: перехват держался всю
+        настройку, после отката fast-path вернулся сам.
+
     === "Другой роутер"
 
         В настройках локальной сети найдите DNS-серверы, которые роутер раздаёт по DHCP:
