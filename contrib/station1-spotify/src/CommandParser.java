@@ -22,7 +22,7 @@ public final class CommandParser {
     }
     public static Control control(String text){
         text=clean(text).toLowerCase(new Locale("ru")).replace('ё','е');
-        if(text.matches("(?:стоп|останови|пауза|останови музыку|останови трек|поставь на паузу|выключи музыку)"))return new Control("pause",0);
+        if(text.matches("(?:стоп|хватит|тихо|замолчи|выруби|останови|пауза|останови музыку|останови трек|поставь на паузу|выключи музыку)"))return new Control("pause",0);
         if(text.matches("(?:продолжи|продолжай|продолжи воспроизведение|продолжи музыку|сними с паузы)"))return new Control("resume",0);
         if(text.matches("(?:следующий|следующий трек|переключи трек)"))return new Control("next",0);
         if(text.matches("(?:предыдущий|предыдущий трек)"))return new Control("previous",0);

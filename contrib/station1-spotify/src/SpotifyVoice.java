@@ -109,7 +109,11 @@ public final class SpotifyVoice {
         String query=CommandParser.parse(text);
         CommandParser.Control control=active?CommandParser.control(text):null;
         if(query==null&&control==null){
-            if(text.toLowerCase(new Locale("ru")).matches(".*(?:включи|поставь|сыграй) .+")||text.toLowerCase(new Locale("ru")).matches(".*(?:sound\\s*cloud|саунд\\s*клауд).+")){active=false;new File(directory,"spotify-active").delete();}
+            if(text.toLowerCase(new Locale("ru")).matches(".*(?:включи|поставь|сыграй) .+")||text.toLowerCase(new Locale("ru")).matches(".*(?:sound\\s*cloud|саунд\\s*клауд).+")){
+                // Переход на другой музыкальный сервис: сначала пауза, иначе играют оба.
+                if(active){try{broadcast("pause",null,0);}catch(Exception pauseError){error="pause: "+pauseError.getMessage();}}
+                active=false;new File(directory,"spotify-active").delete();
+            }
             ignored++;diagnostic();return;
         }
         cancelNative();
