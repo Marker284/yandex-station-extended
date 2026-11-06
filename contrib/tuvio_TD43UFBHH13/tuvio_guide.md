@@ -21,7 +21,7 @@ adb connect ip_телека:5555
 
 # Рутинг
 
-Получаем рут мы через адаптированный эксплойт с станции Макс. Качаете архив - [https://github.com/Marker284/yandex-station-extended/tree/main/contrib/tuvio_TD43UFBHH13/archive.zip] (ссылка заработает после мерджа веток сорян)
+Получаем рут мы через адаптированный эксплойт с станции Макс. Качаете архив - [https://github.com/Marker284/yandex-station-binaries/raw/main/tuvio/archive.zip] (ссылка заработает после мерджа веток сорян)
 Анзипаем архив, запускаем скрипт tvroot.ps1 (тестировал я только .sh, чиниите с ИИ пожалуйста если что не так) 
 Если в логах будет : [R] spawn: euid=0 uid()=0
 [R] socket=5 errno=12

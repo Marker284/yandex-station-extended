@@ -13,7 +13,7 @@
 # SSH-клиент можно подменить: SSHPASS= YSE_SSH="sshpass -e ssh" sh install-yse.sh <IP> --ssh
 set -eu
 
-YSE_URL="https://raw.githubusercontent.com/Marker284/yandex-station-extended/main/contrib/bin/yse"
+YSE_URL="https://raw.githubusercontent.com/Marker284/yandex-station-binaries/main/bin/yse"
 IP="${1:?укажи IP колонки: sh install-yse.sh 192.168.1.120}"
 MODE="${2:-auto}"
 SSH="${YSE_SSH:-ssh}"

@@ -12,13 +12,13 @@
 
 | Программа | Размер | Прямая ссылка на скачивание | Описание |
 |---|---|---|---|
-| **`fastfetch`** | 1.1 МБ | [Скачать fastfetch](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/fastfetch) | Системный информер с цветным логотипом Алисы и выводом температуры. |
-| **`dropbear`** | 2.7 МБ | [Скачать dropbear](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/dropbear) | Легковесный автономный SSH-сервер. |
-| **`dropbearkey`**| 2.3 МБ | [Скачать dropbearkey](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/dropbearkey) | Генератор ED25519/RSA хост-ключей для Dropbear. |
-| **`nano`** | 325 КБ | [Скачать nano](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/nano) | Удобный консольный текстовый редактор. |
-| **`zsh`** | 3.6 МБ | [Скачать zsh](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/zsh-5.9.2-aarch64-musl) | Мощная командная оболочка Zsh (версия 5.9.2). |
-| **`yse`** | 20 КБ | [Скачать yse](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/yse) | Пакетный менеджер: Entware + `.yap`-пакеты с GitHub. Установщик с ПК — [`install-yse.sh`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/install-yse.sh), [инструкция](https://hackalice.me/start/packages/). |
-| **`bt-proxy`** | 1.2 МБ | [Скачать bt-proxy](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/bt-proxy) | MPRIS-плееры как Bluetooth-источник Алисы; `armv7-linux-musleabihf`, сборка — [`bt-proxy/build.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bt-proxy/build.sh). [Рецепт](https://hackalice.me/recipes/bt-proxy/). |
+| **`fastfetch`** | 1.1 МБ | [Скачать fastfetch](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/fastfetch) | Системный информер с цветным логотипом Алисы и выводом температуры. |
+| **`dropbear`** | 2.7 МБ | [Скачать dropbear](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/dropbear) | Легковесный автономный SSH-сервер. |
+| **`dropbearkey`**| 2.3 МБ | [Скачать dropbearkey](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/dropbearkey) | Генератор ED25519/RSA хост-ключей для Dropbear. |
+| **`nano`** | 325 КБ | [Скачать nano](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/nano) | Удобный консольный текстовый редактор. |
+| **`zsh`** | 3.6 МБ | [Скачать zsh](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/zsh-5.9.2-aarch64-musl) | Мощная командная оболочка Zsh (версия 5.9.2). |
+| **`yse`** | 20 КБ | [Скачать yse](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/yse) | Пакетный менеджер: Entware + `.yap`-пакеты с GitHub. Установщик с ПК — [`install-yse.sh`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/install-yse.sh), [инструкция](https://hackalice.me/start/packages/). |
+| **`bt-proxy`** | 1.2 МБ | [Скачать bt-proxy](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/bt-proxy) | MPRIS-плееры как Bluetooth-источник Алисы; `armv7-linux-musleabihf`, сборка — [`bt-proxy/build.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bt-proxy/build.sh). [Рецепт](https://hackalice.me/recipes/bt-proxy/). |
 
 ---
 
@@ -56,11 +56,11 @@
 
 | Файл | Размер | Прямая ссылка | Описание |
 |---|---|---|---|
-| **`mac-startup-chime-t2.mp3`** | 63 КБ | [Скачать MP3](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/mac-startup-chime-t2.mp3) | Легендарный звук запуска Apple Mac (чип T2) для автозагрузки Станции. |
-| **`mini2-ssh.tar.gz`** | 7.6 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/mini2-ssh.tar.gz) | Готовый самораспаковывающийся архив SSH для Станции Мини 2. |
-| **`librespot-micro-installer.zip`**| 2.3 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/librespot-micro-installer.zip) | Установщик клиента Spotify Connect для Станции Лайт. |
-| **`Station1_ROOT.zip`** | 2.8 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/Station1_ROOT.zip) | Архив инструментов рутирования для первой Станции (Allwinner). |
-| **`airplay-lite2-armhf.tar.gz`** | 1.4 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz) | shairport-sync 5.6.2 (AirPlay 2, MPRIS, soxr) и nqptp 1.2.9 для Станции Лайт 2: armhf, штатная glibc колонки, 9 библиотек рядом. Собран [`airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile), SHA256 `1521dbbd29c86ff265c40ca158f8795d71332bb7062d4d7eead8cf9cdb9cd1a9`. Ставится [`airplay-lite2/install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh). |
+| **`mac-startup-chime-t2.mp3`** | 63 КБ | [Скачать MP3](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/mac-startup-chime-t2.mp3) | Легендарный звук запуска Apple Mac (чип T2) для автозагрузки Станции. |
+| **`mini2-ssh.tar.gz`** | 7.6 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/mini2-ssh.tar.gz) | Готовый самораспаковывающийся архив SSH для Станции Мини 2. |
+| **`librespot-micro-installer.zip`**| 2.3 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/librespot-micro-installer.zip) | Установщик клиента Spotify Connect для Станции Лайт. |
+| **`Station1_ROOT.zip`** | 2.8 МБ | [Скачать zip](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/Station1_ROOT.zip) | Архив инструментов рутирования для первой Станции (Allwinner). |
+| **`airplay-lite2-armhf.tar.gz`** | 1.4 МБ | [Скачать архив](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/airplay-lite2-armhf.tar.gz) | shairport-sync 5.6.2 (AirPlay 2, MPRIS, soxr) и nqptp 1.2.9 для Станции Лайт 2: armhf, штатная glibc колонки, 9 библиотек рядом. Собран [`airplay-lite2/Dockerfile`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/Dockerfile), SHA256 `1521dbbd29c86ff265c40ca158f8795d71332bb7062d4d7eead8cf9cdb9cd1a9`. Ставится [`airplay-lite2/install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh). |
 
 ---
 
