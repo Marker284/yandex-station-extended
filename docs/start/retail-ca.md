@@ -39,7 +39,7 @@
 - [eQuasar](https://git.gay/iwakura/eQuasar/), nginx и DNS-сервер;
 - роутер, в настройках DHCP которого можно указать собственный DNS-сервер;
 - `adb`;
-- [файл `retail-ca-certificates-with-aaa.pem`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/retail-ca-certificates-with-aaa.pem).
+- [файл `retail-ca-certificates-with-aaa.pem`](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/retail-ca-certificates-with-aaa.pem).
 
 ## 1. Установка и запуск eQuasar
 

@@ -74,7 +74,7 @@ SSH запускает `socat` к локальному IPC `127.0.0.1:9875` **н
 
 ## Звук при включении (Mac Chime)
 
-Файл в репозитории: [`contrib/packages/mac-startup-chime-t2.mp3`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/mac-startup-chime-t2.mp3).
+Файл в репозитории: [`contrib/packages/mac-startup-chime-t2.mp3`](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/mac-startup-chime-t2.mp3).
 
 ```sh
 adb shell mkdir -p /data/sounds

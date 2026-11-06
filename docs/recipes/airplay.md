@@ -268,7 +268,7 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
 
 [`install.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/airplay-lite2/install.sh)
 ставит avahi из Entware, [bt-proxy](bt-proxy.md), готовую сборку shairport-sync + nqptp.
-Архив — [`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz).
+Архив — [`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/airplay-lite2-armhf.tar.gz).
 Скрипт ставит конфиги и автозапуск, отключает D-Bus-активацию `org.bluez`.
 Значение `airplay_device_id` (MAC `wlan0`) и имя хоста для avahi (`YandexLite-gen2-<deviceid>`)
 вычисляются на колонке; имя можно задать явно: `AP_HOSTNAME=… sh install.sh …`.
@@ -515,7 +515,7 @@ Content-Type: application/x-apple-binary-plist
 
 ## Станция Лайт 1 (Micro): AirPlay 2 самостоятельным приёмником { #lite1 }
 
-**Проверено на Станции Лайт (`yandexmicro`, device-tree `Yandex Station Micro`, усилитель `tas5825m`, ядро 4.9.68, userland armhf):** `shairport-sync 5.6.2` + `nqptp` + `avahi 0.8` из Entware. Готовая armhf-сборка для Лайт 2 ([`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/airplay-lite2-armhf.tar.gz)) запускается на Лайт 1 без пересборки: userland и `libasound` те же (armhf, glibc 2.30). Звук идёт через штатную цепочку `default` → dmix 48 кГц, ответы Алисы звучат поверх музыки.
+**Проверено на Станции Лайт (`yandexmicro`, device-tree `Yandex Station Micro`, усилитель `tas5825m`, ядро 4.9.68, userland armhf):** `shairport-sync 5.6.2` + `nqptp` + `avahi 0.8` из Entware. Готовая armhf-сборка для Лайт 2 ([`contrib/packages/airplay-lite2-armhf.tar.gz`](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/airplay-lite2-armhf.tar.gz)) запускается на Лайт 1 без пересборки: userland и `libasound` те же (armhf, glibc 2.30). Звук идёт через штатную цепочку `default` → dmix 48 кГц, ответы Алисы звучат поверх музыки.
 
 Пакет `/data/shairport` не нужен. В отличие от Лайт 2, [bt-proxy](bt-proxy.md) подключить
 **нельзя**: в `maind` на Micro нет classic-Bluetooth-аудио (`strings maind` даёт `There is no

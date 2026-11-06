@@ -19,7 +19,7 @@ Local IP (wlan0): 192.168.1.120/24
 
 ## Установка
 
-Статический `fastfetch` под `aarch64` — в [`contrib/bin/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bin):
+Статический `fastfetch` под `aarch64` — в [`contrib/bin/`](https://github.com/Marker284/yandex-station-binaries/tree/main/bin):
 
 ```sh
 adb push contrib/bin/fastfetch /data/opt/bin/fastfetch

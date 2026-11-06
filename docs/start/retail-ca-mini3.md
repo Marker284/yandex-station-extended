@@ -43,7 +43,7 @@ ADB и конфиг Wi-Fi. После normal-загрузки ADB с root под
 - DNS: подмена на роутере или хотспот с компьютера (общий доступ к интернету в Windows отдаёт
   колонке DNS = IP компьютера);
 - корень AAA:
-  [`contrib/packages/aaa-certificate-services.pem`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/packages/aaa-certificate-services.pem).
+  [`contrib/packages/aaa-certificate-services.pem`](https://github.com/Marker284/yandex-station-binaries/raw/main/packages/aaa-certificate-services.pem).
 
 ## 0. Проверка: жив ли factory-образ
 

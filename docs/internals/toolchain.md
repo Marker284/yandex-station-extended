@@ -84,16 +84,16 @@ zig objcopy --strip-all build/my_program
 
 ## Уже проверенные и работающие утилиты
 
-Все готовые бинарники уже скомпилированы и выложены в репозиторий в папку [`contrib/bin/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/bin):
+Все готовые бинарники уже скомпилированы и выложены в репозиторий в папку [`contrib/bin/`](https://github.com/Marker284/yandex-station-binaries/tree/main/bin):
 
 | Программа | Архитектура | Ссылка на бинарник | Примечания |
 |---|---|---|---|
-| **Fastfetch** | `aarch64` | [Скачать fastfetch](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/fastfetch) | Информер с цветным логотипом Алисы и датчиком температуры CPU. |
-| **Dropbear (SSH)** | `aarch64` | [Скачать dropbear](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/dropbear) | Автономный SSH-сервер со статическим musl. |
-| **Dropbearkey** | `aarch64` | [Скачать dropbearkey](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/dropbearkey) | Генератор ED25519/RSA хост-ключей. |
-| **Nano** | `aarch64` | [Скачать nano](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/nano) | Удобный консольный текстовый редактор. |
-| **Zsh** | `aarch64` | [Скачать zsh](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/zsh-5.9.2-aarch64-musl) | Мощная командная оболочка Zsh (5.9.2). |
-| **yse** | shell | [Скачать yse](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/yse) | Пакетный менеджер поверх Entware — [установка пакетов](../start/packages.md). |
+| **Fastfetch** | `aarch64` | [Скачать fastfetch](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/fastfetch) | Информер с цветным логотипом Алисы и датчиком температуры CPU. |
+| **Dropbear (SSH)** | `aarch64` | [Скачать dropbear](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/dropbear) | Автономный SSH-сервер со статическим musl. |
+| **Dropbearkey** | `aarch64` | [Скачать dropbearkey](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/dropbearkey) | Генератор ED25519/RSA хост-ключей. |
+| **Nano** | `aarch64` | [Скачать nano](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/nano) | Удобный консольный текстовый редактор. |
+| **Zsh** | `aarch64` | [Скачать zsh](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/zsh-5.9.2-aarch64-musl) | Мощная командная оболочка Zsh (5.9.2). |
+| **yse** | shell | [Скачать yse](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/yse) | Пакетный менеджер поверх Entware — [установка пакетов](../start/packages.md). |
 | **htop, tmux, …** | `aarch64` / `armv7` | `yse install <pkg>` | Из Entware в `/opt`. |
 
 ## Заливка и запуск на колонке

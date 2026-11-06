@@ -14,7 +14,7 @@
 
 ## Установка
 
-[:material-download: Скачать `yse`](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/bin/yse){ .md-button .md-button--primary }
+[:material-download: Скачать `yse`](https://github.com/Marker284/yandex-station-binaries/raw/main/bin/yse){ .md-button .md-button--primary }
 [:material-download: Скачать установщик](https://github.com/Marker284/yandex-station-extended/raw/main/contrib/install-yse.sh){ .md-button }
 
 **Одной командой с компьютера** — Linux, macOS или WSL; нужен `adb` или `ssh`.
@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/Marker284/yandex-station-extended/m
 yse install htop
 ```
 
-Исходники: [`contrib/bin/yse`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/bin/yse),
+Исходники: [`contrib/bin/yse`](https://github.com/Marker284/yandex-station-binaries/blob/main/bin/yse),
 [`contrib/install-yse.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/install-yse.sh).
 Обновить `yse` до новой версии — запустить установщик ещё раз.
 
