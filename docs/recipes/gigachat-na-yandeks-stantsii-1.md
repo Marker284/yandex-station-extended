@@ -48,7 +48,7 @@ cd /opt/jarvis
 
 python3 -m venv /opt/jarvis/venv
 /opt/jarvis/venv/bin/pip install --upgrade pip
-/opt/jarvis/venv/bin/pip install vosk gigachat
+/opt/jarvis/venv/bin/pip install vosk gigachat num2words
 
 python3 -m venv /opt/jarvis/piper-venv
 /opt/jarvis/piper-venv/bin/pip install --upgrade pip
@@ -165,13 +165,442 @@ EOF
 ```sh
 cat > /opt/jarvis/text_normalizer.py <<'EOF'
 import re
+from num2words import num2words
+
+MONTHS = {
+    1: "января", 2: "февраля", 3: "марта",
+    4: "апреля", 5: "мая", 6: "июня",
+    7: "июля", 8: "августа", 9: "сентября",
+    10: "октября", 11: "ноября", 12: "декабря"
+}
+
+DAYS = {
+    1: "первое", 2: "второе", 3: "третье",
+    4: "четвертое", 5: "пятое", 6: "шестое",
+    7: "седьмое", 8: "восьмое", 9: "девятое",
+    10: "десятое", 11: "одиннадцатое",
+    12: "двенадцатое", 13: "тринадцатое",
+    14: "четырнадцатое", 15: "пятнадцатое",
+    16: "шестнадцатое", 17: "семнадцатое",
+    18: "восемнадцатое", 19: "девятнадцатое",
+    20: "двадцатое", 21: "двадцать первое",
+    22: "двадцать второе", 23: "двадцать третье",
+    24: "двадцать четвертое", 25: "двадцать пятое",
+    26: "двадцать шестое", 27: "двадцать седьмое",
+    28: "двадцать восьмое", 29: "двадцать девятое",
+    30: "тридцатое", 31: "тридцать первое"
+}
+
+GENITIVE = {
+    "первый": "первого", "второй": "второго",
+    "третий": "третьего", "четвертый": "четвертого",
+    "пятый": "пятого", "шестой": "шестого",
+    "седьмой": "седьмого", "восьмой": "восьмого",
+    "девятый": "девятого", "десятый": "десятого",
+    "одиннадцатый": "одиннадцатого",
+    "двенадцатый": "двенадцатого",
+    "тринадцатый": "тринадцатого",
+    "четырнадцатый": "четырнадцатого",
+    "пятнадцатый": "пятнадцатого",
+    "шестнадцатый": "шестнадцатого",
+    "семнадцатый": "семнадцатого",
+    "восемнадцатый": "восемнадцатого",
+    "девятнадцатый": "девятнадцатого",
+    "двадцатый": "двадцатого"
+}
+
+GEN_SMALL = {
+    0: "нуля", 1: "одного", 2: "двух",
+    3: "трех", 4: "четырех", 5: "пяти",
+    6: "шести", 7: "семи", 8: "восьми",
+    9: "девяти", 10: "десяти",
+    11: "одиннадцати", 12: "двенадцати",
+    13: "тринадцати", 14: "четырнадцати",
+    15: "пятнадцати", 16: "шестнадцати",
+    17: "семнадцати", 18: "восемнадцати",
+    19: "девятнадцати"
+}
+
+GEN_TENS = {
+    20: "двадцати", 30: "тридцати",
+    40: "сорока", 50: "пятидесяти",
+    60: "шестидесяти", 70: "семидесяти",
+    80: "восьмидесяти", 90: "девяноста"
+}
 
 
-def normalize_for_speech(text: str) -> str:
-    text = re.sub(r"https?://\S+", "", text)
-    text = re.sub(r"[*_`#~<>]", "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+def cardinal(value, gender="m"):
+    raw = str(value).replace(" ", "").replace(",", ".")
+
+    sign = ""
+    if raw.startswith("+"):
+        sign, raw = "плюс ", raw[1:]
+    elif raw.startswith("-"):
+        sign, raw = "минус ", raw[1:]
+
+    if "." in raw:
+        whole, fraction = raw.split(".", 1)
+        denominator = {
+            1: "десятых", 2: "сотых",
+            3: "тысячных", 4: "десятитысячных",
+            5: "стотысячных", 6: "миллионных"
+        }.get(len(fraction), "долей")
+
+        result = (
+            num2words(int(whole), lang="ru")
+            + " целых "
+            + num2words(int(fraction), lang="ru")
+            + " " + denominator
+        )
+    else:
+        if len(raw) > 1 and raw.startswith("0"):
+            names = [
+                "ноль", "один", "два", "три", "четыре",
+                "пять", "шесть", "семь", "восемь", "девять"
+            ]
+            result = " ".join(names[int(x)] for x in raw)
+        else:
+            result = num2words(int(raw or "0"), lang="ru")
+
+        if gender == "f":
+            parts = result.split()
+            if parts[-1] == "один":
+                parts[-1] = "одна"
+            elif parts[-1] == "два":
+                parts[-1] = "две"
+            result = " ".join(parts)
+
+    return sign + result.replace("-", " ")
+
+
+def ordinal(number):
+    try:
+        return num2words(int(number), lang="ru", to="ordinal")
+    except Exception:
+        return cardinal(number)
+
+
+def year_genitive(number):
+    words = ordinal(number).split()
+    words[-1] = GENITIVE.get(words[-1], words[-1])
+    return " ".join(words)
+
+
+def year_locative(number):
+    forms = {
+        "первый": "первом", "второй": "втором",
+        "третий": "третьем", "четвертый": "четвертом",
+        "пятый": "пятом", "шестой": "шестом",
+        "седьмой": "седьмом", "восьмой": "восьмом",
+        "девятый": "девятом", "десятый": "десятом"
+    }
+    words = ordinal(number).split()
+    words[-1] = forms.get(words[-1], words[-1])
+    return " ".join(words)
+
+
+def genitive(number):
+    n = int(number)
+
+    if n in GEN_SMALL:
+        return GEN_SMALL[n]
+
+    if n < 100:
+        tens = n // 10 * 10
+        remainder = n % 10
+
+        result = GEN_TENS[tens]
+        if remainder:
+            result += " " + GEN_SMALL[remainder]
+
+        return result
+
+    return cardinal(n)
+
+
+def plural(number, forms):
+    raw = str(number).replace(",", ".")
+
+    if "." in raw:
+        return forms[2]
+
+    n = abs(int(raw))
+    last_two = n % 100
+
+    if 11 <= last_two <= 14:
+        return forms[2]
+
+    last = n % 10
+
+    if last == 1:
+        return forms[0]
+    if 2 <= last <= 4:
+        return forms[1]
+
+    return forms[2]
+
+
+def quantity(number, forms, tail="", gender="m"):
+    return (
+        cardinal(number, gender)
+        + " "
+        + plural(number, forms)
+        + tail
+    )
+
+
+def normalize_for_speech(text):
+    text = text.replace("\u00a0", " ")
+
+    names = {
+        "NASA": "НАСА",
+        "Artemis": "Артемида",
+        "Orion": "Орион",
+        "Apollo": "Аполлон",
+        "SpaceX": "Спейс Икс",
+        "Blue Origin": "Блю Ориджин",
+        "Teghaza": "Тегаза"
+    }
+
+    text = re.sub(
+        r"\bArtemis\s+II\b", "Артемида два",
+        text, flags=re.I
+    )
+    text = re.sub(
+        r"\bArtemis\s+III\b", "Артемида три",
+        text, flags=re.I
+    )
+
+    for old, new in names.items():
+        text = re.sub(re.escape(old), new, text, flags=re.I)
+
+    def numeric_date(m):
+        day, month, year = map(int, m.groups())
+
+        if month not in MONTHS or day not in DAYS:
+            return m.group(0)
+
+        return (
+            DAYS[day] + " " + MONTHS[month]
+            + " " + year_genitive(year) + " года"
+        )
+
+    text = re.sub(
+        r"(?<!\d)(\d{1,2})[./](\d{1,2})[./](\d{4})(?!\d)",
+        numeric_date,
+        text
+    )
+
+    months = "|".join(MONTHS.values())
+
+    def textual_date(m):
+        day, month, year = m.groups()
+        return (
+            DAYS[int(day)] + " " + month
+            + " " + year_genitive(year) + " года"
+        )
+
+    text = re.sub(
+        rf"(?<!\d)(\d{{1,2}})\s+({months})\s+(\d{{4}})\s+года\b",
+        textual_date, text, flags=re.I
+    )
+
+    text = re.sub(
+        r"(?<!\d)(\d{4})\s+года\b",
+        lambda m: year_genitive(m.group(1)) + " года",
+        text
+    )
+
+    text = re.sub(
+        r"(?<!\d)(\d{4})\s+году\b",
+        lambda m: year_locative(m.group(1)) + " году",
+        text
+    )
+
+    text = re.sub(
+        r"(?<!\d)(\d{4})\s+год\b",
+        lambda m: ordinal(m.group(1)) + " год",
+        text
+    )
+
+    text = re.sub(
+        rf"(?<!\d)(\d{{1,2}})\s+({months})\b",
+        lambda m: DAYS[int(m.group(1))] + " " + m.group(2),
+        text, flags=re.I
+    )
+
+    range_units = {
+        "м/с": "метров в секунду",
+        "km/s": "километров в секунду",
+        "км/ч": "километров в час",
+        "км": "километров",
+        "м": "метров",
+        "см": "сантиметров",
+        "мм": "миллиметров",
+        "°c": "градусов Цельсия",
+        "%": "процентов"
+    }
+
+    def range_replace(m):
+        return (
+            "от " + genitive(m.group(1))
+            + " до " + genitive(m.group(2))
+            + " " + range_units[m.group(3).lower()]
+        )
+
+    range_pattern = (
+        r"(?<!\w)(\d+)\s*[–—-]\s*(\d+)\s*"
+        r"(км/ч|м/с|km/s|км|см|мм|м|°C|%)"
+        r"(?!\w)"
+    )
+
+    text = re.sub(
+        range_pattern, range_replace, text, flags=re.I
+    )
+
+    rules = [
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:км/ч|km/h)",
+         ("километр", "километра", "километров"), " в час", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:м/с|m/s)",
+         ("метр", "метра", "метров"), " в секунду", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*°\s*C",
+         ("градус", "градуса", "градусов"), " Цельсия", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*%",
+         ("процент", "процента", "процентов"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:кВт)",
+         ("киловатт", "киловатта", "киловатт"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:ГБ)",
+         ("гигабайт", "гигабайта", "гигабайтов"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:МБ)",
+         ("мегабайт", "мегабайта", "мегабайтов"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:км)",
+         ("километр", "километра", "километров"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:см)",
+         ("сантиметр", "сантиметра", "сантиметров"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:мм)",
+         ("миллиметр", "миллиметра", "миллиметров"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:кг)",
+         ("килограмм", "килограмма", "килограммов"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:мл)",
+         ("миллилитр", "миллилитра", "миллилитров"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:л)",
+         ("литр", "литра", "литров"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:г)",
+         ("грамм", "грамма", "граммов"), "", "m"),
+
+        (r"(?P<n>[+-]?\d+(?:[.,]\d+)?)\s*(?:м)",
+         ("метр", "метра", "метров"), "", "m")
+    ]
+
+    for pattern, forms, tail, gender in rules:
+        text = re.sub(
+            pattern,
+            lambda m: quantity(
+                m.group("n"), forms, tail, gender
+            ),
+            text,
+            flags=re.I
+        )
+
+    abbreviations = {
+        r"\bм/с\b": "метров в секунду",
+        r"\bкм/ч\b": "километров в час",
+        r"\bкм\b": "километров",
+        r"\bсм\b": "сантиметров",
+        r"\bмм\b": "миллиметров",
+        r"\bкг\b": "килограммов",
+        r"\bмл\b": "миллилитров",
+        r"\bмлн\.": "миллионов",
+        r"\bмлрд\.": "миллиардов",
+        r"\bтыс\.": "тысяч",
+        r"\bруб\.": "рублей",
+        r"\bдолл\.": "долларов",
+        r"\bшт\.": "штук",
+        r"\bмин\.": "минут",
+        r"\bсек\.": "секунд",
+        r"\bГБ\b": "гигабайтов",
+        r"\bМБ\b": "мегабайтов",
+        r"\bТБ\b": "терабайтов",
+        r"\bМГц\b": "мегагерц",
+        r"\bГГц\b": "гигагерц",
+        r"\bдБ\b": "децибел"
+    }
+
+    for pattern, replacement in abbreviations.items():
+        text = re.sub(pattern, replacement, text, flags=re.I)
+
+    ordinal_forms = {
+        "й": {
+            1: "первый", 2: "второй", 3: "третий",
+            4: "четвертый", 5: "пятый"
+        },
+        "го": {
+            1: "первого", 2: "второго", 3: "третьего",
+            4: "четвертого", 5: "пятого"
+        },
+        "я": {
+            1: "первая", 2: "вторая", 3: "третья"
+        },
+        "е": {
+            1: "первое", 2: "второе", 3: "третье"
+        }
+    }
+
+    def ordinal_suffix(m):
+        n = int(m.group(1))
+        suffix = m.group(2)
+        return ordinal_forms.get(suffix, {}).get(n, ordinal(n))
+
+    text = re.sub(
+        r"(?<!\w)(\d+)-(го|й|я|е)\b",
+        ordinal_suffix, text
+    )
+
+    number_pattern = (
+        r"(?<!\w)([+-]?\d{1,3}(?:[ \u00a0]\d{3})+"
+        r"(?:[.,]\d+)?|[+-]?\d+(?:[.,]\d+)?)(?!\w)"
+    )
+
+    text = re.sub(
+        number_pattern,
+        lambda m: cardinal(m.group(1)),
+        text
+    )
+
+    symbols = {
+        "№": "номер",
+        "&": "и",
+        "=": "равно",
+        "%": "процентов",
+        "°": "градусов",
+        "$": "долларов",
+        "€": "евро",
+        "₽": "рублей",
+        "+": "плюс",
+        "/": "или"
+    }
+
+    for symbol, word in symbols.items():
+        text = text.replace(symbol, " " + word + " ")
+
+    text = re.sub(r"[()\[\]{}<>]", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+([,.!?;:])", r"\1", text)
+
+    return text.strip()
 EOF
 ```
 
@@ -959,10 +1388,10 @@ check_files() {
         test -n "${GIGACHAT_CREDENTIALS:-}"
     ' sh "$ENV_FILE" || die "Нет ключа GigaChat"
 
-    "$PYTHON" -m py_compile "$BASE/jarvis.py" ||
-        die "Ошибка синтаксиса jarvis.py"
+    "$PYTHON" -m py_compile "$BASE/jarvis.py" "$BASE/text_normalizer.py" "$BASE/piper_worker.py" ||
+        die "Ошибка синтаксиса Python-скриптов"
 
-    "$PYTHON" -c 'import vosk, gigachat' ||
+    "$PYTHON" -c 'import vosk, gigachat, num2words' ||
         die "Не загружаются библиотеки Python"
 
     "$PIPER" --help >/dev/null 2>&1 ||
