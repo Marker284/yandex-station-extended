@@ -43,6 +43,7 @@ RTC и выход на наушники.
 | YAM | работает | [профиль mini2](../recipes/packagemanagers.md) |
 | YouTube Music | работает | [YouTube Music](../recipes/youtube-music.md) |
 | Своя LLM | работает | [Своя LLM](../recipes/llm.md) |
+| Tailscale | работает | [Tailscale на колонке](../recipes/tailscale.md) |
 
 ## Получение root { #root }
 
