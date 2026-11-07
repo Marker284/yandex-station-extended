@@ -56,7 +56,23 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 | Обработанный микрофон | работает | [VQE и full-duplex](#vqe) |
 | Подсветка | работает | [Подсветка Лайт](../recipes/led.md#lite-led) |
 | YAM | работает | [YAM и BetterYAM](../recipes/packagemanagers.md#betteryam) |
-| Своя LLM | есть нативный GPT; результаты автора адаптации | [Alisa Voice](../recipes/llm.md#chatgpt-web) |
+| Своя LLM | есть нативный GPT; результаты автора адаптации; Quasar Bridge проверен (см. ниже) | [Alisa Voice](../recipes/llm.md#chatgpt-web) |
+
+### Своя LLM через Quasar Bridge { #quasar-bridge }
+
+Гибридный режим [Quasar Bridge](../recipes/llm.md) проверен на этой модели: «Алиса, спроси
+нейросеть …» уходит своей модели, обычные команды остаются у Яндекса. Детали, которые
+оказались специфичны для `yandexmicro`:
+
+- **Архитектура релиза.** Установщик смотрит `uname -m`; у Лайт 1 ядро `aarch64`, поэтому
+  нужен архив **arm64**, а не armv7 (userspace при этом 32-битный — Go-бинарник статический
+  и идёт на aarch64-ядре поверх него).
+- **Установка целиком по ADB**, без SSH: `adb push` архива → распаковать на колонке
+  (`gzip -dc … | tar -xf -`) → `sh install.sh`. Правка эндпоинта и `control.sh apply` —
+  как в рецепте.
+- **Свой HTTPS-эндпоинт за Let's Encrypt принимается:** в `ca-certificates.crt` колонки
+  есть корни `ISRG Root X1` и `ISRG Root X2`, так что мост соединяется с моделью по
+  обычному сертификату LE без доработок.
 
 ## Получение root { #root }
 
