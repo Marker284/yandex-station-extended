@@ -19,6 +19,7 @@ import time
 TARGET = "/bkupgrade/data/local/opt/soloist"
 APPLETS = ["sh", "sha256sum", "cmp", "setsid", "nohup", "mkfifo", "awk", "sed", "tail",
            "ln", "df", "mount", "ip", "nslookup", "tr", "wc"]
+MAX_CMD = 900          # bytes per batched shell command (adbd limit is ~4 KB)
 LOG = "/tmp/soloist-install.log"
 RC = "/tmp/soloist-install.rc"
 
@@ -35,7 +36,11 @@ class Adb:
         cmd = ["adb"] + (["-s", self.serial] if self.serial else []) + args
         last = ""
         for attempt in range(6 if retry else 1):
-            r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+            p = subprocess.run(cmd, capture_output=True)
+            # adb shell on Windows ends lines with \r\r\n; drop every \r
+            stdout = p.stdout.decode("utf-8", "replace").replace("\r", "")
+            stderr = p.stderr.decode("utf-8", "replace").replace("\r", "")
+            r = subprocess.CompletedProcess(cmd, p.returncode, stdout, stderr)
             out = r.stdout + r.stderr
             # adb's own connection errors, not errors of the command on the station
             err = r.stderr.strip().lower()
@@ -68,6 +73,17 @@ class Adb:
         if check and code != 0:
             raise Fail(f"on the station: {script.splitlines()[0][:80]}... -> rc={code}\n{body[-500:]}")
         return body
+
+    def sh_batch(self, commands, limit=MAX_CMD):
+        """Run many commands in chunks: the station's adbd (old protocol) drops
+        a shell command longer than ~4 KB. Each chunk stops at the first error."""
+        chunk = []
+        for c in commands + [None]:
+            if chunk and (c is None or len(" &&\n".join(chunk + [c])) > limit):
+                self.sh(" &&\n".join(chunk))
+                chunk = []
+            if c is not None:
+                chunk.append(c)
 
     def push(self, local, remote):
         self._run(["push", local, remote])
@@ -156,7 +172,7 @@ def deploy(a):
     dirs = sorted({posixpath_dir(p) for p in files if "/" in p})
     adb.sh(f"rm -rf {s} && mkdir -p " + " ".join(f"{s}/{d}" for d in dirs) + f" && chmod 700 {s}/etc")
     if link:
-        adb.sh("\n".join(f"ln -f {q}/{p} {s}/{p}" for p in link))
+        adb.sh_batch([f"ln -f {q}/{p} {s}/{p}" for p in link])
     for i, p in enumerate(push, 1):
         adb.push(os.path.join(kit, *p.split("/")), f"{stage}/{p}")
         print(f"\r  copied {i}/{len(push)}", end="", flush=True)
@@ -174,7 +190,9 @@ def deploy(a):
     # start a second installer (install.sh also refuses that with a lock)
     adb.sh(f"rm -f {LOG} {RC}; TARGET={q} setsid nohup sh -c "
            + shlex.quote(f"sh {shlex.quote(stage + '/install.sh')}{opts} > {LOG} 2>&1; echo $? > {RC}")
-           + " > /dev/null 2>&1 < /dev/null &", retry=False)
+           # adbd hangs up the session as soon as the command ends; without the
+           # pause the child dies before setsid detaches it (seen on the station)
+           + " > /dev/null 2>&1 < /dev/null &\nsleep 2", retry=False)
     shown, deadline = 0, time.time() + 420
     while time.time() < deadline:
         time.sleep(3)

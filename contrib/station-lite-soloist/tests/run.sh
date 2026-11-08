@@ -630,7 +630,12 @@ fake_adb() {
 case "$1" in
 connect) exit 0 ;;
 push) cp "$2" "$3" ;;
-shell) shift; exec sh -c "$*" ;;
+shell) shift
+    # the station's adbd silently drops a shell command over ~4 KB (here 1 KB)
+    c="$*"; [ -e "$ST/adb-maxlen" ] && [ ${#c} -gt 1024 ] && exit 0
+    # Windows adb ends shell output lines with \r\r\n
+    if [ -e "$ST/adb-crlf" ]; then sh -c "$*" | awk '{ printf "%s\r\r\n", $0 }'; exit 0; fi
+    exec sh -c "$*" ;;
 *) exit 1 ;;
 esac
 EOF
@@ -644,6 +649,7 @@ show_deploy() { sed 's/^/  > /' "$T/deploy.out"; }
 t_deploy_upgrade_copies_only_changes() {
     old_install
     fake_adb
+    : > "$ST/adb-maxlen"
     mk_stage v2 "$T/kit"
     INIT_DIR="$T/initd" ROOT_MOUNTS="$ST/rootmounts" deploy --kit "$T/kit"
     check "deploy exit 0" eval '[ $DRC -eq 0 ]'
@@ -667,13 +673,15 @@ t_deploy_first_install_needs_key() {
     check "nothing created" eval '[ ! -e "$O" ] && [ ! -e "$O.new" ]'
 }
 
-# Requirement: dry run changes nothing.
+# Requirement: dry run changes nothing; works with Windows adb line endings.
 t_deploy_dry_run() {
     old_install
     fake_adb
+    : > "$ST/adb-crlf"
     mk_stage v2 "$T/kit"
     deploy --kit "$T/kit" --dry-run
     check "dry run exit 0" eval '[ $DRC -eq 0 ]'
+    check "free space parsed" has "$T/deploy.out" "KB free"
     check "no staging dir" eval '[ ! -e "$O.new" ]'
     check "v1 untouched" eval '[ "$(cat "$O/VERSION")" = v1 ]'
     stop_all
