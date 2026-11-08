@@ -100,8 +100,8 @@ DNS-метод.
 
         ```text
         ip host quasar.yandex.net 179.254.167.126
-        system configuration save
-        ```
+        ip host quasar.yandex.ru 179.254.167.126
+system configuration save        ```
 
         Откат после шага 2 — верните прежние DNS в веб-интерфейсе или выполните
         `no ip host quasar.yandex.net` и `system configuration save`.
