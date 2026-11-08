@@ -157,6 +157,7 @@ nav:
       - AirPlay: recipes/airplay.md
       - Плееры как Bluetooth (bt-proxy): recipes/bt-proxy.md
       - Spotify Connect: recipes/spotify.md
+      - Spotify Connect через Soloist (Лайт): recipes/station-lite-spotify-soloist.md
       - Spotify голосом (Станция 1): recipes/station1-spotify.md
       - SoundCloud голосом (Станция 1): recipes/station1-soundcloud.md
       - YouTube Music: recipes/youtube-music.md

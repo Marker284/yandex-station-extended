@@ -1,0 +1,9 @@
+# Minimal PulseAudio for Soloist on Yandex Station Lite 1 (yandexmicro).
+# Template: run-pulse.sh replaces @RUN@ with the runtime directory.
+# Debian's time64 libasound cannot talk to kernel 4.9 (SNDRV_PCM_IOCTL_SYNC_PTR
+# fails with ENOTTY), so Pulse never touches ALSA itself: it writes raw PCM into
+# a FIFO and the station's own /usr/bin/aplay plays it into the system "default"
+# (softvol -> dmix), shared with Alice. The card plays 48 kHz only.
+load-module module-pipe-sink file=@RUN@/pcm.fifo sink_name=station format=s16le rate=48000 channels=2 use_system_clock_for_timing=yes
+load-module module-native-protocol-unix socket=@RUN@/pulse/native auth-anonymous=1
+set-default-sink station
