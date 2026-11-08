@@ -1,46 +1,46 @@
-# ГигаЧат на Яндекс Станции 1
+# Автономный голосовой помощник с GigaChat в Debian
 
-Коротко: полностью автономный голосовой ассистент («Джарвис») на базе **GigaChat**, офлайн-распознавания речи **Vosk** и синтеза речи **Piper** поверх Debian 13 на первой Станции. Работает без серверов Яндекса, поддерживает физические кнопки, поворотное кольцо громкости и автозапуск через `runit`.
+Рецепт заменяет штатную Алису связкой из локального распознавания речи Vosk, генерации
+ответов через GigaChat API и офлайн-синтеза речи Piper. Помощник откликается на имя
+«Джарвис», работает без серверов Яндекса, поддерживает физические кнопки, кольцо
+громкости и автозапуск при подаче питания.
 
-## Что понадобится
+**Проверено на:** Станция 1, Debian 13 (Bookworm), ноябрь 2026.
 
-- колонка с root ([шаг 1](../start/root.md))
-- установленный Debian 13 ([шаг 2](https://hackalice.me/recipes/station1-debian/))
-- авторизационный ключ **GigaChat API** (`GIGACHAT_CREDENTIALS`), полученный в личном кабинете разработчика Сбера
+## Что понадобится { #requirements }
 
-## Архитектура решения
+- Станция 1 с [полученным root](../start/root.md) и установленным
+  [Debian 13](station1-debian.md)
+- доступ к колонке по [SSH](../start/ssh.md) от имени `root`
+- авторизационный ключ GigaChat API (`GIGACHAT_CREDENTIALS`) из личного кабинета
+  разработчика Сбера
 
-В образе Debian для Станции 1 нет Android-окружения и штатной Алисы, но работают все аппаратные узлы платы `tulip`: микрофонная матрица, усилители `TAS5751M` (`snddaudio1`), кнопка активации, кнопка отключения микрофона и энкодер громкости.
+## Установка { #install }
 
-Связка компонентов в `/opt/jarvis`:
+### 1. Системные пакеты и сертификаты { #deps }
 
-- **Vosk (`vosk-model-small-ru-0.22`)** — локальное распознавание русской речи и ключевого слова без отправки аудиопотока в облако.
-- **GigaChat API** — генерация ответов и поиск актуальной информации в сети (Web Search).
-- **Piper (`ru_RU-dmitri-medium.onnx`)** — локальный нейросетевой TTS-движок, удерживающий модель в памяти через `piper_worker.py` для быстрого отклика.
-- **runit (`/etc/service/jarvis`)** — системный супервизор Debian на Станции, отвечающий за автостарт при подаче питания, логирование (`svlogd`) и перезапуск при сбоях.
-
-## Шаги
-
-### 1. Установка системных зависимостей и сертификатов НУЦ Минцифры
-
-Зайдите на Станцию в Debian по SSH под `root` и установите базовые пакеты для работы со звуком, архивами и Python:
+Подключитесь к Станции по SSH под `root` и установите пакеты для работы со звуком,
+архивами и Python:
 
 ```sh
 apt update
-apt install -y python3 python3-venv python3-pip alsa-utils curl ca-certificates unzip nano
+apt install -y python3 python3-venv python3-pip \
+  alsa-utils curl ca-certificates unzip
 ```
 
-Для работы с API Сбера установите корневой сертификат Минцифры по пути, который проверяет управляющий скрипт:
+Установите корневой сертификат Минцифры для подключения к API Сбера:
 
 ```sh
-curl -kfsSL https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt \
+curl -kfsSL \
+  [https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt](https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt) \
   -o /usr/local/share/ca-certificates/russian_trusted_root_ca_pem.crt
 update-ca-certificates
 ```
 
-### 2. Подготовка каталога `/opt/jarvis`, виртуальных окружений и моделей
+### 2. Виртуальные окружения и модели { #models }
 
-Создайте рабочую структуру каталогов и два виртуальных окружения — основное (`venv`) и для голосового синтезатора (`piper-venv`):
+Создайте рабочий каталог `/opt/jarvis` и два виртуальных окружения — основное
+и отдельное для синтезатора речи:
 
 ```sh
 mkdir -p /opt/jarvis/models/piper
@@ -55,23 +55,25 @@ python3 -m venv /opt/jarvis/piper-venv
 /opt/jarvis/piper-venv/bin/pip install piper-tts
 ```
 
-Скачайте модель распознавания речи **Vosk** и голосовую модель **Piper**:
+Скачайте русскую модель распознавания речи Vosk и голосовую модель Piper:
 
 ```sh
 cd /opt/jarvis/models
-curl -fSL https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip -o vosk.zip
+curl -fSL \
+  [https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip](https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip) \
+  -o vosk.zip
 unzip vosk.zip && rm -f vosk.zip
 
 cd /opt/jarvis/models/piper
-curl -fSL https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx \
-  -o ru_RU-dmitri-medium.onnx
-curl -fSL https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx.json \
-  -o ru_RU-dmitri-medium.onnx.json
+VOICE_URL="[https://huggingface.co/rhasspy/piper-voices/resolve/main](https://huggingface.co/rhasspy/piper-voices/resolve/main)"
+VOICE_PATH="ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx"
+curl -fSL "$VOICE_URL/$VOICE_PATH" -o ru_RU-dmitri-medium.onnx
+curl -fSL "$VOICE_URL/$VOICE_PATH.json" -o ru_RU-dmitri-medium.onnx.json
 ```
 
-### 3. Создание рабочих скриптов помощника
+### 3. Скрипты помощника { #scripts }
 
-Создайте скрипт постоянного фонового воркера синтеза речи `/opt/jarvis/piper_worker.py`:
+Создайте скрипт фонового процесса синтеза речи `/opt/jarvis/piper_worker.py`:
 
 ```sh
 cat > /opt/jarvis/piper_worker.py <<'EOF'
@@ -160,7 +162,7 @@ print("Piper worker завершён.", file=sys.stderr, flush=True)
 EOF
 ```
 
-Создайте вспомогательный модуль нормализации текста перед озвучиванием `/opt/jarvis/text_normalizer.py`:
+Создайте модуль нормализации чисел, дат и сокращений `/opt/jarvis/text_normalizer.py`:
 
 ```sh
 cat > /opt/jarvis/text_normalizer.py <<'EOF'
@@ -636,6 +638,10 @@ MODEL_PATH = "/opt/jarvis/models/vosk-model-small-ru-0.22"
 
 PIPER_WORKER = "/opt/jarvis/piper_worker.py"
 PIPER_PYTHON = "/opt/jarvis/piper-venv/bin/python"
+CA_CERT = (
+    "/usr/local/share/ca-certificates/"
+    "russian_trusted_root_ca_pem.crt"
+)
 
 armed = False
 mic_muted = False
@@ -756,9 +762,13 @@ def hardware_controls():
         except OSError:
             pass
 
+        status_msg = (
+            "Микрофон выключен."
+            if mic_muted else "Микрофон включён."
+        )
         print(
             "Jarvis: Аппаратное управление подключено. "
-            + ("Микрофон выключен." if mic_muted else "Микрофон включён.")
+            + status_msg
         )
 
         while True:
@@ -846,201 +856,206 @@ def hardware_controls():
 
 
 def clean_answer(text, max_sentences, max_words=None):
-  text = re.sub(
-    r"\[sources=\[[^\]]*\]\]",
-    "",
-    text,
-    flags=re.IGNORECASE
-  )
-  text = re.sub(
-    r"\[([^\]]+)\]\(https?://[^)]+\)",
-    r"\1",
-    text
-  )
-  text = re.sub(r"https?://\S+", "", text)
-  text = re.sub(r"(?m)^\s*#{1,6}\s*", "", text)
-  text = re.sub(r"(?m)^\s*[-*•]\s*", "", text)
-  text = re.sub(r"[*_`#]", "", text)
-  text = re.sub(r"\s+", " ", text).strip()
-
-  protected = "\uE000"
-
-  for abbreviation in (
-    "т.д.", "т.п.", "т.е.", "т.к.", "т.ч.",
-    "г.", "ул.", "д.", "им.", "стр.", "рис."
-  ):
     text = re.sub(
-      re.escape(abbreviation),
-      abbreviation.replace(".", protected),
-      text,
-      flags=re.IGNORECASE
+        r"\[sources=\[[^\]]*\]\]",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+    text = re.sub(
+        r"\[([^\]]+)\]\(https?://[^)]+\)",
+        r"\1",
+        text
+    )
+    text = re.sub(r"https?://\S+", "", text)
+    text = re.sub(r"(?m)^\s*#{1,6}\s*", "", text)
+    text = re.sub(r"(?m)^\s*[-*•]\s*", "", text)
+    text = re.sub(r"[*_`#]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+
+    protected = "\uE000"
+
+    for abbreviation in (
+        "т.д.", "т.п.", "т.е.", "т.к.", "т.ч.",
+        "г.", "ул.", "д.", "им.", "стр.", "рис."
+    ):
+        text = re.sub(
+            re.escape(abbreviation),
+            abbreviation.replace(".", protected),
+            text,
+            flags=re.IGNORECASE
+        )
+
+    sentences = re.split(
+        r'(?<=[.!?])\s+(?=[А-ЯЁA-Z0-9«„"“])',
+        text
     )
 
-  sentences = re.split(
-    r'(?<=[.!?])\s+(?=[А-ЯЁA-Z0-9«„"“])',
-    text
-  )
+    sentences = [
+        part.strip()
+        for part in sentences
+        if part.strip()
+    ]
 
-  sentences = [
-    part.strip()
-    for part in sentences
-    if part.strip()
-  ]
+    sentences = sentences[:max_sentences]
 
-  sentences = sentences[:max_sentences]
+    if max_words is not None:
+        limited = []
+        remaining = max_words
 
-  if max_words is not None:
-    limited = []
-    remaining = max_words
+        for sentence in sentences:
+            words = sentence.split()
 
-    for sentence in sentences:
-      words = sentence.split()
+            if len(words) <= remaining:
+                limited.append(sentence)
+                remaining -= len(words)
+            elif remaining > 0:
+                fragment = " ".join(
+                    words[:remaining]
+                ).rstrip(" ,;:—-")
+                if fragment and fragment[-1] not in ".!?":
+                    fragment += "."
+                if fragment:
+                    limited.append(fragment)
+                break
+            else:
+                break
 
-      if len(words) <= remaining:
-        limited.append(sentence)
-        remaining -= len(words)
-      elif remaining > 0:
-        fragment = " ".join(words[:remaining]).rstrip(" ,;:—-")
-        if fragment and fragment[-1] not in ".!?":
-          fragment += "."
-        if fragment:
-          limited.append(fragment)
-        break
-      else:
-        break
+        sentences = limited
 
-    sentences = limited
+    text = " ".join(sentences)
 
-  text = " ".join(sentences)
-
-  return text.replace(protected, ".").strip()
+    return text.replace(protected, ".").strip()
 
 
 def ask_gigachat(client, question):
-  today = date.today().strftime("%d.%m.%Y")
+    today = date.today().strftime("%d.%m.%Y")
 
-  detailed = bool(re.search(
-    r"\b(подробн\w*|развернут\w*|развёрнут\w*|детальн\w*|"
-    r"полный разбор|пошагово|с деталями)\b",
-    question,
-    flags=re.IGNORECASE
-  ))
+    detailed = bool(re.search(
+        r"\b(подробн\w*|развернут\w*|развёрнут\w*|детальн\w*|"
+        r"полный разбор|пошагово|с деталями)\b",
+        question,
+        flags=re.IGNORECASE
+    ))
 
-  if detailed:
-    answer_style = (
-      "Пользователь запросил подробный ответ. "
-      "Дай содержательное объяснение примерно "
-      "в 5–10 предложениях. Раскрой важные детали, "
-      "но не повторяй одно и то же."
-    )
-    max_sentences = 10
-  else:
-    answer_style = (
-      "Это обычный режим. Ответь строго в 1–3 "
-      "коротких предложениях, желательно не более "
-      "25 слов. Не добавляй вступление и вывод, "
-      "если они не нужны."
-    )
-    max_sentences = 3
-
-  prompt = (
-    "Все числа, даты и единицы измерения пиши полностью словами на русском языке. "
-    "Не используй цифры, латинские сокращения и математические символы. "
-    "Используй правильные падежи и различай количественные и порядковые числительные. "
-    f"Сегодня {today}. "
-    "Ты Jarvis — голосовой помощник. "
-    "Общайся исключительно на русском. "
-    "Для ответа обязательно используй подключённый "
-    "веб-поиск, а не только знания модели. "
-    "Проверяй актуальные сведения, даты и факты "
-    "по найденным источникам. "
-    "Не выдумывай события, цифры и ссылки. "
-    "Если надёжных результатов нет или источники "
-    "расходятся, честно скажи об этом. "
-    "Не используй Markdown, списки, заголовки "
-    "и URL в самом ответе: источники будут "
-    "показаны отдельно в консоли. "
-    + answer_style
-    + "\nЗапрос пользователя: " + question
-  )
-
-  request = ChatCompletionRequest(
-    model="GigaChat-3-Ultra",
-    messages=[
-      ChatMessage(
-        role="user",
-        content=prompt
-      )
-    ],
-    tools=[
-      ChatTool(
-        web_search=ChatWebSearchTool(
-          type="actual_info_web_search"
+    if detailed:
+        answer_style = (
+            "Пользователь запросил подробный ответ. "
+            "Дай содержательное объяснение примерно "
+            "в 5–10 предложениях. Раскрой важные детали, "
+            "но не повторяй одно и то же."
         )
-      )
-    ],
-    tool_config=ChatToolConfig(
-      mode="forced",
-      tool_name="web_search"
-    )
-  )
+        max_sentences = 10
+    else:
+        answer_style = (
+            "Это обычный режим. Ответь строго в 1–3 "
+            "коротких предложениях, желательно не более "
+            "25 слов. Не добавляй вступление и вывод, "
+            "если они не нужны."
+        )
+        max_sentences = 3
 
-  response = client.chat.create(request)
-
-  data = response.model_dump(exclude_none=True)
-
-  messages = data.get("messages", [])
-
-  if not messages:
-    raise RuntimeError("GigaChat не вернул сообщение")
-
-  message = messages[0]
-  content = message.get("content", [])
-
-  if isinstance(content, str):
-    content = [{"text": content}]
-
-  text_parts = []
-  sources_by_url = {}
-
-  for part in content:
-    if not isinstance(part, dict):
-      continue
-
-    part_text = part.get("text")
-
-    if part_text:
-      text_parts.append(part_text)
-
-    inline = part.get("inline_data") or {}
-    source_map = inline.get("sources") or {}
-
-    source_items = (
-      source_map.values()
-      if isinstance(source_map, dict)
-      else source_map
+    prompt = (
+        "Все числа, даты и единицы измерения пиши полностью "
+        "словами на русском языке. Не используй цифры, латинские "
+        "сокращения и математические символы. Используй правильные "
+        "падежи и различай количественные и порядковые числительные. "
+        f"Сегодня {today}. "
+        "Ты Jarvis — голосовой помощник. "
+        "Общайся исключительно на русском. "
+        "Для ответа обязательно используй подключённый "
+        "веб-поиск, а не только знания модели. "
+        "Проверяй актуальные сведения, даты и факты "
+        "по найденным источникам. "
+        "Не выдумывай события, цифры и ссылки. "
+        "Если надёжных результатов нет или источники "
+        "расходятся, честно скажи об этом. "
+        "Не используй Markdown, списки, заголовки "
+        "и URL в самом ответе: источники будут "
+        "показаны отдельно в консоли. "
+        + answer_style
+        + "\nЗапрос пользователя: " + question
     )
 
-    for source in source_items:
-      if not isinstance(source, dict):
-        continue
+    request = ChatCompletionRequest(
+        model="GigaChat-3-Ultra",
+        messages=[
+            ChatMessage(
+                role="user",
+                content=prompt
+            )
+        ],
+        tools=[
+            ChatTool(
+                web_search=ChatWebSearchTool(
+                    type="actual_info_web_search"
+                )
+            )
+        ],
+        tool_config=ChatToolConfig(
+            mode="forced",
+            tool_name="web_search"
+        )
+    )
 
-      url = source.get("url", "").strip()
-      title = source.get("title", "").strip()
+    response = client.chat.create(request)
 
-      if url and url not in sources_by_url:
-        sources_by_url[url] = {
-          "title": title or url,
-          "url": url
-        }
+    data = response.model_dump(exclude_none=True)
 
-  answer = " ".join(text_parts).strip()
-  answer = clean_answer(answer, max_sentences, max_words=None if detailed else 25)
+    messages = data.get("messages", [])
 
-  if not answer:
-    raise RuntimeError("GigaChat вернул пустой ответ")
+    if not messages:
+        raise RuntimeError("GigaChat не вернул сообщение")
 
-  return answer, list(sources_by_url.values())
+    message = messages[0]
+    content = message.get("content", [])
+
+    if isinstance(content, str):
+        content = [{"text": content}]
+
+    text_parts = []
+    sources_by_url = {}
+
+    for part in content:
+        if not isinstance(part, dict):
+            continue
+
+        part_text = part.get("text")
+
+        if part_text:
+            text_parts.append(part_text)
+
+        inline = part.get("inline_data") or {}
+        source_map = inline.get("sources") or {}
+
+        source_items = (
+            source_map.values()
+            if isinstance(source_map, dict)
+            else source_map
+        )
+
+        for source in source_items:
+            if not isinstance(source, dict):
+                continue
+
+            url = source.get("url", "").strip()
+            title = source.get("title", "").strip()
+
+            if url and url not in sources_by_url:
+                sources_by_url[url] = {
+                    "title": title or url,
+                    "url": url
+                }
+
+    answer = " ".join(text_parts).strip()
+    answer = clean_answer(
+        answer, max_sentences, max_words=None if detailed else 25
+    )
+
+    if not answer:
+        raise RuntimeError("GigaChat вернул пустой ответ")
+
+    return answer, list(sources_by_url.values())
 
 
 def parse_command(text):
@@ -1130,8 +1145,8 @@ def main():
         credentials=os.environ["GIGACHAT_CREDENTIALS"],
         scope="GIGACHAT_API_PERS",
         model="GigaChat-3-Ultra",
-        base_url="https://api.giga.chat/v1",
-        ca_bundle_file="/usr/local/share/ca-certificates/russian_trusted_root_ca_pem.crt",
+        base_url="[https://api.giga.chat/v1](https://api.giga.chat/v1)",
+        ca_bundle_file=CA_CERT,
         verify_ssl_certs=True,
         max_retries=2,
     ) as client:
@@ -1232,7 +1247,7 @@ def main():
 
                             try:
                                 answer, sources = ask_gigachat(
-                                  client, question
+                                    client, question
                                 )
 
                                 answer = normalize_for_speech(answer)
@@ -1283,14 +1298,15 @@ if __name__ == "__main__":
 EOF
 ```
 
-### 4. Настройка ключа GigaChat
+### 4. Ключ API и системное время { #config }
 
-Создайте закрытый файл конфигурации `/etc/jarvis/gigachat.env` с вашим ключом авторизации:
+Запишите ключ авторизации в закрытый файл `/etc/jarvis/gigachat.env`, подставив своё
+значение вместо заглушки:
 
 ```sh
 mkdir -p /etc/jarvis
 cat > /etc/jarvis/gigachat.env <<'EOF'
-GIGACHAT_CREDENTIALS="ВАШ_КЛЮЧ_АВТОРИЗАЦИИ_BASE64"
+GIGACHAT_CREDENTIALS="<REDACTED>"
 GIGACHAT_SCOPE="GIGACHAT_API_PERS"
 GIGACHAT_VERIFY_SSL_CERTS="true"
 EOF
@@ -1299,43 +1315,29 @@ chmod 600 /etc/jarvis/gigachat.env
 chown root:root /etc/jarvis/gigachat.env
 ```
 
-!!! warning "Только свои устройства"
-    Не публикуйте ключи из `devices.json`, `gigachat.env`, MAC-адреса, серийные номера и токены.
-
-### 5. Проверка системного времени и часового пояса
-
-Корректное время необходимо для проверки SSL-сертификатов GigaChat. Убедитесь, что служба `chrony` активна в `runit`, а часовой пояс настроен верно:
+Проверьте работу службы синхронизации времени `chrony` и текущую дату, иначе проверка
+сертификатов завершится ошибкой:
 
 ```sh
 sv status /etc/service/chrony
 date
 ```
 
-Если часовой пояс отличается от вашего, задайте его (например, для Москвы):
+Если часовой пояс не совпадает с вашим, установите нужный (в примере — Москва):
 
 ```sh
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 echo "Europe/Moscow" > /etc/timezone
 ```
 
-### 6. Установка единого скрипта управления и автозапуска (`jarvisctl`)
+### 5. Служба автозапуска { #service }
 
-Чтобы не управлять процессами вручную и обеспечить автоматический старт помощника при включении Станции в розетку, создайте управляющий скрипт `/root/jarvis-control.sh`. Он проверит целостность всех моделей и библиотек, создаст службу `runit` в `/etc/service/jarvis` и настроит ротацию логов через `svlogd` в `/var/log/jarvis`.
-
-Откройте редактор:
-
-```sh
-nano /root/jarvis-control.sh
-```
-
-Вставьте следующий код:
+Создайте управляющий скрипт `/root/jarvis-control.sh`. Скрипт проверяет целостность
+моделей и библиотек, создаёт службу автозапуска и настраивает ротацию журнала:
 
 ```sh
+cat > /root/jarvis-control.sh <<'EOF'
 #!/bin/sh
-# ==========================================
-# JARVIS CONTROL
-# Управление голосовым помощником Яндекс Станции
-# ==========================================
 
 set -eu
 
@@ -1349,6 +1351,7 @@ PIPER="$BASE/piper-venv/bin/piper"
 
 MODEL="$BASE/models/vosk-model-small-ru-0.22"
 VOICE="$BASE/models/piper/ru_RU-dmitri-medium.onnx"
+CA_CERT="/usr/local/share/ca-certificates/russian_trusted_root_ca_pem.crt"
 
 ACTION="${1:-install}"
 
@@ -1374,7 +1377,7 @@ check_files() {
         "$MODEL/am/final.mdl" \
         "$VOICE" \
         "$VOICE.json" \
-        "/usr/local/share/ca-certificates/russian_trusted_root_ca_pem.crt"
+        "$CA_CERT"
     do
         [ -e "$file" ] || die "Нет файла: $file"
         echo "[OK] $file"
@@ -1388,7 +1391,10 @@ check_files() {
         test -n "${GIGACHAT_CREDENTIALS:-}"
     ' sh "$ENV_FILE" || die "Нет ключа GigaChat"
 
-    "$PYTHON" -m py_compile "$BASE/jarvis.py" "$BASE/text_normalizer.py" "$BASE/piper_worker.py" ||
+    "$PYTHON" -m py_compile \
+        "$BASE/jarvis.py" \
+        "$BASE/text_normalizer.py" \
+        "$BASE/piper_worker.py" ||
         die "Ошибка синтаксиса Python-скриптов"
 
     "$PYTHON" -c 'import vosk, gigachat, num2words' ||
@@ -1550,9 +1556,10 @@ case "$ACTION" in
         exit 0
         ;;
 esac
+EOF
 ```
 
-Сделайте скрипт исполняемым, создайте короткую ссылку `jarvisctl` и запустите установку службы:
+Сделайте скрипт исполняемым, добавьте симлинк `jarvisctl` и зарегистрируйте службу:
 
 ```sh
 chmod +x /root/jarvis-control.sh
@@ -1560,22 +1567,57 @@ ln -sf /root/jarvis-control.sh /usr/local/bin/jarvisctl
 jarvisctl install
 ```
 
-### 7. Управление и проверка работы
+## Использование { #usage }
 
-После установки управлять помощником можно одной командой `jarvisctl`:
+Активировать помощника можно двумя способами:
 
-| Команда             | Действие                                                     |
-| :------------------ | :----------------------------------------------------------- |
-| `jarvisctl check`   | Проверить целостность файлов, моделей, библиотек и ключей    |
-| `jarvisctl status`  | Показать статус службы `runit`, уровень громкости ALSA и хвост лога |
-| `jarvisctl logs`    | Открыть журнал работы в реальном времени (`/var/log/jarvis/current`) |
-| `jarvisctl restart` | Перезапустить помощника                                      |
-| `jarvisctl stop`    | Остановить службу                                            |
-| `jarvisctl start`   | Запустить службу                                             |
+- сказать «Джарвис» и сразу произнести вопрос или дождаться готовности к приёму;
+- нажать верхнюю кнопку активации на корпусе и задать вопрос.
 
-Убедитесь, что в выводе `jarvisctl status` служба имеет статус `run: /etc/service/jarvis: (pid ...)`, и проверьте работу колонки:
+Для развёрнутого ответа (до десяти предложений вместо одного-трёх) добавьте в запрос
+слово «подробно» или «пошагово». Вращение верхнего кольца регулирует громкость низких
+и высоких частот, а кнопка отключения микрофона блокирует запись.
 
-- вращение кольца регулирует громкость (`Subwoofer Master` / `Tweeters Master`);
-- нажатие кнопки активации включает прослушивание;
-- кнопка микрофона аппаратно и программно отключает запись;
-- ассистент отвечает голосом на вопросы.
+Управление службой выполняется через `jarvisctl`:
+
+| Команда | Действие |
+|---|---|
+| `jarvisctl check` | Проверить наличие файлов, моделей, библиотек и ключей |
+| `jarvisctl status` | Показать статус службы, громкость ALSA и конец журнала |
+| `jarvisctl logs` | Открыть журнал `/var/log/jarvis/current` в реальном времени |
+| `jarvisctl restart` | Перезапустить помощника |
+| `jarvisctl stop` | Остановить службу |
+| `jarvisctl start` | Запустить службу |
+
+## Ограничения { #limits }
+
+- Рецепт рассчитан на образ Debian 13, где нет Android-окружения и штатной Алисы.
+- Распознавание и синтез речи работают локально, но для ответов нужен доступ в интернет
+  к серверам GigaChat API.
+- Контекст диалога между репликами не сохраняется: каждый вопрос обрабатывается отдельно.
+- Во время озвучивания ответа микрофон отключается, поэтому перебить помощника голосом
+  нельзя.
+- Светодиодное кольцо для индикации состояний помощника не используется.
+
+## Откат { #rollback }
+
+Остановите службу и удалите созданные файлы:
+
+```sh
+jarvisctl stop
+rm -rf /etc/service/jarvis /var/log/jarvis /etc/jarvis /opt/jarvis
+rm -f /usr/local/bin/jarvisctl /root/jarvis-control.sh
+```
+
+## Как это работает { #how }
+
+В образе Debian для Станции 1 доступны все аппаратные узлы платы: микрофонная матрица,
+усилители TAS5751M на звуковой карте `snddaudio1`, физические кнопки и энкодер громкости.
+
+| Компонент | Роль в системе |
+|---|---|
+| Vosk | Локальное распознавание речи и ключевого слова (`vosk-model-small-ru-0.22`) |
+| GigaChat API | Генерация ответов с веб-поиском через модель `GigaChat-3-Ultra` |
+| `text_normalizer.py` | Перевод чисел, дат, единиц измерения и символов в слова |
+| Piper | Синтез речи (`ru_RU-dmitri-medium.onnx`), удерживаемый в памяти |
+| `runit` и `svlogd` | Автозапуск службы `/etc/service/jarvis` и ротация журнала |
