@@ -151,7 +151,9 @@ start() {
   pidof dropbear >/dev/null 2>&1 && return 0
   # -B: root has an empty password, without it dropbear refuses the login.
   # This build has no syslog: its messages go to stderr, i.e. to $LOG (no -E flag here).
-  "$DB" -r "$HK" -p 2222 -B 2>>"$LOG"
+  # stdin/stdout go to /dev/null: otherwise dropbear keeps the rcS log pipe open,
+  # rcS never finishes and reboot is ignored (seen on Station Street).
+  "$DB" -r "$HK" -p 2222 -B </dev/null >/dev/null 2>>"$LOG"
 }
 case "$1" in
   start)   start ;;
@@ -186,10 +188,27 @@ ssh -p 2222 root@АЙПИ.АДРЕС.ЯНДЕКС.СТАНЦИИ
     ```sh
     mount -o remount,rw /
     sed -i 's/ -E 2>>/ 2>>/; s/-p 2222 2>>/-p 2222 -B 2>>/' /etc/init.d/S99zdropbear
-    grep -- '-p 2222' /etc/init.d/S99zdropbear      # должно быть: -p 2222 -B 2>>"$LOG"
+    sed -i 's|-p 2222 -B 2>>|-p 2222 -B </dev/null >/dev/null 2>>|' /etc/init.d/S99zdropbear
+    grep -- '-p 2222' /etc/init.d/S99zdropbear      # -p 2222 -B </dev/null >/dev/null 2>>"$LOG"
     sync; mount -o remount,ro /
     /etc/init.d/S99zdropbear stop; /etc/init.d/S99zdropbear start
     ```
+
+??? note "Колонка не перезагружается после установки автозапуска"
+    Если `reboot` молча ничего не делает, а `ps` показывает живой `/etc/init.d/rcS`, загрузка
+    не завершилась: `rcS` ждёт `logger`, а канал `/run/logfifo` держит открытым `dropbear`,
+    запущенный без перенаправления stdout. Добавьте перенаправление в строку запуска и
+    перезапустите сервер; перезагрузка снова работает со следующей загрузки.
+
+    ```sh
+    mount -o remount,rw /
+    sed -i 's|-p 2222 -B 2>>|-p 2222 -B </dev/null >/dev/null 2>>|' /etc/init.d/S99zdropbear
+    sync; mount -o remount,ro /
+    (sleep 1; /etc/init.d/S99zdropbear restart) </dev/null >/dev/null 2>&1 &
+    ```
+
+    Проверено на Станции Стрит, прошивка `0.373.1.16`, ноябрь 2026. На других моделях не
+    проверялось; перенаправление на них ничего не ломает.
 
 !!! danger "Доступ по SSH открыт без пароля для всей локальной сети"
     Dropbear запускается с ключом `-B` (разрешить пустой пароль), иначе вход отклоняется.
