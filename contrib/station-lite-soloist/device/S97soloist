@@ -1,0 +1,41 @@
+#!/bin/sh
+# Spotify Soloist autostart (yandex-station-extended, contrib/station-lite-soloist).
+# Runs $O/soloist-svc.sh in the background. install.sh writes the real path.
+# Disable the next start without touching rootfs: touch $O/disabled
+# Rollback: S97soloist stop; mount -o remount,rw /; rm /etc/init.d/S97soloist;
+#           mount -o remount,ro /; rm -rf $O
+O="@O@"
+SVC="$O/soloist-svc.sh"
+RUN=/tmp/soloist-run
+[ -r "$O/lib.sh" ] && . "$O/lib.sh"
+
+svc_pids() {   # exact "sh $SVC" command line, not anything that mentions it
+    for f in /proc/[0-9]*/cmdline; do
+        case "$(tr '\0' ' ' 2>/dev/null < "$f")" in
+            "sh $SVC "*) p=${f#/proc/}; echo "${p%/cmdline}" ;;
+        esac
+    done
+}
+
+case "$1" in
+start)
+    [ -f "$SVC" ] || exit 0
+    [ -n "$(svc_pids)" ] && exit 0
+    setsid nohup sh "$SVC" > /dev/null 2>&1 < /dev/null &
+    ;;
+stop)
+    for p in $(svc_pids); do kill -TERM "$p" 2>/dev/null; done
+    i=0
+    while [ $i -lt 25 ] && [ -n "$(svc_pids)" ]; do sleep 1; i=$((i+1)); done
+    [ -z "$(svc_pids)" ] || { echo "soloist-svc still running" >&2; exit 1; }
+    ;;
+restart)
+    "$0" stop && "$0" start
+    ;;
+status)
+    p=$(svc_pids)
+    if [ -n "$p" ]; then echo "soloist-svc running: $p"; else echo "soloist-svc not running"; fi
+    tail -n 5 "$RUN/svc.log" 2>/dev/null
+    ;;
+esac
+exit 0
