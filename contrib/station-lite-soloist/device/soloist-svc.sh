@@ -14,7 +14,7 @@ setup_env
 SVLOG="$RUN/svc.log"
 PIPE="$RUN/solo.pipe"
 P2P_WAIT=${P2P_WAIT:-30}      # seconds to wait for dhcpcd to put IPv4LL on p2p0
-PPID_=""; SPID=""; GPID=""; VPID=""; MOUNTED=""
+PPID_=""; SPID=""; GPID=""; VPID=""; YPID=""; MOUNTED=""
 
 log() { log_to "$SVLOG" "$@"; }
 
@@ -143,6 +143,21 @@ start_voice() {   # voice control watcher, own process group (setsid)
     log "voice watcher pid=$VPID"
 }
 
+start_vsync() {   # Soloist follows Alice's volume
+    [ "$VOLUME_SYNC" = 1 ] && [ -f "$O/volume-sync.sh" ] || return 0
+    setsid sh "$O/volume-sync.sh" > /dev/null 2>&1 < /dev/null &
+    YPID=$!
+    log "volume sync pid=$YPID"
+}
+
+stop_vsync() {
+    [ -n "$YPID" ] || return 0
+    kill -TERM "$YPID" 2>/dev/null
+    wait_gone "$YPID" 3 || kill -9 "$YPID" 2>/dev/null
+    wait "$YPID" 2>/dev/null
+    YPID=""
+}
+
 stop_voice() {
     [ -n "$VPID" ] || return 0
     kill -TERM "$VPID" 2>/dev/null
@@ -174,6 +189,7 @@ cleanup() {   # cleanup EXIT_CODE
     trap '' INT TERM
     log "stopping"
     stop_voice
+    stop_vsync
     stop_soloist
     stop_pulse
     restore_cp15
@@ -203,6 +219,7 @@ set_cp15 || { log "cannot set $CP15_FILE to 2: Soloist would livelock, not start
 setup_cache || { log "no tmpfs cache: not starting Soloist"; cleanup 1; }
 ensure_pulse || { log "PulseAudio did not come up: not starting Soloist"; cleanup 1; }
 start_voice
+start_vsync
 
 fails=0
 while :; do
@@ -238,6 +255,7 @@ while :; do
         fi
         running "$PPID_" || { log "pulse died while soloist runs, restarting pulse"; ensure_pulse; }
         [ -z "$VPID" ] || running "$VPID" || { log "voice watcher died, restarting"; start_voice; }
+        [ -z "$YPID" ] || running "$YPID" || { log "volume sync died, restarting"; start_vsync; }
         rotate "$RUN/pulse.log"
     done
     wait "$SPID"; rc=$?

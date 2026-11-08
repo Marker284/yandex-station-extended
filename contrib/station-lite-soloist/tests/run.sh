@@ -36,6 +36,8 @@ MOUNTS="$ST/mounts"
 APLAY="$B/aplay"
 BRIDGE_JOURNAL="$T/journal.jsonl"
 P2P_WAIT=4
+ALICE_VOLUME_FILE="$ST/alice-volume"
+ALICE_MUTE_FILE="$ST/alice-muted"
 EOF
     if [ -n "$BB" ]; then
         "$BB" --install -s "$B" 2>/dev/null ||
@@ -128,7 +130,8 @@ if "--version" in sys.argv:
         print("error while loading shared libraries: libpulse.so.0", file=sys.stderr); sys.exit(127)
     print("1.3.10.51 build test"); sys.exit(0)
 if sys.argv[1:2] == ["ctl"]:
-    open(st + "/ctl.log", "a").write(sys.argv[2] + "\n"); sys.exit(0)
+    a = sys.argv[2:sys.argv.index("-D")] if "-D" in sys.argv else sys.argv[2:]
+    open(st + "/ctl.log", "a").write(" ".join(a) + "\n"); sys.exit(0)
 open(st + "/soloist.args", "a").write("\0".join(sys.argv[1:]) + "\n")
 if os.path.exists(st + "/echo-key"):
     print("E [soloist] auth request failed for key " + sys.argv[sys.argv.index("-k") + 1], flush=True)
@@ -622,6 +625,46 @@ t_install_ro_restore_fails_reported() {
     stop_all
 }
 
+
+# --- tests: volume follows Alice ----------------------------------------------------
+# Requirement: Soloist starts at Alice's volume (15 of 20 -> 75), not at its own 40.
+t_volume_initial_from_alice() {
+    echo 15 > "$ST/alice-volume"; echo 0 > "$ST/alice-muted"
+    start_svc
+    wait_for 20 soloist_started
+    args=$(tr '\0' '\n' < "$ST/soloist.args" 2>/dev/null)
+    check "started with -i 75" eval 'echo "$args" | grep -A1 -x -- "-i" | grep -qx 75'
+    stop_svc
+}
+
+# Requirement: when Alice's volume changes (buttons, "Алиса, громче"), Soloist
+# gets the same share; muting Alice mutes the music.
+t_volume_follows_alice() {
+    echo 10 > "$ST/alice-volume"; echo 0 > "$ST/alice-muted"
+    start_svc
+    wait_for 20 soloist_started
+    sleep 1.5
+    echo 18 > "$ST/alice-volume"
+    wait_for 6 has "$ST/ctl.log" "^volume 90$"
+    check "volume 90 after Alice 18" has "$ST/ctl.log" "^volume 90$"
+    echo 1 > "$ST/alice-muted"
+    wait_for 6 has "$ST/ctl.log" "^volume 0$"
+    check "volume 0 when Alice is muted" has "$ST/ctl.log" "^volume 0$"
+    stop_svc
+}
+
+# Requirement: an unreadable or garbled level changes nothing.
+t_volume_garbage_ignored() {
+    printf 'x1\n' > "$ST/alice-volume"
+    start_svc
+    wait_for 20 soloist_started
+    sleep 2.5
+    args=$(tr '\0' '\n' < "$ST/soloist.args" 2>/dev/null)
+    check "no -i passed" eval '! echo "$args" | grep -qx -- "-i"'
+    check "no volume command" eval '! has "$ST/ctl.log" "^volume"'
+    stop_svc
+}
+
 # --- tests: deploy.py (fake adb runs the station side locally) ----------------------
 fake_adb() {
     cat > "$B/adb" <<'EOF'
@@ -695,7 +738,8 @@ for t in t_cache_mount_fails t_pulse_never_up t_p2p0_keeps_non_ll t_p2p0_drops_l
          t_install_manifest_mismatch t_install_remount_fails_rolls_back t_install_start_fails_rolls_back \
          t_deploy_upgrade_copies_only_changes t_deploy_first_install_needs_key t_deploy_dry_run \
          t_cp15_missing_refuses t_cp15_restore_failure_kept t_gate_redacts_key \
-         t_install_stage_move_fails_rolls_back t_install_parallel_refused t_install_ro_restore_fails_reported; do
+         t_install_stage_move_fails_rolls_back t_install_parallel_refused t_install_ro_restore_fails_reported \
+         t_volume_initial_from_alice t_volume_follows_alice t_volume_garbage_ignored; do
     run_test "$t"
 done
 echo "passed $PASS, failed $FAIL${FAILED:+:$FAILED}"

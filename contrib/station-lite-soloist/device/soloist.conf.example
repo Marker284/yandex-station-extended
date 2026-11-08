@@ -4,6 +4,7 @@
 #WLAN_IF=wlan0
 #P2P_IF=p2p0                  # empty: do not touch the Wi-Fi Direct interface
 #CACHE_SIZE=12m               # RAM taken by the Soloist cache at most
-#SOLOIST_ARGS="-i 30"         # extra Soloist options (here: initial volume 30)
+#VOLUME_SYNC=1                # 0: Soloist keeps its own volume instead of following Alice
+#SOLOIST_ARGS="-i 30"         # extra Soloist options (here: fixed initial volume 30)
 #BRIDGE_JOURNAL=/tmp/quasar-conv.jsonl
 #LOG_MAX=262144

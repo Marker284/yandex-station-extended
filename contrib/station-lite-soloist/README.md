@@ -11,6 +11,7 @@
 | `device/soloist-svc.sh` | колонка | служба: сеть, `p2p0`, CP15, tmpfs-кэш, PulseAudio, Soloist, перезапуски |
 | `device/audio-gate.sh` | колонка | держит системный `aplay` (общий dmix с Алисой) только пока играет музыка |
 | `device/spotify-voice.sh` | колонка | голосовые команды по журналу Quasar Bridge → `soloist ctl` |
+| `device/volume-sync.sh` | колонка | громкость Soloist следует за громкостью Алисы |
 | `device/lib.sh`, `soloist.conf.example` | колонка | общие функции и настройки (переопределяются в `etc/soloist.conf`) |
 | `device/S97soloist` | колонка | init-скрипт (шаблон, путь подставляет `install.sh`) |
 

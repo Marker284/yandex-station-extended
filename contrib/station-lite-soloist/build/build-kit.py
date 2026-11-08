@@ -52,7 +52,7 @@ ELF_ENTRIES = ["/usr/bin/pulseaudio", "@MODULES@/module-pipe-sink.so",
 # no ELF lists it in DT_NEEDED, so it is added explicitly (error if absent).
 DLOPEN_LIBS = ["libgcc_s.so.1"]
 LIB_DIRS = ["/usr/lib/arm-linux-gnueabihf", "/lib/arm-linux-gnueabihf", "/usr/lib", "/lib"]
-DEVICE_FILES = ["lib.sh", "soloist-svc.sh", "audio-gate.sh", "spotify-voice.sh",
+DEVICE_FILES = ["lib.sh", "soloist-svc.sh", "audio-gate.sh", "spotify-voice.sh", "volume-sync.sh",
                 "run-pulse.sh", "run-soloist.sh", "install.sh", "S97soloist"]
 DEVICE_ETC = ["soloist.pa.in", "soloist.conf.example"]
 UA = {"User-Agent": "station-lite-soloist-build/1"}

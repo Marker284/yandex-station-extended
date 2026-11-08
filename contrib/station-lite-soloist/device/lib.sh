@@ -14,6 +14,10 @@ SOLOIST_ARGS=""                   # extra Soloist options, e.g. "-i 30" (initial
 NET_HOST=apresolve.spotify.com    # must resolve before Soloist starts
 BRIDGE_JOURNAL=/tmp/quasar-conv.jsonl  # Quasar Bridge conversation_log (voice control)
 LOG_MAX=262144                    # rotate each log above this many bytes (one .1 copy kept)
+VOLUME_SYNC=1                     # 1 = Soloist follows Alice's volume (volume-sync.sh)
+ALICE_VOLUME_FILE=/data/quasar/data/last_vendor_volume   # Alice's level, written by maind
+ALICE_MUTE_FILE=/data/quasar/data/is_speaker_muted      # 1 = muted
+ALICE_VOLUME_MAX=20               # top of Alice's scale on Station Lite
 CP15_FILE=/proc/sys/abi/cp15_barrier
 MOUNTS=/proc/mounts
 APLAY=/usr/bin/aplay              # the station's own aplay: system libasound, dmix shared with Alice
@@ -45,6 +49,16 @@ wait_gone() {   # wait_gone PID SECONDS
     i=0
     while [ $i -lt $(( $2 * 5 )) ] && running "$1"; do sleep 0.2; i=$((i+1)); done
     ! running "$1"
+}
+
+# Alice's volume as Soloist's 0-100; nothing (status 1) if unreadable.
+alice_volume() {
+    v=$(tr -d ' \r\n' < "$ALICE_VOLUME_FILE" 2>/dev/null)
+    case "$v" in ''|*[!0-9]*) return 1 ;; esac
+    m=$(tr -d ' \r\n' < "$ALICE_MUTE_FILE" 2>/dev/null)
+    [ "$m" = 1 ] && { echo 0; return 0; }
+    [ "$v" -gt "$ALICE_VOLUME_MAX" ] && v=$ALICE_VOLUME_MAX
+    echo $(( v * 100 / ALICE_VOLUME_MAX ))
 }
 
 # Debian trixie runtime (glibc 2.41) through its own loader. Never a global
