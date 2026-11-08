@@ -1,0 +1,7 @@
+# Нормализация переносов строк. Скрипты уходят на колонку (Linux/busybox),
+# где CRLF ломает их: busybox падает с `set: illegal option`. Поэтому
+# shell- и python-скрипты всегда хранятся и выдаются с LF, а .ps1 — с CRLF.
+* text=auto
+*.sh  text eol=lf
+*.py  text eol=lf
+*.ps1 text eol=crlf
