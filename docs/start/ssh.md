@@ -125,8 +125,11 @@ adb shell chmod +x /data/opt/bin/dropbear /data/opt/bin/dropbearkey
 adb shell /data/opt/bin/dropbearkey -t ed25519 -f /data/opt/etc/dropbear/hk_ed25519
 ```
 
-Скрипт автозапуска (обычно)находится тут: `/etc/init.d/S99zdropbear` 
-Он запускается после скрипта `/etc/init.d/S99quasar`, который поднимает adb-сервер как запасной доступ
+Скрипт автозапуска (обычно)находится тут: `/etc/init.d/S99zdropbear`
+
+Он запускается после скрипта `/etc/init.d/S99quasar`, 
+который поднимает adb-сервер как запасной доступ
+
 Сам скрипт автозапуска dropbear можно установить на колонку следущим образом:
 
 1. Будучи подключенными к своей колонке (через команду `adb connect`), выполните команду `adb shell`
