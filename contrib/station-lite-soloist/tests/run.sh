@@ -164,12 +164,19 @@ mk_kit() {   # mk_kit DIR: device scripts + stub programs laid out like the real
     [ -e "$1/etc/api.key" ] || echo "test-key-not-real" > "$1/etc/api.key"
 }
 
-procs_in_test() {   # pids whose command line mentions the temp dir
+procs_in_test() {   # pids started by this test: the command line names the temp dir,
+    # or the environment carries this test's ST (a leftover `sleep 30` names neither file)
+    (
+    export PROC_SCAN=1   # helpers of this scan (tr, grep) carry it and are skipped
     for f in /proc/[0-9]*/cmdline; do
         p=${f#/proc/}; p=${p%/cmdline}
         [ "$p" = $$ ] && continue
-        case "$(tr '\0' ' ' 2>/dev/null < "$f")" in *"$T"*) echo "$p" ;; esac
+        case "$(tr '\0' ' ' 2>/dev/null < "$f")" in *"$T"*) echo "$p"; continue ;; esac
+        e=$(tr '\0' '\n' 2>/dev/null < "/proc/$p/environ")
+        case "$e" in *PROC_SCAN=1*) continue ;; esac
+        printf '%s\n' "$e" | grep -qxF "ST=$ST" && echo "$p"
     done
+    )
 }
 
 wait_for() {   # wait_for SECONDS CONDITION...

@@ -14,12 +14,12 @@ mkdir -p "$RUN"
 
 log() { log_to "$VSLOG" "$@"; }
 
-trap 'log "volume sync stop"; exit 0' INT TERM
+trap 'end_nap; log "volume sync stop"; exit 0' INT TERM
 
 log "volume sync start"
 last=$(alice_volume)
 while :; do
-    sleep 1 & wait $!
+    nap 1
     v=$(alice_volume) || continue
     [ "$v" = "$last" ] && continue
     # Soloist answers ctl only once it is up; keep "last" so we retry

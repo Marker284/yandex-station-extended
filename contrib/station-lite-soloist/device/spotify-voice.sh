@@ -75,11 +75,11 @@ function classify(t) {
 
 TPID=""
 # Killing tail ends the stream: awk sees EOF, the read loop ends with it.
-stop() { [ -n "$TPID" ] && kill -TERM "$TPID" 2>/dev/null; log "voice watcher stop"; exit 0; }
+stop() { end_nap; [ -n "$TPID" ] && kill -TERM "$TPID" 2>/dev/null; log "voice watcher stop"; exit 0; }
 trap stop INT TERM
 
 log "voice watcher start"
-while [ ! -e "$BRIDGE_JOURNAL" ]; do sleep 5 & wait $!; done
+while [ ! -e "$BRIDGE_JOURNAL" ]; do nap 5; done
 FIFO="$RUN/voice.fifo"
 rm -f "$FIFO"; mkfifo "$FIFO" || exit 1
 tail -n 0 -F "$BRIDGE_JOURNAL" > "$FIFO" 2>/dev/null &

@@ -45,6 +45,13 @@ running() {
     [ -n "$st" ] && [ "$st" != Z ]
 }
 
+# Interruptible sleep: a trap runs during `wait`, not during a foreground sleep.
+# The sleep's pid is kept in NAP so a stopping script can kill it (end_nap):
+# otherwise the sleep outlives the script by up to its full length.
+NAP=""
+nap() { sleep "$1" & NAP=$!; wait "$NAP"; NAP=""; }
+end_nap() { [ -n "$NAP" ] && kill "$NAP" 2>/dev/null; NAP=""; }
+
 wait_gone() {   # wait_gone PID SECONDS
     i=0
     while [ $i -lt $(( $2 * 5 )) ] && running "$1"; do sleep 0.2; i=$((i+1)); done

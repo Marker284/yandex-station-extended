@@ -179,7 +179,7 @@ wait_net() {
     i=0
     until net_ready; do
         [ $((i % 60)) -eq 0 ] && log "waiting for network/clock/DNS (${i}s)"
-        sleep 5 & wait $!
+        nap 5
         i=$((i+5))
     done
     log "network ready after ${i}s"
@@ -187,6 +187,7 @@ wait_net() {
 
 cleanup() {   # cleanup EXIT_CODE
     trap '' INT TERM
+    end_nap
     log "stopping"
     stop_voice
     stop_vsync
@@ -238,7 +239,7 @@ while :; do
     GPID=$!
     log "soloist pid=$SPID gate pid=$GPID"
     while running "$SPID"; do
-        sleep 30 & wait $!
+        nap 30
         running "$SPID" || break
         if [ -e "$RUN/login-failed" ]; then
             # observed: after a failed login Soloist took ~100 s to honour INT.
@@ -264,7 +265,7 @@ while :; do
     log "soloist exited rc=$rc"
     if [ -e "$RUN/login-failed" ]; then
         log "login failed (stopped by gate); retry in 20s, not counted as a crash"
-        sleep 20 & wait $!
+        nap 20
         continue
     fi
     [ -n "$restart" ] && continue
@@ -275,6 +276,6 @@ while :; do
     [ $(( $(date +%s) - t0 )) -gt 600 ] && fails=0
     fails=$((fails+1))
     if [ $fails -ge 5 ]; then log "5 restarts in a row, giving up"; break; fi
-    sleep 30 & wait $!
+    nap 30
 done
 cleanup 1
