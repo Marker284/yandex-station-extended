@@ -8,8 +8,8 @@
 - обновления от Яндекса больше не ставятся — root не пропадёт;
 - SSH на порту **2222** поднимается при каждой загрузке (ADB остаётся запасным входом).
 
-Все команды выполняются с компьютера, из клона репозитория
-[Marker284/yandex-station-extended](https://github.com/Marker284/yandex-station-extended).
+!!! danger "В данной инструкции некоторые значения являются плейсхолдерами"
+    К примеру, `АЙПИ.АДРЕС.ЯНДЕКС.СТАНЦИИ` должен быть заменён на IP адрес вашей яндекс станции.
 
 Для JBL Link Portable с Алисой используйте [отдельную инструкцию](root-jbl-link-portable.md).
 На её Yocto-прошивке другие маркеры ADB и автозапуск через systemd; команды
@@ -31,7 +31,7 @@ adb shell 'mkdir -p /data/quasar &&
 Проверка после перезагрузки колонки:
 
 ```sh
-adb connect 192.168.1.120:5555   # IP вашей колонки
+adb connect АЙПИ.АДРЕС.ЯНДЕКС.СТАНЦИИ:5555   # IP вашей колонки
 adb devices
 ```
 
@@ -116,7 +116,7 @@ ota key     : подменён
 
 ## 3. Поставьте SSH (Dropbear) { #dropbear }
 
-Статический `dropbear` (32-битный ARM, armhf) лежит в репозитории, в [`contrib/bin/`](https://github.com/Marker284/yandex-station-binaries/tree/main/bin).
+Скомпилированный бинарный файл ssh-сервера dropbear лежит в [репозитории](https://github.com/Marker284/yandex-station-binaries/tree/main/bin)
 
 ```sh
 adb shell mkdir -p /data/opt/bin /data/opt/etc/dropbear
@@ -125,11 +125,14 @@ adb shell chmod +x /data/opt/bin/dropbear /data/opt/bin/dropbearkey
 adb shell /data/opt/bin/dropbearkey -t ed25519 -f /data/opt/etc/dropbear/hk_ed25519
 ```
 
-Автозапуск — скрипт `/etc/init.d/S99zdropbear` (стартует после `S99quasar`, когда ADB уже
-поднят как запасной вход):
+Скрипт автозапуска (обычно)находится тут: `/etc/init.d/S99zdropbear` 
+Он запускается после скрипта `/etc/init.d/S99quasar`, который поднимает adb-сервер как запасной доступ
+Сам скрипт автозапуска dropbear можно установить на колонку следущим образом:
 
+1. Будучи подключенными к своей колонке (через команду `adb connect`), выполните команду `adb shell`
+
+2.Вставьте следущее в терминал.
 ```sh
-adb shell
 mount -o remount,rw /
 cat > /etc/init.d/S99zdropbear <<'EOF'
 #!/bin/sh
@@ -159,18 +162,17 @@ sync; mount -o remount,ro /
 /etc/init.d/S99zdropbear start
 ```
 
-Одной командой `adb shell '/etc/init.d/S99zdropbear start'` сервер тоже стартует, но сеанс
-не завершается: `dropbear` уходит в фон, не закрыв вывод. Прервите сеанс (Ctrl+C) — сервер
-продолжит работать (проверено на Миди factory-6).
+Если вы хотите протестировать скрипт запуска, можно выполнить даннную команду будучи подключённым через adb на вашей колонке: `/etc/init.d/S99zdropbear start` 
+Завершение сеанса adb не убивает ssh-сервер.
 
-Подключение, пароль пустой — на запрос нажмите Enter:
+При подключении пароля не будет, при запросе пароля нажмите Enter.
 
 ```sh
-ssh -p 2222 root@192.168.1.120   # IP вашей колонки
+ssh -p 2222 root@АЙПИ.АДРЕС.ЯНДЕКС.СТАНЦИИ
 ```
 
-Если не пускает — смотрите лог `/data/opt/etc/dropbear/dropbear.log` (через `adb shell`) и
-перезапустите сервер: `/etc/init.d/S99zdropbear restart`.
+Если не пускает — откройте лог-файл при помощи данной команды (через adb shell) `cat /data/opt/etc/dropbear/dropbear.log` и, если надо,
+перезапустите сервер этой командой: `/etc/init.d/S99zdropbear restart`.
 
 ??? note "Ставили автозапуск по старой версии этой страницы — почините строку запуска"
     Раньше здесь был запуск с `-E` и без `-B`, с ним сервер не стартует: эта сборка
