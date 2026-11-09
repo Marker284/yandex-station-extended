@@ -3,7 +3,7 @@
 #   ap2.sh start | stop | restart | status
 #   ap2.sh ssh        — поднять dropbear на 2222 (вход только по ключу)
 #   ap2.sh receiver   — поднять приёмник, если его нет (зовёт audio-owner.sh)
-#   ap2.sh spotify    — поднять librespot, если его нет (зовёт audio-owner.sh)
+#   ap2.sh spotify    — поднять librespot, если его нет (зовёт audio-owner.sh); с Soloist не нужен
 #   ap2.sh ytm        — поднять плеер YouTube Music, если его нет (зовёт audio-owner.sh)
 #   ap2.sh run-sps | run-spotify | run-ytm — приёмник / librespot / ytmd в переднем плане
 #   ap2.sh run-avahi  — avahi с перезапуском при падении
@@ -111,9 +111,17 @@ run_spotify() {
 
 start_spotify() {
   [ -x "$B/librespot" ] || return 0
+  # с Soloist (soloist-install.sh) librespot не нужен: оба назвались бы «Станция 2»
+  [ -x "$AP/soloist/soloist.sh" ] && return 0
   [ -n "$(pids_matching "$B/librespot")" ] && return 0
   prime_volume
   spawn /run/ap2-spotify.pid /bin/sh "$SELF" run-spotify
+}
+
+# Spotify Soloist (soloist-install.sh): свои процессы и сторож — в soloist/soloist.sh
+start_soloist() {
+  [ -x "$AP/soloist/soloist.sh" ] || return 0
+  "$AP/soloist/soloist.sh" start >/dev/null 2>&1
 }
 
 # YouTube Music (ytm-install.sh): Python из Entware, yt-dlp в ytm/lib, звук — ytm-sink.sh
@@ -155,6 +163,7 @@ start_all() {
   fi
   start_receiver
   start_spotify
+  start_soloist
   start_ytm
   start_voice
   [ -n "$(pids_matching "$AP/audio-owner.sh")" ] ||
@@ -162,6 +171,7 @@ start_all() {
 }
 
 stop_all() {
+  [ -x "$AP/soloist/soloist.sh" ] && "$AP/soloist/soloist.sh" stop
   for m in "$AP/audio-owner.sh" "$AP/voice-spotify.sh" "$B/alice-text" "$SELF run-avahi" \
            "$B/shairport-sync" "$B/librespot" "$B/aplay -q -D spotify" "$AP/ytm/ytmd.py" \
            "$B/ytm-dec" "$B/aplay -q -D youtube" avahi-daemon "$B/nqptp" "$B/dbus-daemon"; do
@@ -185,6 +195,11 @@ show_status() {
   tail -5 "$LOGD/sps.log" 2>/dev/null
   echo "--- spotify.log:"
   tail -5 "$LOGD/spotify.log" 2>/dev/null
+  if [ -x "$AP/soloist/soloist.sh" ]; then
+    echo "--- soloist:"
+    "$AP/soloist/soloist.sh" status
+    tail -3 "$LOGD/soloist.log" 2>/dev/null
+  fi
   if [ -f "$AP/ytm/ytmd.py" ]; then
     echo "--- ytm.log:"
     tail -5 "$LOGD/ytm.log" 2>/dev/null

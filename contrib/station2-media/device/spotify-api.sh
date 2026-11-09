@@ -1,7 +1,7 @@
 #!/bin/sh
 # Spotify Web API с колонки: найти и включить на этой колонке, пауза, дальше, назад.
 #   spotify-api.sh play <auto|track|album|playlist> <запрос>
-#   spotify-api.sh liked | pause | resume | next | prev | devices
+#   spotify-api.sh liked [shuffle] | shuffle <on|off> | pause | resume | next | prev | devices
 # Ключи — etc/spotify-webapi.json ({client_id, refresh_token}), их кладёт
 # spotify-webapi-login.sh с Mac. Запросы идут через XKeen на роутере, как и сам Spotify.
 . /data/local/opt/ap2/common.sh
@@ -35,6 +35,9 @@ access_token() {
   echo "$at"
 }
 
+# PUT/POST плеера отвечают пусто или (с 2026) строкой-идентификатором; ошибка — JSON с "error"
+api_ok() { case "$1" in *'"error"'*) echo "$1" >&2; return 1 ;; esac; }
+
 api() { # метод путь [тело JSON]
   at=$(access_token) || return 1
   if [ -n "${3:-}" ]; then
@@ -52,8 +55,8 @@ device_id() {
 play_body() { # body JSON -> включить на этой колонке
   dev=$(device_id)
   [ -n "$dev" ] || { echo "колонка «$SPOTIFY_NAME» не видна в Spotify" >&2; return 1; }
-  out=$(api PUT "/me/player/play?device_id=$dev" "$1")
-  [ -z "$out" ] || { echo "$out" >&2; return 1; }
+  out=$(api PUT "/me/player/play?device_id=$dev" "$1") || return 1
+  api_ok "$out"
 }
 
 # Строчные для кириллицы и латиницы: ascii_downcase в jq кириллицу не трогает
@@ -95,10 +98,31 @@ play_query() { # mode query
   esac && echo "$uri"
 }
 
-# «Поставь музыку» — любимые треки; если их нельзя включить контекстом, то списком
+# Перемешивание на этой колонке: on | off
+shuffle() {
+  dev=$(device_id)
+  [ -n "$dev" ] || { echo "колонка «$SPOTIFY_NAME» не видна в Spotify" >&2; return 1; }
+  st=false; [ "$1" = on ] && st=true
+  out=$(api PUT "/me/player/shuffle?state=$st&device_id=$dev") || return 1
+  api_ok "$out"
+}
+
+rnd() { od -An -N2 -tu2 /dev/urandom | tr -d ' '; }
+
+# «Поставь музыку» — любимые треки; если их нельзя включить контекстом, то списком.
+# С shuffle: старт со случайного трека и перемешивание (иначе первый трек всегда один).
 play_liked() {
   me=$(api GET /me | "$JQ" -r '.id // empty')
   [ -n "$me" ] || return 1
+  if [ "${1:-}" = shuffle ]; then
+    total=$(api GET "/me/tracks?limit=1" | "$JQ" -r '.total // 0')
+    pos=0; [ "$total" -gt 1 ] && pos=$(( $(rnd) % total ))
+    play_body "$("$JQ" -nc --arg u "spotify:user:$me:collection" --argjson p "$pos"       '{context_uri: $u, offset: {position: $p}}')" 2>/dev/null && { shuffle on; return 0; }
+    uris=$(api GET "/me/tracks?limit=50" | "$JQ" -c '[.items[].track.uri]')
+    play_body "$("$JQ" -nc --argjson u "$uris" --argjson p "$(rnd)" '{uris: $u, offset: {position: ($p % ($u | length))}}')" &&
+      shuffle on
+    return
+  fi
   play_body "$("$JQ" -nc --arg u "spotify:user:$me:collection" '{context_uri: $u}')" 2>/dev/null && return 0
   uris=$(api GET "/me/tracks?limit=50" | "$JQ" -c '[.items[].track.uri]')
   play_body "$("$JQ" -nc --argjson u "$uris" '{uris: $u}')"
@@ -106,12 +130,13 @@ play_liked() {
 
 case "${1:-}" in
   play)    play_query "${2:-auto}" "${3:?запрос}" ;;
-  liked)   play_liked ;;
+  liked)   play_liked "${2:-}" ;;
+  shuffle) shuffle "${2:?on|off}" ;;
   pause)   api PUT /me/player/pause ;;
   resume)  api PUT /me/player/play ;;
   next)    api POST /me/player/next ;;
   prev)    api POST /me/player/previous ;;
   devices) api GET /me/player/devices | "$JQ" -r '.devices[]? | "\(.name)\t\(.is_active)\t\(.id)"' ;;
-  *) echo "usage: $0 play <auto|track|album|playlist> <запрос> | liked | pause | resume | next | prev | devices" >&2
+  *) echo "usage: $0 play <auto|track|album|playlist> <запрос> | liked [shuffle] | shuffle <on|off> | pause | resume | next | prev | devices" >&2
      exit 1 ;;
 esac

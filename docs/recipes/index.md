@@ -21,7 +21,7 @@
 | [Колонка без Яндекса](standalone.md) | заблокированные подписочные Станции | — |
 | [Отключение обновлений](station1-disable-updates.md) | остановка цикла обязательного OTA, из-за которого Алиса отвечает с ошибками | проверено на Станции 1, прошивка 2.369.5.46 |
 | [Ограничить отправку метрик](station1-privacy.md) | обратимая блокировка узлов аналитики | проверены применение и откат на Станции 1 |
-| [Spotify Connect](spotify.md) | колонка как приёмник Spotify и «Алиса, поставь …» через Spotify | Станция 2 |
+| [Spotify Connect](spotify.md) | колонка как приёмник Spotify (Soloist или librespot) и «Алиса, поставь …» через Spotify | Станция 2 |
 | [Spotify голосом на Станции 1](station1-spotify.md) | Spotify TV и голосовой мост, Free или Premium; установка из AliceBridge или с Windows | проверено на Станции 1, Android 6.0.1 |
 | [SoundCloud голосом на Станции 1](station1-soundcloud.md) | первый трек голосом, пауза и перемотка; установка из AliceBridge | проверено на Станции 1, Android 6.0.1 |
 | [YouTube Music](youtube-music.md) | ytm-alice: YouTube Music голосом, из веб-панели и трансляцией с телефона | Лайт 1, Мини 2 |
