@@ -17,9 +17,13 @@ dropbear и распорядитель звука в одном каталоге
 | `device/S96otaguard` | сторож обновлений на корневой ФС |
 | `device/etc/` | ALSA (громкость через регулятор Алисы, приглушение), D-Bus, avahi, `shairport-sync` |
 | `build/spotify-build.sh` | `librespot 0.8.0` (avahi, rustls, ALSA-микшер) в тот же набор |
+| `build/soloist-build.sh` | окружение Spotify Soloist в `debian:trixie` (arm64): загрузчик glibc 2.41, PulseAudio 17 с `module-pipe-sink`, `patchelf` |
+| `soloist-install.sh <IP> <ключ> [--remove]` | Soloist в `ap2/soloist`: окружение, ключ, клиент с CDN Spotify, обновлённые скрипты набора |
+| `device/soloist/soloist.sh` | `start`/`stop`/`status`/`update`/`ctl`: PulseAudio, soloist, события, громкость ↔ `Master` |
+| `device/soloist/sink.sh` | вывод Soloist из FIFO: забирает звук у медиа-демона Алисы на время игры |
 | `build/voice-build.sh` | `alice-text` из `build/voice/alice-text.c`, `jq`, `curl` и сертификаты для Web API |
 | `device/spotify-sink.sh` | вывод `librespot`: забирает звук у медиа-демона Алисы на время игры |
-| `device/spotify-api.sh` | Spotify Web API: найти и включить на колонке, пауза, дальше, назад |
+| `device/spotify-api.sh` | Spotify Web API: найти и включить на колонке, пауза, дальше, назад, перемешивание |
 | `device/voice-spotify.sh` | «Алиса, поставь …» → Spotify; приглушение музыки, пока Алиса слушает |
 | `spotify-login.sh <IP>` | вход `librespot` по OAuth через SSH-туннель |
 | `spotify-webapi-login.sh <Client ID> <IP>` | ключ Web API (PKCE) для голосовых команд |
