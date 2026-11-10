@@ -134,6 +134,7 @@ not_in_nav: |
 
 nav:
   - Главная: index.md
+  - Частые вопросы (FAQ): faq.md
   - Начало работы:
       - start/index.md
       - Установка ADB на компьютер: start/adb.md
