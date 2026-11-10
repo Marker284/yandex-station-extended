@@ -16,21 +16,21 @@
 
 | Модель | Способ |
 |---|---|
-| Мини 1, Мини 2, Миди, Станция 1, Станция 2, Станция Макс, Стрит, Умный хаб | [подмена DNS](start/root.md) |
-| Лайт (1-го поколения) | [подмена DNS](start/root.md); на сборках после 21.10.2026 — [свой сервер обновлений](start/root.md#local-stand) с откатом прошивки на `.46` |
-| Лайт 2 (Plum) | [сертификат из factory-образа](start/retail-ca.md) |
-| Мини 3 (bergamot) | [сертификат и маркеры из factory](start/retail-ca-mini3.md) |
-| Станция 3 (orion) | [подмена DNS](start/root.md); свой сертификат колонка [не примет](devices/station-3.md#tls) |
-| Мини 3 Про (pickle) | только на заводской [factory-12](devices/station-mini3-pro.md#factory-12) — [подмена DNS](start/root.md) |
+| Мини 1, Мини 2, Миди, Станция 1, Станция 2, Станция Макс, Стрит, Умный хаб | [подмена DNS](root.md) |
+| Лайт (1-го поколения) | [подмена DNS](root.md); на сборках после 21.10.2026 — [свой сервер обновлений](root.md#local-stand) с откатом прошивки на `.46` |
+| Лайт 2 (Plum) | [сертификат из factory-образа](retail-ca.md) |
+| Мини 3 (bergamot) | [сертификат и маркеры из factory](retail-ca-mini3.md) |
+| Станция 3 (orion) | [подмена DNS](root.md); свой сертификат колонка [не примет](../devices/station-3.md#tls) |
+| Мини 3 Про (pickle) | только на заводской [factory-12](../devices/station-mini3-pro.md#factory-12) — [подмена DNS](root.md) |
 
 ### Запасные способы (если DNS не работает)
 
 | Модель | Способ |
 |---|---|
-| Мини 1 (2019, YNDX-0004) | [свой образ по USB](start/root-mini1-usb.md) — без сброса и смены DNS |
-| Станция 1-го поколения | [AliceBridge](start/root-android.md#station-1) с Android-телефона |
-| JBL Link Music (с Алисой) | [ADB по USB на старте](start/root-jbl-link-music.md) |
-| JBL Link Portable (с Алисой) | [ADB по USB-C, OTA и SSH](start/root-jbl-link-portable.md) |
+| Мини 1 (2019, YNDX-0004) | [свой образ по USB](root-mini1-usb.md) — без сброса и смены DNS |
+| Станция 1-го поколения | [AliceBridge](root-android.md#station-1) с Android-телефона |
+| JBL Link Music (с Алисой) | [ADB по USB на старте](root-jbl-link-music.md) |
+| JBL Link Portable (с Алисой) | [ADB по USB-C, OTA и SSH](root-jbl-link-portable.md) |
 
 Без компьютера, с Android-телефона: [AliceBridge](root-android.md) — проверен на Лайт, Мини,
 Миди и Лайт 2; для Станции 1 — отдельный путь через образ `boot`.
