@@ -168,6 +168,7 @@ nav:
       - Голосовой спутник Home Assistant: recipes/home-assistant.md
       - Своя LLM вместо Алисы: recipes/llm.md
       - Колонка без Яндекса: recipes/standalone.md
+      - СберПортал → Станция Дуо Макс: recipes/sberportal-centaur.md
       - Отключение обновлений (Станция 1): recipes/station1-disable-updates.md
       - Ограничить метрики (Станция 1): recipes/station1-privacy.md
       - ТВ-набор (Станция 1): recipes/station1-tv.md
@@ -197,6 +198,7 @@ nav:
       - Умный хаб (Saturn): devices/yandex-hub.md
       - JBL Link Music: devices/jbl-link-music.md
       - JBL Link Portable: devices/jbl-link-portable.md
+      - СберПортал (Sber): devices/sberportal.md
   - Как это устроено:
       - Архитектура прошивки: internals/architecture.md
       - Сеть и порты: internals/network.md
