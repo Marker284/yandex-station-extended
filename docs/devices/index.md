@@ -19,6 +19,7 @@ Amlogic-станций механизмы (прошивка, доступ, се�
 | **Amlogic / Android 9** | Amlogic (TV-класс) | Cortex-A53 @1.8 ГГц, Android 9 | quasar как APK | Станция Макс |
 | **MediaTek MT8516 / Yocto** | MediaTek MT8516 (MT8167) | Cortex-A35, **32-бит**, Linux 4.4, NAND+UBI | `maind` на Yocto + systemd | JBL Link Music, JBL Link Portable |
 | **Allwinner / Android** | Allwinner R18 (sun50iw1) | Cortex-A53, Android 6 | quasar как APK | Станция (1 пок) |
+| **Amlogic A311D / Android 9** | Amlogic A311D (G12B) | Cortex-A73/A53, Linux 4.9.268 | StarOS (не Яндекс) | СберПортал |
 
 Раздел [«Как это устроено»](../internals/architecture.md) описывает преимущественно
 **Amlogic/Buildroot** (maind, `gst-launch`, init.d) — применимо ко всем
@@ -45,6 +46,7 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция Мини 3 Про | `yandex,pickle-evt` (pickle) | Amlogic A4 (A53) | только на заводской [factory-12](station-mini3-pro.md#factory-12) | [Мини 3 Про](station-mini3-pro.md) |
 | JBL Link Music (с Алисой) | `mediatek,mt8167` | MediaTek MT8516 (A35, 32-бит) | [ADB по USB](../start/root-jbl-link-music.md) | [JBL Link Music](jbl-link-music.md) |
 | JBL Link Portable (с Алисой) | `MT8167` | MediaTek, aud8516 (A35, 32-бит) | [ADB и SSH](../start/root-jbl-link-portable.md) | [JBL Link Portable](jbl-link-portable.md) |
+| СберПортал (Сбер, не Яндекс) | `stargate` | Amlogic A311D (G12B), Android 9 | [эксплойт CVE-2022-38181](https://github.com/sber-portal/sberportal-root) | [СберПортал](sberportal.md) |
 | Станция 3 | `yandex,orion-pvt` (orion) | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Станция 3](station-3.md) |
 | Станция Дуо Макс | ? | ? | нужны данные | — |
 | Станция Про | ? | ? | нужны данные | — |
