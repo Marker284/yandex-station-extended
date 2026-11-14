@@ -13,6 +13,7 @@
 | [Подсветка](led.md) | управление кольцом, возврат штатных анимаций, формат `.led` | Лайт, Лайт 2, Мини 2, Мини 3 |
 | [YAM и BetterYAM](packagemanagers.md) | плагины `.yap` с веб-панелью и Lua API к подсветке, кнопкам, датчикам, голосовым командам | `aarch64`; BetterYAM — Мини |
 | [Голосовой спутник Home Assistant](home-assistant.md) | Assist через Pulsar, свой выбор распознавания и голоса | Лайт 2 / Plum |
+| [Спутник Home Assistant на Станции Макс](max-home-assistant.md) | Assist и плеер Music Assistant через pulsar-max, «Алиса» распознаётся на колонке | Макс с Zigbee (`YNDX-00052`) |
 | [SoundCloud голосом](station1-soundcloud.md) | воспроизведение треков и плейлистов через AliceBridge без HDMI | Станция 1 |
 | [ТВ-набор и веб-пульт](station1-tv.md) | быстрый веб-пульт с паролем и управление HDMI-выходом | Станция 1 |
 | [Ограничение метрик](station1-privacy.md) | отключение AppMetrica без удаления Quasar с гарантированным откатом | Станция 1 |
