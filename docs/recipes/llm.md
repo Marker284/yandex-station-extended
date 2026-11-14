@@ -220,8 +220,14 @@ ssh -p 2222 -N -L 127.0.0.1:18443:127.0.0.1:8443 root@SPEAKER_IP
   установка, обновление и автозапуск работают на Станции 2 (Linux 4.9.68, BusyBox 1.31.1)
   и Миди (Linux 5.4.180, BusyBox 1.36.1), переход с YAM — на Станции 2. На Станции Лайт
   [работа подтверждена](https://github.com/skrashevich/quasar-bridge/blob/v0.6.2/README.md#на-каких-колонках-проверено),
-  установка и автозапуск на ней отдельно не проверялись. Сборка ARMv7 есть, но ни на одной
-  32-битной модели не проверялась.
+  установка и автозапуск на ней отдельно не проверялись.
+- **На колонках JBL Quasar Bridge не работает.** На JBL Link Portable (ARMv7, прошивка 2021 года)
+  сборка 0.7.1 устанавливается и запускается, но колонка говорит с голосовым сервером в JSON,
+  а мост понимает только protobuf. Ключ `voiceDialogSettings.useUniProxyProtobuf` переводит в
+  protobuf лишь звук, команды остаются в JSON, и распознавание ломается. То же подтверждено на
+  JBL Link Music с прошивкой декабря 2025 года, см.
+  [issue #46](https://github.com/skrashevich/quasar-bridge/issues/46). Для JBL есть
+  [llm-alice](#llm-alice).
 - Пока модель думает, Quasar Bridge держит соединение беззвучной паузой, но общий лимит
   времени на запрос остаётся.
 - С Ollama берите модель без рассуждений. Тег `qwen3:30b-a3b` рассуждает, и отключить это
@@ -436,6 +442,28 @@ VLESS нативного клиента направляет через тунн
 [alisa-lite2-update]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/docs/release-0.3.3.md
 [alisa-station2-pr]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/pull/3
 [alisa-station2]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/docs/firmware-compatibility.md#яндекс-станция-2-yandexmidi
+
+## llm-alice: для колонок, где Quasar Bridge не работает { #llm-alice }
+
+[llm-alice](https://github.com/lemeshovich/jbl-link-portable-hackalice/blob/main/docs/ru/14-llm-alice.md) не подменяет адрес голосового сервера, а работает
+рядом с Алисой. Он читает её события через локальный IPC `aliced` (`127.0.0.1:9875`),
+отменяет её ответ до того, как она его произнесёт, отправляет вопрос в модель с
+OpenAI-совместимым API и заставляет Алису прочитать ответ своим голосом. Формат голосового
+протокола для него не важен, системные файлы не меняются.
+
+**Проверено на:** JBL Link Portable, прошивка `1.80.0.16.1086317237.20210928` (quasar 3.21),
+Gemini, ноябрь 2026. На других моделях не проверялось.
+
+- В модель уходят фразы «Алиса, спроси нейросеть, …», вопросы по правилам («объясни»,
+  «почему» и похожие) и всё, на что Алиса сама не знает ответа. Время, погода, таймеры и
+  музыка остаются за Алисой.
+- Если ответ модели заканчивается вопросом, колонка продолжает слушать, и ответить можно без
+  «Алиса».
+- Если демон остановить, Алиса работает как раньше.
+
+Установка, настройки и ограничения —
+[на странице проекта](https://github.com/lemeshovich/jbl-link-portable-hackalice/blob/main/docs/ru/14-llm-alice.md). Нужны root, SSH и автозапуск, например
+[как для JBL Link Portable](../start/root-jbl-link-portable.md).
 
 ## Что пока не исследовано { #open }
 
