@@ -22,7 +22,7 @@
 | Мини 3 Про | на заводской сборке `factory-12` root берётся [подменой DNS](root.md); на текущих `.50` способа нет — [что известно](../devices/station-mini3-pro.md#factory-12) |
 | **Мини 1 (2019)**, `YNDX-0004` | [свой образ по USB](root-mini1-usb.md) через Station Mini Root: без смены DNS и заводского сброса. Запасной путь — [подмена DNS](root.md) |
 | Станция 1-го поколения | [AliceBridge](root-android.md#station-1): постоянный root через свой образ `boot` |
-| **Станция Макс (YNDX-0008)** | [доступ по ADB](adb-max.md) сервисной утилитой: права действуют до перезагрузки, сброс не нужен |
+| **Станция Макс (YNDX-0008)** | [DNS-метод](root.md), затем [доступ по ADB](adb-max.md) сервисной утилитой: права действуют до перезагрузки; [постоянный root](../recipes/root-max.md#permanent-root) |
 | Станция 3 (orion) | [DNS-метод](root.md), как на других Amlogic; свой сертификат колонка не примет — [почему](../devices/station-3.md#tls) |
 | **JBL Link Music** (с Алисой) | [ADB по USB на старте](root-jbl-link-music.md) — маркеры сетевого ADB через сервисный Micro-USB |
 | **JBL Link Portable** (с Алисой) | [ADB, OTA и SSH](root-jbl-link-portable.md) — внешний USB-C, без вскрытия |

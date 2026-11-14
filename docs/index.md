@@ -58,7 +58,7 @@
 | Мини 1 (2019, YNDX-0004) | [свой образ по USB](start/root-mini1-usb.md) — без сброса и смены DNS |
 | Станция 3 (orion) | [подмена DNS](start/root.md); свой сертификат колонка [не примет](devices/station-3.md#tls) |
 | Станция 1-го поколения | [AliceBridge](start/root-android.md#station-1) с Android-телефона |
-| Станция Макс (YNDX-0008) | [доступ по ADB](start/adb-max.md): права действуют до перезагрузки |
+| Станция Макс (YNDX-0008) | [подмена DNS](start/root.md) и [доступ по ADB](start/adb-max.md): права действуют до перезагрузки; [постоянный root](recipes/root-max.md#permanent-root) |
 | JBL Link Music (с Алисой) | [ADB по USB на старте](start/root-jbl-link-music.md) |
 | JBL Link Portable (с Алисой) | [ADB по USB-C, OTA и SSH](start/root-jbl-link-portable.md) |
 | Мини 3 Про (pickle) | только на заводской [factory-12](devices/station-mini3-pro.md#factory-12) — [подмена DNS](start/root.md) |
