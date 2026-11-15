@@ -96,6 +96,10 @@
 * **[`panel/install-panel.sh`](panel/install-panel.sh)** — Веб-панель колонки по HTTPS (порт 8443) для Fiero Hi. [Руководство](../docs/devices/fiero-hi.md#web-panel).
 
 ### Доступ и ADB:
+- **[`pickle-factory12/S98picklessh`](pickle-factory12/S98picklessh)** — автозапуск SSH
+  только по ключу на Pickle factory `.8`, без stop/restart и без установщика.
+  [Ручная настройка и откат](../docs/start/pickle-factory12.md);
+  офлайн-тест: `python3 -m unittest discover -s contrib/tests -p test_pickle_ssh.py`.
 - **[`lite-kit-oauth.py`](lite-kit-oauth.py)**: запуск своего сервера lite-kit с передачей
   OAuth выбранной колонки при закрытом прямом интернете. Исходники кита не меняются.
   [Настройка для Мини 2](../docs/start/root.md#local-oauth).

@@ -141,6 +141,7 @@ nav:
           - Большинство моделей — подмена DNS: start/root.md
           - Лайт 2 (Plum) — сертификат из factory: start/retail-ca.md
           - Мини 3 (Bergamot) — сертификат и маркеры: start/retail-ca-mini3.md
+          - Мини 3 Про (Pickle) — SSH на factory .8: start/pickle-factory12.md
           - Станции на Android — AliceBridge: start/root-android.md
           - Станция Макс — доступ через ADB: start/adb-max.md
           - Мини 1 (2019) — ADB по USB: start/root-mini1-usb.md

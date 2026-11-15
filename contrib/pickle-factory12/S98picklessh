@@ -1,0 +1,39 @@
+#!/bin/sh
+set -eu
+# Key-only SSH: boot-tested on Pickle factory-12 .8, 2026-11-15.
+# No stop/restart semantics; remove the init entry to disable autostart only.
+
+pidfile=/run/alice-pickle-dropbear.pid
+
+check_pid() {
+    pid=$(cat "$pidfile") || return 1
+    case "$pid" in
+        ''|*[!0-9]*) return 1 ;;
+    esac
+    process_exe=$(readlink -f "/proc/$pid/exe") || return 1
+    [ "$process_exe" = "$owned_exe" ] || return 1
+    # Hash NUL-delimited argv, including its final NUL, to preserve argument boundaries.
+    expected_argv=$(printf '%s\000' /data/opt/bin/dropbear -r /data/opt/etc/dropbear/hk_ed25519 -D /data/opt/etc/dropbear -s -B -j -k -T 3 -p 2222 -P /run/alice-pickle-dropbear.pid | sha256sum) || return 1
+    process_argv=$(sha256sum < "/proc/$pid/cmdline") || return 1
+    [ "${process_argv%% *}" = "${expected_argv%% *}" ]
+}
+
+case "${1:-start}" in
+    start)
+        [ "$(id -u)" = 0 ] || exit 1
+        [ -x /data/opt/bin/dropbear ] || exit 1
+        [ -r /data/opt/etc/dropbear/hk_ed25519 ] || exit 1
+        [ -r /data/opt/etc/dropbear/authorized_keys ] || exit 1
+        owned_exe=$(readlink -f /data/opt/bin/dropbear) || exit 1
+        [ -n "$owned_exe" ] || exit 1
+        # A stale or unrelated PID is never overwritten, even on a manual start.
+        if [ -e "$pidfile" ] || [ -L "$pidfile" ]; then
+            check_pid
+            exit 0
+        fi
+        /data/opt/bin/dropbear -r /data/opt/etc/dropbear/hk_ed25519 -D /data/opt/etc/dropbear -s -B -j -k -T 3 -p 2222 -P /run/alice-pickle-dropbear.pid </dev/null >/dev/null 2>&1
+        check_pid
+        ;;
+    stop) : ;;
+    *) exit 2 ;;
+esac
