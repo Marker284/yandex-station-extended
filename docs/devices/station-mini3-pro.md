@@ -528,10 +528,129 @@ grep -a '\[zigbee\]' /data/quasar/daemons_logs/maind.log | tail
 Работа Zigbee через штатный Quasar с подменой бэкенда описана
 [в исследовании quasard на Миди](../internals/zigbee.md) — там другая модель и другой путь.
 
+## Климатический модуль { #climate }
+
+**Проверено на:** Yandex Pickle EVT, `0.12.1.8.2901568369.20250228.factory-12`,
+15 ноября 2026 года, один модуль с датчиками температуры, влажности и CO₂. Версия прошивки
+модуля не считана, прямой обмен с ним не проверялся.
+
+Модуль — подставка под колонку. С колонкой он связан по USB через контакты на дне,
+Zigbee здесь не участвует. В прошивке он называется cradle.
+
+| Что | Значение |
+|---|---|
+| USB | `28e9:018a`, производитель Yandex, продукт Blanc, Full Speed, до 100 мА |
+| Класс | CDC ACM, порт `/dev/ttyACM0` |
+| Кто держит порт | роль `--platformd`, очередь `CradleCapability` |
+| Модель в событиях умного дома | `YNDX-00652` |
+| Опрос | раз в 60 секунд: температура, CO₂, влажность |
+
+При снятии колонки с модуля и при возврате на него она перезагружалась — по одному
+наблюдению на каждый случай. Без модуля в журнале остаётся `No cradle was connected`.
+
+### Показания из журнала { #climate-log }
+
+Quasar пишет каждый ответ модуля в `/data/quasar/daemons_logs/maind.log`:
+
+```text
+[cradle] [info] [temperature_sensor_capability.cpp:81] Got temperature data response, temperature_celsius=24.1019
+[cradle] [info] [co2_sensor_capability.cpp:81] Got CO2 data response, co2_ppm=1293
+[cradle] [info] [humidity_sensor_capability.cpp:81] Got humidity data response, humidity_percent=41.7423
+```
+
+Последние значения одной командой:
+
+```sh
+grep -a '\[cradle\]' /data/quasar/daemons_logs/maind.log | grep -a 'Got ' | tail -3
+```
+
+Это единственный способ чтения, не мешающий Quasar. Свой опрос порта при работающем
+Quasar не пробовался: на этой же колонке второй читатель порта радио
+[сбивал обмен с чипом](#zigbee-radio).
+
+### Протокол { #climate-protocol }
+
+Кадр — HDLC: флаг `7e`, адрес `01`, байт управления со счётчиками, полезные данные,
+контрольная сумма CRC-16/X-25 младшим байтом вперёд, флаг `7e`. Сумма считается по
+адресу, байту управления и данным; она сошлась на четырёх записанных кадрах.
+Экранирование байта `7e` внутри данных в записи не встретилось.
+
+Данные — protobuf, пакет `cradle`. Схема встроена в maind, имена файлов начинаются
+с `smart_devices/libs/cradle/protos/`.
+
+| Сообщение | Поля |
+|---|---|
+| RequestMessage | одно из: `endpoint` = 1, `capability` = 2, `debug_info` = 3, `factory` = 4 |
+| CapabilityRequest | `message` = 1, тип `google.protobuf.Any` |
+| ResponseMessage | те же четыре поля и `log_message` = 6 |
+| CapabilityResponse | `message` = 1 (Any), `capability_name` = 2 |
+| SyncEndpointResponse | `endpoint_id`, версии приложения и загрузчика, список возможностей, `device_id`, `pcba_id` |
+
+Внутри Any лежит запрос или ответ одной возможности с адресом типа вида
+`type.googleapis.com/cradle.Co2SensorCapabilityRequest`.
+
+| Возможность | Номер | Запрос | Ответ |
+|---|---|---|---|
+| BATTERY | 0 | заряд, принудительный уровень и температура | уровень, напряжение, ток, температура, статистика |
+| UPDATER | 1 | подготовка, запись частями, применение прошивки | код ошибки, состояние |
+| BUTTON | 2 | — | номер кнопки и тип нажатия |
+| ANIMATION | 3 | показать уровень заряда | — |
+| PARTICULATES | 4 | данные | `pm_1_0_ug_m3`, `pm_2_5_ug_m3`, `pm_10_0_ug_m3` |
+| CO2_SENSOR | 5 | данные; калибровка с `target_co2_ppm` | `co2_ppm`, `stale_data`; поправка калибровки |
+| TEMPERATURE_SENSOR | 6 | данные | `temperature_celsius` (float), `stale_data` |
+| HUMIDITY_SENSOR | 7 | данные | `humidity_percent` (float), `stale_data` |
+| VOC_SENSOR | 8 | данные | `voc`, `stale_data` |
+| NOX_SENSOR | 9 | данные | `nox`, `stale_data` |
+| CRYPTOGRAPHY | 10 | схема не извлечена | — |
+| POWER_SUPPLY | 11 | схема не извлечена | — |
+
+В обмене этого модуля видны только номера 5, 6 и 7. Остальные взяты из схемы и,
+судя по набору, относятся к другим подставкам, в том числе с аккумулятором.
+
+Записанный запрос CO₂ и ответ на него, 69 и 75 байт:
+
+```text
+7e 01 02 | 12 3d 0a 3b 0a 35 "type.googleapis.com/cradle.Co2SensorCapabilityRequest" 12 02 0a 00 | 04 d8 | 7e
+7e 01 4e | 12 43 0a 3f 0a 36 "type.googleapis.com/cradle.Co2SensorCapabilityResponse" 12 05 0a 03 08 9e 0a 10 05 | 5c ae | 7e
+```
+
+В ответе `08 9e 0a` — поле `co2_ppm` со значением 1310, `10 05` — `capability_name`
+со значением CO2_SENSOR. Ответ приходит через 3–4 мс после запроса.
+
+### Запись обмена без захвата порта { #climate-trace }
+
+В ядре нет usbmon и на колонке нет strace, но есть kprobe-события. Точки ставятся на
+запись в CDC ACM и на приём в tty; порт при этом не открывается, Quasar ничего не замечает.
+
+```sh
+T=/sys/kernel/debug/tracing
+W='n=%x2:s32'; R='n=%x3:s64'
+for i in $(seq 0 19); do
+    W="$W d$i=+$((i*8))(%x1):x64"; R="$R d$i=+$((i*8))(%x1):x64"
+done
+echo "p:cradle/tx acm_tty_write $W" >> $T/kprobe_events
+echo "p:cradle/rx tty_insert_flip_string_fixed_flag $R" >> $T/kprobe_events
+mkdir $T/instances/cradle
+echo 1 > $T/instances/cradle/events/cradle/enable
+sleep 65
+echo 0 > $T/instances/cradle/events/cradle/enable
+cat $T/instances/cradle/trace > /tmp/cradle.trace
+rmdir $T/instances/cradle
+echo '-:cradle/tx' >> $T/kprobe_events
+echo '-:cradle/rx' >> $T/kprobe_events
+```
+
+В каждой строке записи `n` — длина блока, `d0`…`d19` — его первые 160 байт словами по
+8 байт, младший байт первым. Точка `rx` общая для всех последовательных портов, поэтому
+в запись попадает и обмен с Bluetooth-чипом; кадры модуля отличаются первым байтом `7e`.
+Один ответ модуля может прийти двумя-тремя блоками подряд.
+
 ## Что ещё проверить { #todo }
 
 - Способ получить root на текущих прошивках.
 - Почему на `.50` не сохраняются правки корневой ФС (SELinux в режиме `enforcing`, overlay или
   что-то ещё), если на factory-12 они [сохраняются](#factory-12).
+- Климатический модуль: версия его прошивки, ответ на запрос списка возможностей, прямой
+  обмен по [протоколу](#climate-protocol) при остановленном Quasar, события кнопки.
 - Zigbee: маркировка радиочипа на плате, `on_off` на реальной розетке или лампе, сохранение
   сети после перезагрузки и постоянное включение [локальной панели](#zigbee-panel).
