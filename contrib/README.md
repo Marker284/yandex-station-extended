@@ -103,6 +103,11 @@
   закрепление штатных маркеров ADB в `/data/quasar` с компьютера. Историческое имя сохранено;
   отдельный `S97adb` не нужен, `/etc/init.d` не меняется, перезагрузка не выполняется.
   Нужен уже работающий root ADB. Ограничения моделей — в [шаге 2](../docs/start/ssh.md#perm-adb).
+* **[`midi-factory-to-0369.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/midi-factory-to-0369.sh)** —
+  Станция Миди: перевод с factory-образа на `0.369`. `prepare` закрепляет маркеры ADB обеих
+  схем и блокирует скачивание свежей прошивки, `install` сверяет MD5 образа и ставит его через
+  `yandex-reboot recovery`. Запускается на колонке под root. Проверено: factory-7 → `0.369.1.46`.
+  [Порядок](../docs/devices/station-midi.md#factory-to-0369).
 * **[`patch_boot.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_boot.py)** — модификация boot-образа ядра для снятия флага `rh_unlock=0` (UART-консоль).
 * **[`patch_max_adb_candidate.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/patch_max_adb_candidate.py)** — патчер для включения отладки на Станции Макс.
 * **[`decrypt_ota.py`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/decrypt_ota.py)** — распаковка и расшифровка OTA-пакетов прошивки.
