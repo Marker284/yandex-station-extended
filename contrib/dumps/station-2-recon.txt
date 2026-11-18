@@ -1,0 +1,512 @@
+# Дамп: Станция 2 (yandexmidi), прошивка 0.369.1.46.4793639783.20261020.295
+# Всё персональное заменено на <DEVICE_ID> / <REDACTED>. Снят с живой системы.
+
+### uname
+Linux Yandex-Station-gen2 4.9.68 #1 SMP PREEMPT Tue Oct 20 22:56:33 MSK 2026 aarch64 GNU/Linux
+
+### /proc/version
+Linux version 4.9.68 (sandbox@sandbox5992-18-04-12074239767-0) (gcc version 6.3.1 20170109 (Linaro GCC 6.3-2017.02) ) #1 SMP PREEMPT Tue Oct 20 22:56:33 MSK 2026
+
+### cmdline
+androidboot.serialno=<DEVICE_ID> androidboot.deviceid=<DEVICE_ID> androidboot.localization=RU.RU androidboot.rpmb_state=0 androidboot.rh_unlock=0 ubi.mtd=system root=ubi0:rootfs rootfstype=ubifs ubi.mtd=bkupgrade otg_device=1  no_console_suspend printk_no_block ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 
+
+### mtd
+dev:    size   erasesize  name
+mtd0: 00400000 00040000 "bootloader"
+mtd1: 00600000 00040000 "tpl"
+mtd2: 01400000 00040000 "boot"
+mtd3: 0b000000 00040000 "system"
+mtd4: 00100000 00040000 "nv"
+mtd5: 0e980000 00040000 "bkupgrade"
+mtd6: 03b80000 00040000 "recovery"
+
+### mount
+ubi0:rootfs on / type ubifs (ro,relatime)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=237584k,nr_inodes=59396,mode=755)
+proc on /proc type proc (rw,relatime)
+/dev/ubi1_0 on /bkupgrade type ubifs (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,gid=5,mode=620,ptmxmode=666)
+tmpfs on /dev/shm type tmpfs (rw,relatime,mode=777)
+tmpfs on /tmp type tmpfs (rw,relatime)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
+sysfs on /sys type sysfs (rw,relatime)
+none on /sys/kernel/debug type debugfs (rw,relatime)
+pstore on /sys/fs/pstore type pstore (rw,relatime)
+/dev/mtdblock4 on /tee type vfat (ro,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
+tmpfs on /etc/unbound type tmpfs (rw,relatime)
+tmpfs on /etc/wifi/w1 type tmpfs (rw,relatime)
+
+### df
+Filesystem                Size      Used Available Use% Mounted on
+ubi0:rootfs             146.7M     71.2M     75.4M  49% /
+devtmpfs                232.0M         0    232.0M   0% /dev
+/dev/ubi1_0             198.8M      6.1M    188.0M   3% /bkupgrade
+tmpfs                   245.0M    268.0K    244.7M   0% /dev/shm
+tmpfs                   245.0M    504.0K    244.5M   0% /tmp
+tmpfs                   245.0M     48.0K    244.9M   0% /run
+/dev/mtdblock4         1005.0K     17.0K    988.0K   2% /tee
+tmpfs                   245.0M    504.0K    244.5M   0% /etc/unbound
+tmpfs                   245.0M    504.0K    244.5M   0% /etc/wifi/w1
+
+### cpuinfo
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 1
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 2
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 3
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+Serial		: 250b4300f848ce27adfba675da871207
+Hardware	: Amlogic
+
+
+### meminfo
+MemTotal:         501664 kB
+MemFree:          250220 kB
+MemAvailable:     384632 kB
+Buffers:              16 kB
+Cached:           131796 kB
+SwapCached:            0 kB
+Active:           121544 kB
+Inactive:          61980 kB
+
+### lsmod
+Module                  Size  Used by    Tainted: G  
+hci_uart               20480  1 
+optee_armtz            24576  1 
+optee                  24576  2 optee_armtz
+moal                  811008  3 
+mlan                  548864  1 moal
+gowin_led_device       53248  1 
+aml_info               16384  0 
+snd_soc_sy6045s        20480  1 
+
+### ls /dev
+audiodsp0
+bus
+console
+cpu_dma_latency
+dtb
+efuse
+fb0
+fd
+full
+fuse
+gpiochip0
+gpiochip1
+hwrng
+i2c-0
+i2c-1
+iio:device0
+iio:device1
+input
+keymaster_svc
+kmem
+kmsg
+log
+loop-control
+loop0
+loop1
+loop2
+loop3
+loop4
+loop5
+loop6
+loop7
+mapper
+mem
+memory_bandwidth
+mtd0
+mtd0ro
+mtd1
+mtd1ro
+mtd2
+mtd2ro
+mtd3
+mtd3ro
+mtd4
+mtd4ro
+mtd5
+mtd5ro
+mtd6
+mtd6ro
+mtdblock0
+mtdblock1
+mtdblock2
+mtdblock3
+mtdblock4
+mtdblock5
+mtdblock6
+nand_env
+net
+network_latency
+network_throughput
+null
+pdm_da
+port
+ppp
+ptmx
+pts
+ptyp0
+ptyp1
+ptyp2
+ptyp3
+ptyp4
+ptyp5
+ptyp6
+ptyp7
+ptyp8
+ptyp9
+ptypa
+ptypb
+ptypc
+ptypd
+ptype
+ptypf
+ptyq0
+ptyq1
+ptyq2
+ptyq3
+ptyq4
+ptyq5
+ptyq6
+ptyq7
+ptyq8
+ptyq9
+ptyqa
+ptyqb
+ptyqc
+ptyqd
+ptyqe
+ptyqf
+random
+rfkill
+shm
+snd
+stderr
+stdin
+stdout
+tee0
+teepriv0
+tty
+tty0
+tty1
+tty10
+tty11
+tty12
+tty13
+tty14
+tty15
+tty16
+tty17
+tty18
+tty19
+tty2
+tty20
+tty21
+tty22
+tty23
+tty24
+tty25
+tty26
+tty27
+tty28
+tty29
+tty3
+tty30
+tty31
+tty32
+tty33
+tty34
+tty35
+tty36
+tty37
+tty38
+tty39
+tty4
+tty40
+tty41
+tty42
+tty43
+tty44
+tty45
+tty46
+tty47
+tty48
+tty49
+tty5
+tty50
+tty51
+tty52
+tty53
+tty54
+tty55
+tty56
+tty57
+tty58
+tty59
+tty6
+tty60
+tty61
+tty62
+tty63
+tty7
+tty8
+tty9
+ttyS0
+ttyS1
+ttyS3
+ttyp0
+ttyp1
+ttyp2
+ttyp3
+ttyp4
+ttyp5
+ttyp6
+ttyp7
+ttyp8
+ttyp9
+ttypa
+ttypb
+ttypc
+ttypd
+ttype
+ttypf
+ttyq0
+ttyq1
+ttyq2
+ttyq3
+ttyq4
+ttyq5
+ttyq6
+ttyq7
+ttyq8
+ttyq9
+ttyqa
+ttyqb
+ttyqc
+ttyqd
+ttyqe
+ttyqf
+ubi0
+ubi0_0
+ubi1
+ubi1_0
+ubi_ctrl
+uhid
+uinput
+unifykeys
+urandom
+vcs
+vcs1
+vcsa
+vcsa1
+watchdog
+watchdog0
+wifi_power
+xt_qtaguid
+zero
+zram0
+
+### init.d
+S00hostname
+S01hot-poweroff
+S01rw-dirs
+S01rw-firmware
+S01syslogd
+S01watchdog
+S02klogd
+S02sysctl
+S10mdev
+S20urandom
+S29led_panel_midi
+S30dbus
+S30pd_controller
+S30zigbee
+S39w1_wifi_ant_config
+S40adc
+S40dhcpcd-db
+S40net.lo
+S40wifi
+S41dhcpcd
+S44alsa
+S45tas58xx
+S46hardvold
+S47alsa-audio-monitor
+S47amplifiers_fw
+S49chrony
+S49teeinit
+S50hci0
+S51bluetoothd
+S52bluealsa
+S53bluealsa-aplay
+S54default-bluez-agent
+S70unbound
+S99quasar
+S99zdropbear
+rcK
+rcS
+
+### device_id
+<REDACTED>
+
+### ps
+PID   USER     COMMAND
+    1 root     init
+    2 root     [kthreadd]
+    3 root     [ksoftirqd/0]
+    4 root     [kworker/0:0]
+    5 root     [kworker/0:0H]
+    7 root     [rcu_preempt]
+    8 root     [rcu_sched]
+    9 root     [rcu_bh]
+   10 root     [migration/0]
+   11 root     [lru-add-drain]
+   12 root     [cpuhp/0]
+   13 root     [cpuhp/1]
+   14 root     [migration/1]
+   15 root     [ksoftirqd/1]
+   16 root     [kworker/1:0]
+   17 root     [kworker/1:0H]
+   18 root     [cpuhp/2]
+   19 root     [migration/2]
+   20 root     [ksoftirqd/2]
+   22 root     [kworker/2:0H]
+   23 root     [cpuhp/3]
+   24 root     [migration/3]
+   25 root     [ksoftirqd/3]
+   26 root     [kworker/3:0]
+   27 root     [kworker/3:0H]
+   28 root     [kdevtmpfs]
+   29 root     [kworker/u8:1]
+   33 root     [kworker/u8:2]
+  457 root     [oom_reaper]
+  458 root     [writeback]
+  460 root     [kcompactd0]
+  461 root     [crypto]
+  462 root     [bioset]
+  464 root     [kblockd]
+  496 root     [devfreq_wq]
+  501 root     [ffd13000.spicc_]
+  513 root     [cfg80211]
+  517 root     [watchdogd]
+  602 root     [cfinteractive]
+  604 root     [rpciod]
+  605 root     [kworker/2:1]
+  606 root     [xprtiod]
+  627 root     [kswapd0]
+  628 root     [vmstat]
+  692 root     [nfsiod]
+  809 root     [bioset]
+  812 root     [bioset]
+  815 root     [bioset]
+  818 root     [bioset]
+  821 root     [bioset]
+  824 root     [bioset]
+  827 root     [bioset]
+  830 root     [bioset]
+  835 root     [bioset]
+  872 root     [dm_bufio_cache]
+  889 root     [kworker/0:1]
+  890 root     [kworker/3:1]
+  939 root     [null]
+  940 root     [cpu_hogplug_thr]
+  941 root     [irq/41-meson-am]
+  947 root     [bioset]
+  952 root     [bioset]
+  957 root     [bioset]
+  962 root     [bioset]
+  967 root     [bioset]
+  972 root     [bioset]
+  977 root     [bioset]
+ 1041 root     [ipv6_addrconf]
+ 1049 root     [krfcommd]
+ 1068 root     [ubi_bgt0d]
+ 1071 root     [ubi_bgt1d]
+ 1075 root     [dwc_otg]
+ 1091 root     [ubifs_bgt1_0]
+ 1111 root     /sbin/syslogd -n
+ 1114 root     watchdog -t 1 -T 5 /dev/watchdog
+ 1118 root     /sbin/klogd -n
+ 1130 root     /sbin/mdev -df
+ 1160 root     [lp_touch_work]
+ 1171 dbus     dbus-daemon --system
+ 1213 root     /usr/bin/arecord -D hw:0,1 -r 48000 -f S16_LE -c 2 -t raw /dev/null
+ 1228 root     [MOAL_HANG_WORK_]
+ 1229 root     [MOAL_WORK_QUEUE]
+ 1230 root     [MOAL_EVT_WORK_Q]
+ 1231 root     [MOAL_RX_WORK_QU]
+ 1232 root     [woal_reassoc_se]
+ 1233 root     [ksdioirqd/sdio]
+ 1270 root     [kworker/u9:1]
+ 1273 root     [CSAdfs535216272]
+ 1274 root     [MCLIST_WORK_QUE]
+ 1284 root     [CSAdfs64]
+ 1285 root     [MCLIST_WORK_QUE]
+ 1295 root     [CSAdfs535388304]
+ 1296 root     [MCLIST_WORK_QUE]
+ 1310 root     /usr/sbin/wpa_supplicant -sd -B -Dnl80211 -iwlan0 -c/bkupgrade/data/wpa_supplicant.conf -P /var/run/wpa_supplicant.pid
+ 1314 dhcpcd   dhcpcd: [manager] [ip4] [ip6]
+ 1315 root     dhcpcd: [privileged proxy]
+ 1316 dhcpcd   dhcpcd: [network proxy]
+ 1317 dhcpcd   dhcpcd: [control proxy]
+ 1368 root     /usr/bin/hardvold
+ 1373 root     /usr/bin/alsa-audio-monitord /etc/alsa-audio-diagnostics/devices/yandexmidi.json /etc/alsa-audio-diagnostics.conf
+ 1380 root     chronyd
+ 1395 root     /bin/tee-supplicant
+ 1398 root     /usr/bin/keymaster_svc
+ 1407 root     [kworker/1:2]
+ 1410 dhcpcd   dhcpcd: [BPF ARP] wlan0 <LAN_IP>
+ 1416 root     /usr/bin/btattach -S 2000000 -B /dev/ttyS1
+ 1423 root     [hci0]
+ 1424 root     [hci0]
+ 1431 root     /usr/libexec/bluetooth/bluetoothd -E -d
+ 1435 root     /usr/bin/bluealsa -p a2dp-sink -p a2dp-source -p hfp-ag --sbc-quality=high
+ 1439 root     /usr/bin/bluealsa-aplay -M disable -S
+ 1443 root     /usr/bin/just-works-bluez-agent
+ 1663 root     adbd
+ 1695 root     /system/vendor/quasar/quasar_launcher2 /system/vendor/quasar/launch.json
+ 1697 root     /system/vendor/quasar/maind --telemetry
+ 1698 root     /system/vendor/quasar/maind --fluent-bitd
+ 1790 root     /data/opt/bin/dropbear -r /data/opt/etc/dropbear/hk_ed25519 -p 2222 -s
+ 1791 root     sleep infinity
+ 1794 nobody   /usr/sbin/unbound
+ 1797 root     /system/vendor/quasar/maind --platformd
+ 1840 root     /system/vendor/quasar/maind --mediad
+ 2304 root     [kworker/2:0]
+ 2307 root     [kworker/u9:2]
+ 2385 root     [kworker/u8:0]
+ 2387 root     [kworker/2:2]
+ 2389 root     [kworker/u9:0]
+ 2404 root     /data/opt/bin/dropbear -r /data/opt/etc/dropbear/hk_ed25519 -p 2222 -s -2 8
+ 2405 root     sh -c  echo "### uname"; uname -a echo; echo "### /proc/version"; cat /proc/version echo; echo "### cmdline"; cat /proc/cmdline echo; echo "### mtd"; cat /proc/mtd echo; echo "### mount"; mount echo; echo "### df"; df -h echo; echo "### cpuinfo"; cat /proc/cpuinfo echo; echo "### meminfo"; head -8 /proc/meminfo echo; echo "### lsmod"; lsmod echo; echo "### ls /dev"; ls /dev echo; echo "### init.d"; ls /etc/init.d echo; echo "### device_id"; device_id -r 2>&1 echo; echo "### ps"; ps w 
+ 2417 root     ps w

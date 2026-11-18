@@ -159,6 +159,179 @@ backend-метрики — `SetraceReqId` / `SetraceClientReqId`.
     управляются согласием владельца, а не ключом в `quasar.cfg`. Это не диагностическая телеметрия —
     см. [Когда что включается](#when).
 
+??? note "Полный список событий Quasar на этом устройстве"
+
+    Список получен из `quasar.cfg` (секция `teleme3d`, прошивка
+    `0.369.1.46.4793639783.20261020.295`).
+    Это белые списки разрешённых событий; какое шлёт устройство — не проверялось.
+
+    **AppMetrica (30):**
+
+    ```text
+    NetInterfaceGotAddress, NetInterfaceUp, associationFailed, connectionStats,
+    directiveCompleted, directiveHandled, directiveStarted, emptyIp, emptyIpFixed,
+    emptyNetworks, emptyNetworksFixed, emptyScan, emptyScanFixed, internetRecovery,
+    internetRecoveryFail, internetRecoveryStart, internetRecoverySuccess,
+    phraseSpottedWithoutInternet, pings, processStart, setupConfigurationError, systemMetrics,
+    wifiConnect, wifiDisconnect, wifiReport, wifiReset, wrongIp, wrongIpFixed,
+    ysk_error_network, ysk_error_timeout,
+    ```
+
+    **Таймеры и будильники (9):**
+
+    ```text
+    addAlarm, alarmDirectiveReceived, alarmSoundFallbackDirectiveFailed,
+    alarmSoundFallbackMediaNotConfirmed, pauseTimer, playAlarm, removeAlarm, resumeTimer,
+    startMediaAlarm,
+    ```
+
+    **Алиса и запросы (14):**
+
+    ```text
+    aliceRequest, ysk_time_voicedialog_request, ysk_voicedialog_cancel,
+    ysk_voicedialog_conlost_network_error, ysk_voicedialog_conlost_others,
+    ysk_voicedialog_conlost_pong_timeout, ysk_voicedialog_connection_opened,
+    ysk_voicedialog_go_away, ysk_voicedialog_open_connection, ysk_voicedialog_reconnect,
+    ysk_voicedialog_start_music_input, ysk_voicedialog_start_vins_request,
+    ysk_voicedialog_start_voice_input, ysk_voicedialog_vins_response,
+    ```
+
+    **Аудио и плеер (34):**
+
+    ```text
+    AudioError, YandexMusicPlayTrackTimeout, YandexMusicSwitchTrackTimeout,
+    audioClientAltUrlChanged, audioClientAppSrcUnderrun, audioClientBufferUnderrun,
+    audioClientError, audioClientPlayOnFailed, audioClientPlayRequest,
+    audioClientStartedFromPrev, audioClientStartedFromTtsEnd, audioClientStartedFromVoiceInput,
+    audioDeviceStats, glagolPlayMusic, musicPlayerBackendErrorMessage, musicPlayerBufferStalled,
+    musicPlayerClientDisconnect, musicPlayerClientReconnect, musicPlayerConnectionFail,
+    musicPlayerFailToStartTrack, musicPlayerFailedInRow, notifyOnAudioPlaybackError,
+    notifyOnAudioPlaybackErrorRaw, player_start, progressHeartbeatMusic, progressHeartbeatRadio,
+    startAudio, track_failed, track_start, ysk_error_audio_encoding,
+    ysk_error_audio_interrupted, ysk_error_audio_recorder, ysk_tts_player_begin,
+    ysk_tts_player_end,
+    ```
+
+    **Биометрия (28):**
+
+    ```text
+    bioAddAccountCancelEnrollment, bioAddAccountFailed, bioAddAccountRemoveEnrollment,
+    bioAddAccountSuccess, bioAddAccountTimeout, bioAddEnrolledPersonFailed,
+    bioAddEnrolledPersonSuccess, bioCommitEnrollmentSuccess, bioCustomModelDownloadFailed,
+    bioCustomModelDownloadSuccess, bioEngineException, bioEnrollmentCancelSuccess,
+    bioEnrollmentFailed, bioEnrollmentFinishSuccess, bioEnrollmentHeadersChanged,
+    bioEnrollmentStartSuccess, bioEnrollmentTimeout, bioEnrollmentsCompatibilityError,
+    bioIncompatibleEngineForClassification, bioLibraryDiagnosticData, bioLogStorage,
+    bioRemoveAccountFailed, bioRemoveAccountSuccess, bioSendEnrollmentSemanticFrame,
+    bioShareEnrolledPersonFailed, bioShareEnrolledPersonSendAddDirective,
+    bioShareEnrolledPersonSuccess, bioSoundEnrollmentFailed,
+    ```
+
+    **Аккаунт и токены (28):**
+
+    ```text
+    SmartVolumeChangeAccountEnableness, authTokenRefreshError, authTokenRefreshException,
+    authTokenRefreshSuccess, changeAccountError, changeAccountSuccess, deleteAccount,
+    deleteAccountError, deleteAccountSuccess, phoneCallsAccountConnected,
+    phoneCallsAccountDisconnected, phoneCallsAccountInvalidated, refreshTokenEmptyResponse,
+    refreshTokenError, requestAccountError, requestAccountException, requestAccountSuccess,
+    requestAuthTokenEmptyResponse, requestAuthTokenError, requestTokenEmptyResponse,
+    requestTokenError, revokeTokenEmptyResponse, revokeTokenError, revokeTokenException,
+    revokeTokenSuccess, xTokenRefreshError, xTokenRefreshException, xTokenRefreshSuccess,
+    ```
+
+    **Умный дом и IoT (16):**
+
+    ```text
+    dcpcLoadScenarioFailed, dcpcSaveScenarioFailed, dcpcScenarioStateChange,
+    iotDeviceStatusDuration, iotDirectiveResult, iotDiscoveryResult, iotDiscoverySessionResult,
+    iotDiscoverySessionStart, iotProviderInitResult, iotScenariosLaunchFailed,
+    iotScenariosLaunchFinished, localIotScenarioConditionTriggered, localIotScenarioLaunched,
+    local_scenario_log, matter_diagnostics_event, scenario_timings,
+    ```
+
+    **Bluetooth (5):**
+
+    ```text
+    bluetooth_devices_list, bluetooth_source_connected, bluetooth_source_disconnected,
+    bluetooth_transport_metrics, press_button_bluetooth,
+    ```
+
+    **Wi-Fi и сеть (7):**
+
+    ```text
+    failedSetupNetwork, phraseSpottedWithoutInternet, ysk_error_network,
+    ysk_error_network_text_input, ysk_uniproxy_raised_decode_protobuf,
+    ysk_uniproxy_raised_encode_protobuf, ysk_uniproxy_raised_parse_protobuf,
+    ```
+
+    **Ошибки и диагностика (35):**
+
+    ```text
+    AnimationDownloadFail, AnimationUrlListDownloadFail, addGuestUserFailed,
+    capabilityEventsSendingFailed, clearGuestUserFailed, dcpcSettingsParseFailed,
+    dcpcStorageSaveFailed, failedGetSyncInfoRequest, getNextRequestFailed,
+    historicalCapabilityEventsSendingFailure, log_error, mediadPlaybackError, ntpException,
+    requestUidError, telinkNcpSendFail, ysk_error_client, ysk_error_invalid_api_key,
+    ysk_error_model, ysk_error_model_multichannel, ysk_error_no_speech_detected,
+    ysk_error_no_text_to_synthesize, ysk_error_ok, ysk_error_pong_timeout_elapsed,
+    ysk_error_recording_permissions, ysk_error_server, ysk_error_server_speech_input,
+    ysk_error_spotting_rejected, ysk_error_streaming_response_timeout, ysk_error_timeout,
+    ysk_error_tts, ysk_error_workingthread_block, ysk_error_workingthread_global,
+    zigbeeEnterBootloaderFailed, zigbeeNCPInitFailed, zigbeeNcpException,
+    ```
+
+    **OTA и обновления (5):**
+
+    ```text
+    minidump_on_update, updateAuthTokenError, updateAuthTokenException, updateAuthTokenSuccess,
+    zigbeeFirmwareUpdateFailed,
+    ```
+
+    **Экраны и приложения (2):**
+
+    ```text
+    progressHeartbeatVideo, smartVolumeLog,
+    ```
+
+    **Настройка и миграция (2):**
+
+    ```text
+    setupConfigurationError, ysk_first_synthesis_chunk,
+    ```
+
+    **Уведомления и звонки (14):**
+
+    ```text
+    dcpcSendCallback, notifyOnPlaybackError, phoneCallsAcceptedCall, phoneCallsCallEnded,
+    phoneCallsCallFailed, phoneCallsCancelledCall, phoneCallsConnectWaitTimeoutError,
+    phoneCallsDeclinedCall, phoneCallsHeartbeat, phoneCallsHeartbeatRingtoneIncoming,
+    phoneCallsHeartbeatRingtoneOutgoing, phoneCallsIncomingCall, phoneCallsOutgoingCall,
+    phoneCallsStreamStats,
+    ```
+
+    **Прочее (62):**
+
+    ```text
+    VqeOnDspRestarted, addGuestUserSuccess, backendStatusChanged, cachableCapabilityNoListeners,
+    capabilityEventsSendingStart, capabilityEventsSendingSuccess, clearGuestUserSuccess,
+    device_power_on, directiveCompleted, directiveHandled, directiveStarted, dsp_info,
+    equalizerStats, getNextRequest, historicalCapabilityEventsFlush,
+    historicalCapabilityEventsSendingNotReady, historicalCapabilityEventsSendingSuccess,
+    http_request, hybrid_request, invalidProtoDirective, ledDisplayAnimationStart,
+    localRecognitionData, local_analytics_info, local_request, mediaEndpointAbort,
+    mediaEndpointSuicide, minidump, ntpSync, phraseSpotted, pings, press_button_activate,
+    press_button_left_activate, press_button_mute_key, press_button_mute_state,
+    press_button_play_pause, press_button_power, press_button_right_activate,
+    press_button_touch, press_button_volume_down, press_button_volume_up, processStart,
+    process_suicide, pstore, requestUidEmptyResponse, soundLogRecordRemoved, spotterCommand,
+    spotter_validation_timeout, startRequest, systemAlertOccured, systemMetrics,
+    tooShortAdhanSchedule, wrongAdhanId, ysk_last_synthesis_chunk, ysk_log_ack_received,
+    ysk_log_go_away, ysk_log_sent, ysk_recognition_begin, ysk_spotter_confirmation,
+    ysk_spotter_queue_overflow, ysk_time_ws_connect, zeroChunkDetected, zigbeeNcpReset,
+    ```
+
+
 ## Когда что включается { #when }
 
 Телеметрия делится на два слоя, и управляются они по-разному:

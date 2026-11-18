@@ -273,4 +273,15 @@ xhci-hcd xhci-hcd.0.auto: HC died; cleaning up
 - Карта регистров TLV320ADC3101 (опорный сигнал усилителя).
 - USB-C PD-профили (`husb238`).
 
+## Проверено на нашей сборке { #our-build }
+
+Прошивка `0.369.1.46.4793639783.20261020.295` (2026-10-20, сутками старше проверенной
+сборки `.50`), ноябрь 2026:
+
+- Короткое нажатие кнопки Алисы переключает `music.Text.Hardware.Click.PlaybackControlCapability`:
+  `Music session changed to player_start` → повторным нажатием — `music_thin_client_on_stopped`.
+- `/dev/fb0` принимает запись 356-байтовым кадром (`89×1`, 4 байта на пиксель, порядок R,G,B,W).
+- Секция `audiosender` включает 8 каналов (`raw_mic_0..3`, `raw_spk_0..1`, `vqe_0`, `vqe_bnr`);
+  `speechkitLogChannels` — `["vqe_0", "vqe_bnr"]`. Назначение `vqe_bnr` по-прежнему не установлено.
+
 *Данные для этой страницы собрал **@sharazhniy** — спасибо за вклад.*
