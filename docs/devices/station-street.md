@@ -37,7 +37,8 @@
 
 | Что | Состояние | Где описано |
 |---|---|---|
-| Root и SSH | работает | [подмена DNS](../start/root.md), [SSH](../start/ssh.md) |
+| Root и SSH | работает, в том числе на `0.375.1.21`; SSH на 2222 может не открываться — [ADB-форвард](../start/ssh.md#dropbear) | [подмена DNS](../start/root.md), [SSH](../start/ssh.md) |
+| Отключение обновлений | работает на `0.375.1.21` | [SSH и обновления](../start/ssh.md#kill-ota) |
 | USB Host (OTG) | не проверялось | — |
 | AirPlay | работает (через spotiya) | [AirPlay и Spotify Connect](#spotiya) |
 | Spotify Connect | частично: spotiya ставится, вход по коду на аккаунте без Premium не прошёл | [AirPlay и Spotify Connect](#spotiya) |
@@ -47,7 +48,7 @@
 | Подсветка | работает | [Индикация](#led) |
 | Кнопки и акселерометр | читаются | [Вход](#input) |
 | YAM | не работает (32-битное ядро) | [YAM](../recipes/packagemanagers.md) |
-| Своя LLM | не проверялось | — |
+| Своя LLM | работает: Quasar Bridge 0.7.6 (armv7) + ha-mcp | [Своя LLM](#llm) |
 
 ## Получение root { #root }
 
@@ -59,6 +60,22 @@
 
 После перезагрузки ADB поднимается сам, но заметно дольше обычного — не стоит
 считать, что он не стартует, если он не отвечает первые минуты.
+
+Заводской образ — `0.14.1.16.3424751289.20250929.factory-14`, актуальная сборка —
+`0.375.1.21.4861976899.20261116.99` (16.11.2026). После сброса колонка сама
+обновляется до актуальной; маркеры ADB в `/data` это обновление переживают.
+
+!!! warning "Стрит: обновление запускается через `/allow_update`"
+    На Стрит обновление с `factory-14` до `0.375.1.21` запускается запросом
+    `GET /allow_update`, а не `/check_updates`. Стенд, который отвечает
+    `hasUpdate:false` только на `/check_updates`, обновление **не блокирует**.
+    После обновления сразу отключите обновления ([шаг 2](../start/ssh.md#kill-ota)).
+
+!!! note "Если `quasar.yandex.net` не попадает в стенд"
+    На роутере с policy routing/VPN запросы колонки могут уходить в другой
+    dnsmasq-инстанс, который не видит перезапись DNS. Проверьте, что с колонки
+    `quasar.yandex.net` резолвится в стенд; при необходимости добавьте статическую
+    запись в `/etc/hosts` роутера или выведите колонку из VPN-группы.
 
 ## Разделы флеша { #partitions }
 
@@ -163,6 +180,19 @@ mount -o remount,ro /
 - **Spotify Connect**: вход по коду на аккаунте без Premium не прошёл
   (`session validation failed`). С Premium не проверялось.
 
+## Своя LLM и Home Assistant { #llm }
+
+- **Quasar Bridge 0.7.6** (armv7) установлен и работает на `0.375.1.21`:
+  `control.sh check-backends` показывает `LLM: ok; Home Assistant: N entities`.
+- Модель — `qwen3:4b-instruct` по OpenAI-совместимому API
+  (`http://<HOST>:11434/v1`); Home Assistant — через **ha-mcp**.
+- `ha-mcp` в Docker: `ghcr.io/homeassistant-ai/ha-mcp:latest`, команда `ha-mcp-web`,
+  порт `8086`, переменные `HOMEASSISTANT_URL` и `HOMEASSISTANT_TOKEN`; URL для
+  моста — `http://<HOST>:8086/mcp`, его нужно записать в
+  `/data/opt/quasar-bridge/runtime.env` как `QUASAR_HOME_MCP_URL`.
+- Маршруты: музыка, погода и таймеры — Яндекс; «спроси нейросеть» — LLM;
+  умный дом — Home Assistant. Подробнее — [Своя LLM](../recipes/llm.md).
+
 ## Вход { #input }
 
 События читаются из `/dev/input/eventN`. Номера могут сместиться, поэтому в скриптах
@@ -214,9 +244,9 @@ od -An -tx1 -w16 -v /dev/input/event3
 ## Что ещё проверить { #todo }
 
 - Доступ к данным аккумулятора (`/sys/class/power_supply/*`), уровень/ток заряда.
-- Отключение OTA / durable-доступ на 32-битном ядре 5.15.
 - Bluetooth-пульт (`input_btrcu`): работает ли с реальным пультом.
 - Spotify Connect на аккаунте с Premium.
-- USB Host (OTG), Bluetooth-источник, обработанный микрофон, своя LLM.
+- USB Host (OTG), Bluetooth-источник, обработанный микрофон.
 
 *Данные для этой страницы собрал **@sharazhniy** — спасибо за вклад.*
+*Дополнения по 0.375 — **@LordDetson**.*
