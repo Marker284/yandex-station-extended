@@ -10,10 +10,12 @@ protobuf-IPC внутри `aliced` (порт `9875`), по которому Ал
 
 ## Что это { #what }
 
-- `glagol` (`glagold` в `quasar.cfg`) — локальный API, по которому колонкой управляют
+- **glagol** (`glagold` в `quasar.cfg`) — локальный API, по которому колонкой управляют
   приложения и интеграции, например [YandexStation для Home Assistant](https://github.com/AlexxIT/YandexStation).
 - Локальный IPC `9875` (`aliced`) — поток кадров Алисы: состояние, распознанная фраза и
   отправка ей команд.
+- **GlagolCluster** — реализация glagol внутри `maind`: приём и отправка сообщений в
+  распределённые «кластер»; новости/состояние — через Capability.
 
 ## Порты { #ports }
 
@@ -51,16 +53,16 @@ YandexIOReceiver-<DEVICE_ID>._yandexio._tcp.local. can be reached at yandex-stat
 
 По коду интеграции YandexStation: токен получается запросом
 `https://quasar.yandex.net/glagol/token?device_id=<id>&platform=<platform>` с учётной
-авторизацией Яндекса (тот же OAuth, что и у аккаунта владельца). `platform` — как в TXT-записи
-(`yandexmidi` для Станции 2). Проверено с чужим токеном — колонка отвечает
-WebSocket `Close code=4000, reason="Invalid token"` и закрывает соединение.
+авторизацией Яндекса. `platform` — как в TXT-записи (`yandexmidi` для Станции 2).
+Проверено с чужим токеном — колонка отвечает WebSocket `Close code=4000,
+reason="Invalid token"` и закрывает соединение.
 
 На самой колонке токен хранится в `gsdkTokens.json` (`glagold.tokensStorage`); файла нет
 в снимке `/data` этого устройства — не проверялось.
 
 ## Как устроен обмен по glagol { #protocol }
 
-Соединение — WebSocket (WSS). Клиент шлёт JSON:
+Соединение — WebSocket (WSS). Клиент шлёт сообщения:
 
 ```json
 {"conversationToken": "<token>", "id": "<uuid>",
@@ -70,17 +72,57 @@ WebSocket `Close code=4000, reason="Invalid token"` и закрывает сое
 - `conversationToken` — glagol-токен (см. выше).
 - `id` — uuid запроса; колонка отвечает сообщениями с тем же `id`.
 - `sentTime` — миллисекунды Unix epoch.
-- Команды: `softwareVersion`, `ping` (ping предназначен для поддержания сессии),
-  `serverAction` с `serverActionEventPayload.type = "server_action"` и
-  `name = "on_reset_session"`.
 
 Колонка сама шлёт периодические сообщения со `state` (громкость, плеер, таймеры,
-`timeSinceLastVoiceActivity`) и `vinsResponse` (ответ Алисы, карты, `is_streaming`,
-`output_speech`) — так работает наблюдение громкости, плеера и ответа Алисы через интеграции.
+`timeSinceLastVoiceActivity`), `vinsResponse` (ответ Алисы, карты, `is_streaming`,
+`output_speech`) и со списком `experiments` и `supported_features`.
 
-Набор команд зависит от модели и прошивки: на Orion (Станция 3) команды
-`softwareVersion`, `ping`, `getVersion`, `status`, `allStates`, `getState`, `get_status` не
-отвечают (см. [Станция 3](../devices/station-3.md#glagol)).
+### Команды воспроизведения и громкости { #hardware }
+
+Проверены строки в `maind` (гугл-отчёты локальной интеграции):
+
+| Команда | Параметры | Проверено |
+|---|---|---|
+| `play` | — | строка в maind |
+| `stop` | — | строка в maind (работает как пауза) |
+| `prev` | — | строка в maind |
+| `next` | — | строка в maind |
+| `setVolume` | `volume: 0…10` | строка в maind (23 вхождения) |
+| `rewind` | `position: <сек>` | строка в maind |
+| `repeat` | `mode: None` / `One` / `All` | строка в maind |
+| `shuffle` | `enable: true/false` | строка в maind |
+| `sendText` | `text: <строка>` | строка в maind |
+
+### Команда `externalCommandBypass` { #bypass }
+
+`externalCommandBypass` — generic-обёртка для команд уровня приложений; данные —
+base64 от protobuf `{1: <имя-команды>, 2: <payload-json>}`.
+
+Встречающиеся команды (строки в `maind` присутствуют, поведение не проверялось):
+
+- `audio_play` — играет поток, формирует `payload` вида
+  `{stream: {type: Track/FmRadio, url, id, …}, metadata: {}}`;
+- `sound_louder` / `sound_quiter` — громче/тише;
+- `draw_led_screen` — анимация LED-панели;
+- `draw_scled_animations` — анимации центральных LED.
+
+Из окружения интеграции известно использование `update_form` для сценариев вида
+`personal_assistant.scenarios.quasar.go_home`, `player_continue`, `repeat_phrase`;
+`form_update` и `resubmit` встретились в `maind`.
+
+### `serverAction` { #server-action }
+
+`serverAction` — команда-«маршрут» к сценарию: payload вида
+
+```json
+{"command": "serverAction", "serverActionEventPayload": {
+  "type": "server_action", "name": "<name>",
+  "payload": { "<key>": "<value>" }}}
+```
+
+Описаны две формы: `on_reset_session` (сброс) и `update_form` с
+`resubmit: true` и списком `slots` (заполняются именованные слоты сценария).
+`player_continue`, `go_home`, `repeat_phrase` встречаются в строках `maind`.
 
 ## Команда `START_VOCALIZE` { #vocalize }
 
@@ -93,12 +135,15 @@ WebSocket `Close code=4000, reason="Invalid token"` и закрывает сое
 
 ## Что не разобрано { #unknown }
 
-- Остальные методы glagol и подписки.
+- Остальные методы glagol и подписки (например, `on_reset_session` и
+  `repeat_after_me` не найдены в строках `maind`, но были бы нужны для связывания).
 - Точная семантика событий `TTS_STARTED` / `TTS_COMPLETED`.
 - Срок жизни и способ ротации сертификата.
 - Что включает `enableEndpointProtocol: true` (гипотеза: Endpoint-протокол `YandexIOReceiver`).
-- Чем отличается `9899` (`glagold.port`) от `1961` (`glagold.externalPort`): набор команд и
-  проверки одинаковые или нет.
+- Чем отличается `9899` (`glagold.port`) от `1961` (`glagold.externalPort`):
+  набор команд и проверки одинаковые или нет.
+- Назначение пути `/glagol/check_token` в `maind` (вероятно, проверка токена между
+  колонкой и облаком — точно не установлено).
 
 ## Воспроизведение { #reproduce }
 
@@ -106,7 +151,7 @@ WebSocket `Close code=4000, reason="Invalid token"` и закрывает сое
 openssl s_client -connect <IP_КОЛОНКИ>:1961 -servername yandex-station-gen2 -showcerts
 dns-sd -B _yandexio._tcp
 dns-sd -L YandexIOReceiver-<DEVICE_ID> _yandexio._tcp
-strings -a rootfs/system/vendor/quasar/maind | grep -i TVocalizeDirective
+strings -a rootfs/system/vendor/quasar/maind | grep -i -E "glagol|externalCommandBypass|serverAction"
 ```
 
 ## Что это даёт { #practice }
