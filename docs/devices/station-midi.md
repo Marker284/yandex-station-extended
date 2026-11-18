@@ -39,6 +39,7 @@
 | снимок 1 | 3.21 (`0.369.1.46.4778262955.20261013`) | 20261013 | — |
 | снимок 2 | `0.369.1.50.4794663100.20261021.160` | 21.10.2026 | `01.01.261021.115421` |
 | [factory-6](#factory-6) | `0.6.1.40.1928882720.20230914.factory-6` | 14.09.2023 | `01.01.230914.220025` |
+| [factory-7](#factory-7) | `0.7.1.24.2409336217.20240626.factory-7` | 26.06.2024 | `01.01.240626.224052` |
 
 ## Что работает { #features }
 
@@ -63,6 +64,12 @@
 
 Запасной путь без компьютера — [AliceBridge](../start/root-android.md) с Android-телефона:
 на Миди тоже проверен, но откатывает прошивку.
+
+**После сброса Миди стоит на заводской прошивке.** Сброс откатывает колонку на заводскую
+сборку, а не оставляет текущую: Миди с `0.374.1.20` после сброса оказалась на
+[factory-7](#factory-7). Root на ней получается тем же способом, но
+[Quasar Bridge](../recipes/llm.md#quasar-bridge) не работает — нужна `0.369`, см.
+[переход с factory на 0.369](#factory-to-0369).
 
 ## Чем отличается { #differences }
 
@@ -371,15 +378,151 @@ chattr +i /data/quasar_activate_adb_quasmodrom /data/quasar_activate_network_adb
   это не влияет: `adbd` уже запущен при загрузке.
 - Вернуть: `chattr -i` для тех же файлов.
 
+## Заводская прошивка factory-7 { #factory-7 }
+
+**Проверено на:** Станция Миди после сброса с `0.374.1.20`, прошивка
+`0.7.1.24.2409336217.20240626.factory-7`, ноябрь 2026. Root — [подменой DNS](../start/root.md)
+сервером lite-kit, прошивку сервер не менял.
+
+| | factory-7 |
+|---|---|
+| Userspace | 64-битный, BusyBox 1.31.1 (26.06.2024) |
+| Маркеры ADB | старая схема `/data/quasar_activate_*`, как на [factory-6](#factory-6-adb) |
+| `launch.json` | `updatesd`, `wifid`, `mediad`, `telemetry`, `maind`, `fluent-bitd`, `fluent-bit`, `calld`, `begemot`, `bulbik`; без `--platformd` |
+| `yandex-noupdate.sh` | как на factory-6: ключ и заглушка ставятся, `updatesd` остаётся |
+| Правки корня | `mount -o remount,rw /` работает, правки переживают перезагрузку |
+| `ca-certificates.crt` | 2024 года: нет корня Let's Encrypt для `auth.openai.com`, см. ниже |
+
+- **ADB держится секунды.** Сразу после привязки `adbd` запускается, но первая же
+  настройка от настоящего бэкенда его выключает. Маркеры нужно закрепить `chattr +i` в
+  первые секунды — удобнее заранее запущенным циклом, который ждёт порт 5555. Сразу
+  создайте и маркеры новой схемы `/data/quasar/activate_*` — [шаг 1](../start/ssh.md#perm-adb):
+  после перехода на `0.369` ADB поднимется по ним.
+- **`updatesd` скачивает свежую прошивку в обход сервера обновлений.** Сервер lite-kit отвечал
+  `hasUpdate:false`, но через пару минут после привязки `updatesd` писал
+  `Has update: version: 0.374.1.31…` и качал образ с `*.svc.cdn.yandex.net` в
+  `/bkupgrade/update_<версия>.img`. Откуда колонка узнаёт об обновлении, не выяснено.
+  Скачивание блокирует пустой неизменяемый файл с тем же именем — `updatesd` пишет
+  `Cannot open … for writing`. Раздел `/ota` отдельный, файл переживает установку `0.369`:
+
+    ```sh
+    F=/ota/update_0.374.1.31.4854528605.20261113.165.img   # имя из updatesd.log
+    rm -f "$F"; touch "$F"; chattr +i "$F"
+    ```
+
+- **Quasar Bridge не работает.** Распознавание идёт, ответ приходит, но озвучка не
+  начинается: в `maind.log` последняя строка — `selectNextActivity skipped.
+  activeTtsDirective=…tts_play_placeholder`, затем `maind --cucumber` перезапускается, кольцо
+  горит фиолетовым. Вернуть Алису — `control.sh rollback` и перезагрузка. На `0.369` тот же
+  мост работает.
+- **Вход в ChatGPT у моста падает** с `ChatGPT authorization transport failed`, хотя
+  письмо о входе приходит: `auth.openai.com` подписан Let's Encrypt `YE2`, а корня нет в
+  `/system/vendor/quasar/ca-certificates.crt`. Помогает свой бандл (штатный плюс актуальный
+  `certifi`) в `/data/opt/quasar-bridge/` и строка `SSL_CERT_FILE=…` в `runtime.env`.
+  На `0.369` не нужно.
+- **Привязка по Bluetooth.** После сброса «Дом с Алисой» несколько раз подряд не находил
+  колонку («Не получилось подключить колонку по Bluetooth»): приложение сканировало, но не
+  подключалось. Помогало выдернуть и вставить питание колонки и повторить привязку.
+
+## Переход с factory на 0.369 { #factory-to-0369 }
+
+Ставит официальный подписанный образ `0.369` вручную: колонку с factory-образа сервер
+обновлений сам не переводит, а свежая прошивка не доверяет серверу lite-kit.
+
+**Проверено на:** Станция Миди, `factory-7` → `0.369.1.46.4778262955.20261013.160`,
+ноябрь 2026. Установка заняла около минуты, ADB и привязка к аккаунту сохранились.
+
+Шаги 1 и 4 автоматизирует [`midi-factory-to-0369.sh`](https://github.com/Marker284/yandex-station-extended/blob/main/contrib/midi-factory-to-0369.sh):
+`prepare` сразу после root (можно повторять), `install /ota/<образ>` после шага 3.
+
+1. Получите root на factory-образе, закрепите маркеры ADB обеих схем и заблокируйте
+   скачивание свежей прошивки — см. [factory-7](#factory-7).
+2. Скачайте образ `0.369.1.46.4778262955.20261013.160` для `cucumber` (ссылка — в
+   `metadata.json` на зеркале lite-kit) и сверьте CRC32 `3103154577`. Это пакет SWUpdate
+   (cpio: `sw-description`, `sw-description.sig`, `boot.img.encrypt`,
+   `dt.img.encrypt.padded`, `rootfs.ext4.gz`, `u-boot.bin.device.signed`), а не zip:
+   `install-firmware` из lite-kit такой файл отбраковывает по заголовку.
+3. Положите образ на колонку и сверьте MD5:
+
+    ```sh
+    adb push 0.369.1.46.4778262955.20261013.160.zip /ota/fw-0.369.swu
+    adb shell md5sum /ota/fw-0.369.swu   # b31b3b09242531e89a3877ece83519d1
+    ```
+
+4. Запустите установку так же, как это делает штатный `yandex-apply-ota` из `0.369`.
+   Скрипт запускается через `setsid`, иначе его остановит выход из `adb shell`:
+
+    ```sh
+    adb shell 'cat > /data/apply.sh <<EOF
+    #!/bin/sh
+    exec > /data/apply.log 2>&1
+    killall quasar_launcher2; sleep 5; killall -9 maind
+    mv /ota/fw-0.369.swu /ota/yandex_io_ota.swu
+    sync
+    umount /ota
+    /usr/bin/yandex-reboot recovery
+    EOF
+    chmod +x /data/apply.sh; setsid /data/apply.sh </dev/null >/dev/null 2>&1 &'
+    ```
+
+5. Через минуту колонка загрузится на `0.369`: `busybox` — v1.36.1 от 13.10.2026,
+   в `/ota/swupdate.log` — `SWUPDATE successful`, `/ota/swupdate.status` — `0`.
+6. Сразу [отключите обновления](#0369-ota), затем [SSH](../start/ssh.md).
+
+Как это устроено и что не работает:
+
+- Установку выполняет `S01swupdate` из раздела `recovery`. Туда колонка попадает только
+  по причине перезагрузки `recovery`: ядро Amlogic превращает её в
+  `reboot_mode=factory_reset`, и `switch_bootmode` в U-Boot запускает `recovery_from_flash`.
+  `/usr/bin/yandex-reboot <причина>` есть и на factory-7.
+- `reboot` и `reboot recovery` из BusyBox причину не передают — колонка просто
+  перезагружается, образ остаётся на месте.
+- Сброс кнопкой тоже заходит в recovery, но делает заводской сброс: образ в `/ota` не
+  ставится, колонка возвращается на factory-образ.
+- **Не используйте причину `update`**: в `switch_bootmode` Миди она ведёт в `usb_burning`.
+- Раздел `recovery` (`/dev/recovery`) — Android boot image с зашифрованным ramdisk
+  (Secure Boot), прочитать `S01swupdate` из дампа нельзя. Цепочка восстановлена по
+  `yandex-apply-ota` из `rootfs` образа `0.369` и по [Станции 3](station-3.md) с тем же SoC.
+
+## Обновления на 0.369 { #0369-ota }
+
+**Проверено на:** Станция Миди, `0.369.1.46.4778262955.20261013.160`, ноябрь 2026.
+
+Цепочка: `maind --updatesd` скачивает образ → `device_ota_update.sh` →
+`/usr/bin/apply_packed_ota` (симлинк на `yandex-apply-ota`) → `/etc/yandex-ota.conf`
+(`YANDEX_OTA_PATH=/ota/yandex_io_ota.swu`, `YANDEX_OTA_MOUNT_POINT=/ota`,
+`YANDEX_OTA_REBOOT_MODE=recovery`) → `yandex-reboot recovery`.
+
+Задачи в `launch.json`: `updatesd`, `mediad`, `telemetry`, `maind`, `fluent-bitd`, `bulbik`.
+Роли `--platformd` нет, поэтому `yandex-noupdate.sh` и здесь не убирает `updatesd`.
+
+Что сделано на колонке, всё через `mount -o remount,rw /` (оригиналы сохранены в `/data`):
+
+- `device_ota_update.sh` и `/usr/bin/yandex-apply-ota` заменены заглушками
+  (`logger …; exit 0`);
+- из `launch.json` убрана задача `updatesd` — правка копии, проверка JSON-парсером на ПК,
+  запись на место;
+- пустой неизменяемый `/ota/update_<версия>.img` для текущей прошивки Яндекса оставлен
+  с factory-7.
+
+После перезагрузки по питанию `updatesd` не запускается, правки корня сохраняются, ADB,
+SSH и Quasar Bridge поднимаются сами. Повторный сброс вернёт колонку на factory-образ.
+
 ## Что ещё проверить { #todo }
 
 - Формат кадра LED-framebuffer'ов и анимаций сегментов циферблата.
 - Zigbee: точная модель Telink и можно ли использовать его как полноценный
   Zigbee-координатор.
 - USB-C PD: что отдаёт `husb238`, профили питания.
-- Отключение OTA и правки корня на `0.369` (`verifiedbootstate=green`); на factory-6 правки
-  сохраняются, см. [factory-6](#factory-6).
-- Что стирает сброс к заводским настройкам: `/data` здесь — отдельный раздел eMMC.
+- Откуда factory-образ узнаёт о свежей прошивке, когда сервер обновлений отвечает
+  `hasUpdate:false` — см. [factory-7](#factory-7).
+- Сброс к заводским настройкам: колонка возвращается на factory-образ, `/data` и `/ota`
+  очищаются (маркеры, `/data/opt`, файлы в `/ota` пропадают). Из какого раздела берётся
+  factory-образ (`aml_sysrecovery`?), не проверялось.
 
 *Данные для этой страницы собрали **@egorsexy** и
 **[@chelik0002](https://github.com/chelik0002)** — спасибо за вклад.*
+
+*Разделы про [factory-7](#factory-7), [переход на 0.369](#factory-to-0369) и
+[обновления на 0.369](#0369-ota) — **[@pcmaster4u](https://github.com/pcmaster4u)**: проверено
+на своей колонке, исследование и тексты подготовлены с помощью ИИ (Claude).*
