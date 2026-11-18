@@ -100,7 +100,17 @@ async fn emit_all(sys: &Connection, pause: Option<(&Connection, &Connection)>, o
 
 pub async fn pause_mpris(mp: &Connection, name: &str) {
     eprintln!("bt-proxy: пауза {name}");
-    let _ = mp.call_method(Some(name), MPRIS_PATH, Some(MPRIS_PLAYER), "Pause", &()).await;
+    // Локальная правка: без ожидания ответа — пауза AirPlay ждёт телефон, а заведение нового устройства ждало её.
+    let Ok(b) = Message::method_call(MPRIS_PATH, "Pause") else { return };
+    let Ok(m) = b
+        .destination(name)
+        .and_then(|b| b.interface(MPRIS_PLAYER))
+        .and_then(|b| b.with_flags(zbus::message::Flags::NoReplyExpected))
+        .and_then(|b| b.build(&()))
+    else {
+        return;
+    };
+    let _ = mp.send(&m).await;
 }
 
 fn is_playing(d: &Dev) -> bool {
@@ -126,6 +136,16 @@ fn apply(st: &mut State, name: &str, identity: &str, p: &HashMap<String, OwnedVa
     let exists = st.devs.iter().any(|d| d.mpris == name);
     if !exists && playback.as_deref() != Some("Playing") {
         return Ok(out);
+    }
+    // Локальная правка: паузы — до заведения устройства, а не после: заведение — пять шагов по 400 мс,
+    // и всё это время прежний плеер играл поверх нового.
+    if playback.as_deref() == Some("Playing") && !st.devs.iter().any(|d| d.mpris == name && is_playing(d)) {
+        for other in st.devs.iter().filter(|d| d.mpris != name && is_playing(d)) {
+            out.push(Out::PauseMpris(other.mpris.clone()));
+        }
+        for real in &st.real_playing {
+            out.push(Out::PauseReal(real.clone()));
+        }
     }
     if !exists {
         // как настоящее подключение: Device1 (Connected=false) -> Connected=true -> MediaControl1 ->
@@ -153,14 +173,6 @@ fn apply(st: &mut State, name: &str, identity: &str, p: &HashMap<String, OwnedVa
         out.push(Out::Send(changed(&dev.path, "org.bluez.MediaControl1", ctl)?));
         out.push(Out::Wait(400));
         st.devs.push(dev);
-    }
-    if playback.as_deref() == Some("Playing") && !st.devs.iter().any(|d| d.mpris == name && is_playing(d)) {
-        for other in st.devs.iter().filter(|d| d.mpris != name && is_playing(d)) {
-            out.push(Out::PauseMpris(other.mpris.clone()));
-        }
-        for real in &st.real_playing {
-            out.push(Out::PauseReal(real.clone()));
-        }
     }
     let dev = st.devs.iter_mut().find(|d| d.mpris == name).expect("только что добавлено");
     if let Some(pb) = &playback {
@@ -343,6 +355,25 @@ pub async fn local(sys: &Connection, mp: &Connection, st: &Arc<Mutex<State>>, m:
             Message::method_return(&h)?.build(&())?
         }
         ("org.bluez.MediaPlayer1", "FastForward" | "Rewind") => Message::method_return(&h)?.build(&())?,
+        // Локальная правка: заиграл другой источник — maind отключает прежний, как настоящий телефон.
+        // Без ответа прежнее устройство висело подключённым, а новое maind не подключал (UnknownMethod).
+        // Устройство уходит сразу, плеер — на паузу; следующий Playing заведёт устройство заново.
+        ("org.bluez.Device1", "Disconnect") => {
+            eprintln!("bt-proxy: {mpris}.Disconnect");
+            let sigs = remove(&mut st.lock().unwrap(), |d| d.mpris == mpris)?;
+            emit(sys, sigs).await?;
+            if !crate::no_reply(m) {
+                sys.send(&Message::method_return(&h)?.build(&())?).await?;
+            }
+            // без ожидания ответа: пауза AirPlay ждёт телефон секунды, а этот цикл обслуживает всю шину maind
+            let pause = Message::method_call(MPRIS_PATH, "Pause")?
+                .destination(mpris.as_str())?
+                .interface(MPRIS_PLAYER)?
+                .with_flags(zbus::message::Flags::NoReplyExpected)?
+                .build(&())?;
+            let _ = mp.send(&pause).await;
+            return Ok(());
+        }
         ("org.freedesktop.DBus.Introspectable", "Introspect") => {
             let xml = "<node></node>";
             Message::method_return(&h)?.build(&(xml,))?
