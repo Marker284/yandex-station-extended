@@ -32,6 +32,11 @@
 
     Root, SSH, защита от обновлений, пакеты, восстановление.
 
+-   :material-help-circle: **[Частые вопросы (FAQ)](faq.md)**
+
+    Можно ли получить root на своей модели, как настроить DNS и что делать при ошибках.
+
+
 -   :material-lightbulb-on: **[Рецепты](recipes/index.md)**
 
     USB Host (флешки, Ethernet, наушники), AirPlay, свои звуки, Fastfetch, подсветка,
