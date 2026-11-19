@@ -153,6 +153,12 @@ python3 contrib/spotter_nnet.py acoustic_model.nnet
 с включённым режимом, неизвестно. Поэтому своё слово вызова на этой прошивке не задать:
 можно подменить только файл `nnet`, а инструментов обучения моделей этого формата нет.
 
+На Мини 2 (прошивка 0.369.1.46) активационная модель - обычный TFLite, и её можно заменить
+своей, обученной с нуля, со вторым словом вызова рядом с «Алиса». CKWS там тоже не включён:
+в движке есть строка `Calling CreateCustomActivation() without correct compilation flag`.
+Поэтому это подмена модели, а не слово текстом:
+[Своё слово вызова на Мини 2](../recipes/wake-word-mini2.md).
+
 [spotter-nnet]: https://github.com/Marker284/yandex-station-extended/blob/main/contrib/spotter_nnet.py
 
 ## 4. Активация → поток в облако (SpeechKit)

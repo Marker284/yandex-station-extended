@@ -44,6 +44,7 @@ RTC и выход на наушники.
 | YouTube Music | работает | [YouTube Music](../recipes/youtube-music.md) |
 | Своя LLM | работает (Alisa Voice: нативно и мост с Linux, по отчёту автора адаптации) | [ChatGPT Voice](../recipes/llm.md#chatgpt-web) |
 | Tailscale | работает | [Tailscale на колонке](../recipes/tailscale.md) |
+| Своё слово вызова | работает | [Своё слово вызова](../recipes/wake-word-mini2.md) |
 
 ## Получение root { #root }
 
