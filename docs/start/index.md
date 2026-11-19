@@ -22,7 +22,7 @@
 | **Fiero Hi** (партнёрская Лайт, `blackthorn`) | [DNS-метод](root.md) **через полный заводской сброс**: обычная `.50` не шлёт `get_sync_info`, factory-образ шлёт — см. [Fiero Hi](../devices/fiero-hi.md#root) |
 | **Мини 3 (bergamot)** | [сертификат и маркеры из factory](retail-ca-mini3.md) для сборок после 21.10.2026 — нужен свой сервер на компьютере; на старых сборках хватает подмены DNS |
 | **Лайт 2 (Plum)** | [сертификат из factory](retail-ca.md) — нужен компьютер с Linux: eQuasar, nginx и свой DNS |
-| Мини 3 Про | на заводской сборке `factory-12` root берётся [подменой DNS](root.md); на текущих `.50` способа нет — [что известно](../devices/station-mini3-pro.md#factory-12) |
+| Мини 3 Про | factory `.8`: [постоянный SSH только по ключу](pickle-factory12.md) после DNS-метода; `.22`: [результат сообщества](../devices/station-mini3-pro.md#factory-12); для `.50` способа нет |
 | **Мини 1 (2019)**, `YNDX-0004` | [свой образ по USB](root-mini1-usb.md) через Station Mini Root: без смены DNS и заводского сброса. Запасной путь — [подмена DNS](root.md) |
 | Станция 1-го поколения | [AliceBridge](root-android.md#station-1): постоянный root через свой образ `boot` |
 | **Станция Макс (YNDX-0008)** | [DNS-метод](root.md), затем [доступ по ADB](adb-max.md) сервисной утилитой: права действуют до перезагрузки; [постоянный root](../recipes/root-max.md#permanent-root) |
