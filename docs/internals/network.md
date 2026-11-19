@@ -64,3 +64,39 @@
 Локальный API, через который колонкой управляют приложения и интеграции (например,
 [YandexStation для Home Assistant](https://github.com/AlexxIT/YandexStation)). Протокол
 в этой вики пока не описан — см. исходники интеграции.
+
+### Что проверено на Станции 1 { #glagol-station1 }
+
+**Проверено на:** Станция 1, quasar 2.369.5.46, ноябрь 2026, клиент на самой колонке
+(`wss://127.0.0.1:1961`, самоподписанный сертификат).
+
+1. По OAuth-токену аккаунта (`Authorization: OAuth <токен>`) запрос
+   `https://quasar.yandex.net/glagol/device_list` возвращает устройства; у Станции 1
+   `platform` = `yandexstation`.
+2. `https://quasar.yandex.net/glagol/token?device_id=<DEVICE_ID>&platform=yandexstation`
+   выдаёт `conversationToken` для WebSocket.
+3. Сообщения — JSON вида
+   `{"conversationToken":"…","id":"<uuid>","sentTime":<мс>,"payload":{"command":"…"}}`;
+   ответ приходит с тем же `requestId` и полем `status` (`SUCCESS`), а в поле `state` —
+   `aliceState`, `playing`, `volume` (0…1) и `playerState` (название, исполнитель, позиция).
+
+| `payload` | Результат |
+|---|---|
+| `{"command":"sendText","text":"…"}` | Алиса выполняет фразу как голосовую команду |
+| `play`, `stop`, `next`, `prev` | управление плеером |
+| `{"command":"setVolume","volume":0.3}` | громкость |
+| `{"command":"control","action":"go_right"}` и другие `go_*` | `SUCCESS`, но экран Станции 1 не меняется |
+| `serverAction` со сценарием `quasar.iot.repeat_phrase` | Алиса произносит текст как есть, микрофон не открывается |
+| `serverAction` со сценарием `repeat_after_me` | на экран выводится вступление вроде «Ваша цитата: «…»», затем открывается микрофон |
+
+Произнести свой текст:
+
+```json
+{"command":"serverAction","serverActionEventPayload":{"type":"server_action",
+ "name":"update_form","payload":{"form_update":{
+ "name":"personal_assistant.scenarios.quasar.iot.repeat_phrase",
+ "slots":[{"type":"string","name":"phrase_to_repeat","value":"Текст"}]},"resubmit":true}}}
+```
+
+`sendText` не порождает событий распознавания в локальном IPC `aliced`: мосты, которые
+слушают IPC (SoundCloud, LLM), так проверить нельзя, только голосом.

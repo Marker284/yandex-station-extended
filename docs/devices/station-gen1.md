@@ -50,7 +50,7 @@
 | Обработанный микрофон | не проверялось | — |
 | Подсветка | не проверялось | — |
 | YAM | не проверялось | — |
-| Своя LLM | не проверялось | — |
+| Своя LLM | работает (свой мост по схеме llm-alice) | [своя LLM](../recipes/llm.md#llm-alice-station1) |
 
 ## Получение root { #root }
 
@@ -70,6 +70,94 @@ SHA-256 записанного раздела и перезагружает ко
 - **glagol** — тот же локальный API на `:1961` (WebSocket/TLS), как на всех Станциях.
 - Энтузиасты ставят свои бинарники в `/data/local/bin` (Android-путь) — например,
   `zsh`, `fastfetch`; можно поднять свой dropbear-SSH.
+
+### Вход по SSH-ключу в Dropbear от AliceBridge { #ssh-key }
+
+**Проверено на:** Станция 1, Android 6.0.1 (`MOB30J`), quasar 2.369.5.46, Dropbear 2022.82
+из AliceBridge (`/data/dropbear/start.sh`, порт 22), ноябрь 2026.
+
+Dropbear из AliceBridge собран с musl и берёт домашний каталог root из `/etc/passwd`, а там
+он равен `/data`. Каталог `/data` принадлежит `system` и доступен на запись группе, поэтому
+Dropbear отклоняет ключ из `/data/.ssh/authorized_keys` и пускает только по паролю.
+Bionic `/etc/passwd` не читает, поэтому подмена файла затрагивает только Dropbear.
+
+1. Создайте отдельный домашний каталог с ключом:
+
+    ```sh
+    mkdir -p /data/root/.ssh && chmod 700 /data/root /data/root/.ssh
+    cat > /data/root/.ssh/authorized_keys   # вставьте публичный ключ, затем Ctrl+D
+    chmod 600 /data/root/.ssh/authorized_keys
+    ```
+
+2. Сделайте копию `passwd`, в которой у root домашний каталог `/data/root`:
+
+    ```sh
+    sed 's#^\(root:[^:]*:0:0:[^:]*:\)[^:]*#\1/data/root#' /system/etc/passwd \
+      > /data/dropbear/passwd.home && chmod 644 /data/dropbear/passwd.home
+    ```
+
+3. В `/data/dropbear/start.sh` **до** строки запуска Dropbear добавьте подмену:
+
+    ```sh
+    /sbin/busybox grep -q "^root:[^:]*:0:0:[^:]*:/data/root:" /etc/passwd || \
+      { [ -f /data/dropbear/passwd.home ] && \
+        /sbin/busybox mount -o bind /data/dropbear/passwd.home /system/etc/passwd; }
+    ```
+
+4. Перезагрузите колонку и проверьте вход по ключу. Пароль остаётся запасным входом.
+
+Откат: удалите строки из `start.sh` и перезагрузите колонку. Переустановка SSH из приложения
+AliceBridge перезаписывает `start.sh`, после неё строки нужно добавить снова.
+
+### Android-команды по SSH { #android-env }
+
+В SSH-сессии нет переменных окружения Android (`BOOTCLASSPATH`, `ANDROID_ROOT` и других),
+поэтому `am`, `pm`, `input` и `wm` падают с кодом 134. Переменные можно взять у системного
+процесса `netd`:
+
+```sh
+for kv in $(/sbin/busybox tr "\000" "\n" < /proc/$(/sbin/busybox pidof netd)/environ |
+  /sbin/busybox grep -E "^(ANDROID_[A-Z_]*|BOOTCLASSPATH|SYSTEMSERVERCLASSPATH|EXTERNAL_STORAGE|ASEC_MOUNTPOINT)="); do
+  export "$kv"
+done
+```
+
+После этого работают `am start`, `input keyevent`, `pm list packages` и `screencap`
+(в том числе без HDMI).
+
+### Открытые порты { #ports }
+
+Снято на той же колонке после AliceBridge (`netstat -ltnp`):
+
+| Порт | Кто слушает | Замечание |
+|---|---|---|
+| `0.0.0.0:22` | Dropbear из AliceBridge | вход root по паролю или ключу |
+| `0.0.0.0:5555` | `adbd` | ADB доступен из всей локальной сети, AliceBridge проверяет его состояние |
+| `:::1961` | `maind` | [glagol](../internals/network.md#glagol) |
+| `0.0.0.0:5081` | `maind` | [звонки Алисы (SIP)](../internals/calls.md) |
+| `127.0.0.1:98xx`, `11124` | службы quasar | локальный IPC, например `aliced` на `9875` (порт берётся из `quasar.cfg`) |
+
+!!! warning "ADB открыт для всей сети"
+    Если ADB после настройки SSH не нужен, учитывайте, что любой узел в вашей сети видит
+    порт 5555. Требует ли `adbd` подтверждения ключа на этой сборке, не проверялось.
+
+### Экран без HDMI { #screen }
+
+**Проверено на:** та же колонка, HDMI не подключён.
+
+- `screencap -p` работает и без монитора, но кадр 1920×1080 в PNG занимает около 2 с.
+- Быстрее — скрытый API `android.view.SurfaceControl.screenshot(int, int)` из программы,
+  запущенной от root через `app_process`: кадр 960×540 получается за ~25 мс, сжатие в JPEG
+  (`Bitmap.compress`) — ещё ~50 мс, то есть 6–10 кадров в секунду.
+- Ввод через `InputManager.injectInputEvent` (тапы, свайпы, клавиши, текст латиницей через
+  `KeyCharacterMap`) работает в обычных Android-приложениях, например в браузере.
+- Экран Алисы (`ru.yandex.quasar.app`, он же домашний экран) на касания, D-pad и `Home` не
+  реагирует — ни на внедрённые события, ни на `input` из оболочки. Срабатывает только `Back`,
+  и то для приложений поверх него. Команда glagol `{"command":"control","action":"go_right"}`
+  возвращает `SUCCESS`, но экран не меняется. Управлять экраном Алисы можно только фразами
+  — командой `sendText` через [glagol](../internals/network.md#glagol).
+- Приложения запускаются поверх Алисы через `am start -n <пакет>/<активность>`, вернуть её экран
+  можно через `am start -a android.intent.action.MAIN -c android.intent.category.HOME`.
 
 ## Чем отличается { #differences }
 
@@ -173,5 +261,5 @@ ALSA-карты: `audiocodec`, `snddaudio1` (карта 1, усилители, I
 ## Что ещё проверить { #todo }
 
 - Влияние SELinux-политики на root из AliceBridge.
-- Обход/отключение OTA на Android-платформе (механизм иной, чем `maind --updatesd`).
+- Требует ли `adbd` на `:5555` подтверждения ключа после AliceBridge.
 - Формат прошивки Allwinner (Tina/`tinaos`) и разделы `lback`/`rboot`/`media_data`.
