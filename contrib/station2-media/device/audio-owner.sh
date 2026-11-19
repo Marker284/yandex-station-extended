@@ -38,7 +38,12 @@ sp_holds_pcm() { holds_pcm "$(sp_pid)"; }
 
 # librespot держит spotify-sink.sh только пока играет: на паузе он его убивает.
 # Ищем по «/bin/sh …»: голый путь к скрипту есть и в командной строке самого librespot.
-spotify_playing() { [ -n "$(pids_matching "$SPOTIFY_SINK")$(pids_matching "/bin/sh $AP/spotify-sink.sh")" ]; }
+# Soloist (soloist/soloist.sh) пишет состояние в /run/soloist/state: его приёмник сначала
+# отбирает устройство у медиа-демона, и без этой проверки распорядитель успевал вернуть Алису.
+spotify_playing() {
+  case "$(cat /run/soloist/state 2>/dev/null)" in playing|buffering) return 0 ;; esac
+  [ -n "$(pids_matching "$SPOTIFY_SINK")$(pids_matching "/bin/sh $AP/spotify-sink.sh")" ]
+}
 
 # ytmd.py держит ytm-sink.sh, пока трек играет; между треками его на миг нет, поэтому
 # смотрим и на метку /tmp/ytm.playing — ytmd пишет в неё время каждые 3 с и стирает на паузе

@@ -1,0 +1,4 @@
+# PulseAudio для Soloist: один выход в FIFO, его читает sink.sh
+load-module module-native-protocol-unix socket=/run/soloist/pulse.sock auth-anonymous=1
+load-module module-pipe-sink file=/run/soloist/pcm.fifo format=s16le rate=44100 channels=2 sink_name=fifo use_system_clock_for_timing=yes
+set-default-sink fifo
