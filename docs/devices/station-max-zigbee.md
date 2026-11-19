@@ -56,7 +56,7 @@ dmesg | grep -i 'GPU identified'
 
 | Что | Состояние | Где описано |
 |---|---|---|
-| Root и SSH | частично (ADB до перезагрузки, постоянного root и SSH нет) | [ADB Max](../start/adb-max.md) |
+| Root и SSH | частично: временный root до перезагрузки | [DNS-метод](../start/root.md), [ADB Max](../start/adb-max.md), [постоянный root](../recipes/root-max.md#permanent-root) |
 | AirPlay | не проверялось | — |
 | Spotify Connect | не проверялось | — |
 | Плеер как Bluetooth-источник | не проверялось | — |
@@ -65,10 +65,16 @@ dmesg | grep -i 'GPU identified'
 | Подсветка | не проверялось | — |
 | YAM | не проверялось | — |
 | Своя LLM | не проверялось | — |
+| Голосовой спутник Home Assistant | работает (pulsar-max) | [спутник HA на Макс](../recipes/max-home-assistant.md) |
+| Music Assistant | работает (pulsar-max) | [спутник HA на Макс](../recipes/max-home-assistant.md#music-assistant) |
 
 <a id="access"></a>
 ## Получение root { #root }
 
+- **Временный root:** ADB по сети открывает [DNS-метод](../start/root.md), повышенные права
+  до перезагрузки даёт [ADB Max](../start/adb-max.md).
+- **Постоянный root:** известные способы собраны в разделе
+  [«Постоянный рут»](../recipes/root-max.md#permanent-root).
 - **Root «из коробки» нет:** AVB 1.1 + dm-verity `enforcing` + SELinux `enforcing`,
   `ro.secure=1`, `ro.adb.secure=1`, `ro.boot.vbmeta.device_state=locked`,
   `ro.boot.rh_unlock=0`.

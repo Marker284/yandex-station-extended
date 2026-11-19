@@ -37,8 +37,8 @@ Amlogic-поколениям (с поправкой на версию ядра; 
 | Станция Миди | `yandex,cucumber-dvt2` | Amlogic A5 (A55) | [подмена DNS](../start/root.md) | [Миди](station-midi.md) |
 | Станция 2 | `yandex,station-midi` ⚠️ | Amlogic AXG | [подмена DNS](../start/root.md) | [Станция 2](station-2.md) |
 | Станция Стрит | `Yandex Station Mango DVT` | Amlogic A1 (A35, 32-бит) | [подмена DNS](../start/root.md) | [Стрит](station-street.md) |
-| Станция Макс | `yandexstation_2` ⚠️ | Amlogic + Android 9 | [ADB до перезагрузки](../start/adb-max.md) | [Макс](station-max.md) |
-| Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | [ADB до перезагрузки](../start/adb-max.md) | [Макс с Zigbee](station-max-zigbee.md) |
+| Станция Макс | `yandexstation_2` ⚠️ | Amlogic + Android 9 | [DNS-метод](../start/root.md) + [ADB Max](../start/adb-max.md); [постоянный root](../recipes/root-max.md#permanent-root) | [Макс](station-max.md) |
+| Станция Макс с Zigbee (`YNDX-00052`) | `yandexstation_2` ⚠️ | Amlogic S905X2 + Android 9 | [DNS-метод](../start/root.md) + [ADB Max](../start/adb-max.md); [постоянный root](../recipes/root-max.md#permanent-root) | [Макс с Zigbee](station-max-zigbee.md) |
 | Станция (1-го поколения) | `tulip-d1` | Allwinner R18 (sun50iw1) | [AliceBridge](../start/root-android.md#station-1) | [Станция gen1](station-gen1.md) |
 | Умный хаб Яндекса (не колонка) | `yandex,saturn` | Amlogic AXG | [подмена DNS](../start/root.md) | [Умный хаб](yandex-hub.md) |
 | Станция Мини 3 | `yandex,bergamot` (bergamot) | Amlogic AXG | [сертификат и маркеры](../start/retail-ca-mini3.md) | [Мини 3](station-mini3.md) |

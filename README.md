@@ -71,7 +71,7 @@
 | Станция 1-го поколения | ✅ | [AliceBridge](https://hackalice.me/start/root-android/#station-1) |
 | JBL Link Music (с Алисой) | ✅ | [ADB по USB на старте](https://hackalice.me/start/root-jbl-link-music/) |
 | Мини 3 Про | 🟡 | [только закрепление доступа](https://hackalice.me/devices/station-mini3-pro/) |
-| Станция Макс (`YNDX-0008`) | 🟡 | [ADB Max](https://hackalice.me/start/adb-max/): разовые команды с повышенными правами, постоянного root нет (dm-verity). Вариант с Zigbee (`YNDX-00052`) — [своя страница](https://hackalice.me/devices/station-max-zigbee/) |
+| Станция Макс (`YNDX-0008`) | 🟡 | [DNS-метод](https://hackalice.me/start/root/) и [ADB Max](https://hackalice.me/start/adb-max/): права до перезагрузки; [постоянный root](https://hackalice.me/recipes/root-max/#permanent-root). Вариант с Zigbee (`YNDX-00052`) — [своя страница](https://hackalice.me/devices/station-max-zigbee/) |
 
 Актуальная таблица — на сайте: [какой способ для вашей колонки](https://hackalice.me/start/#root-by-model).
 Нет вашей модели? [Пришлите данные](https://github.com/Marker284/yandex-station-extended/issues/new/choose).
