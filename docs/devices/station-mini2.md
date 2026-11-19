@@ -38,11 +38,11 @@ RTC и выход на наушники.
 | Spotify Connect | не проверялось | — |
 | Плеер как Bluetooth-источник | не проверялось | — |
 | Свои звуки | не проверялось | — |
-| Обработанный микрофон | не проверялось | — |
+| Обработанный микрофон | работает (нативный GPT и Linux-мост, по отчёту автора адаптации) | [VQE-выход на ПК](../recipes/microphone.md) |
 | Подсветка | работает | [Подсветка](../recipes/led.md) |
 | YAM | работает | [профиль mini2](../recipes/packagemanagers.md) |
 | YouTube Music | работает | [YouTube Music](../recipes/youtube-music.md) |
-| Своя LLM | работает | [Своя LLM](../recipes/llm.md) |
+| Своя LLM | работает (Alisa Voice: нативно и мост с Linux, по отчёту автора адаптации) | [ChatGPT Voice](../recipes/llm.md#chatgpt-web) |
 
 ## Получение root { #root }
 

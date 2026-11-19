@@ -1,4 +1,4 @@
-# Обработанный микрофон Лайт 2
+# Обработанный микрофон Лайт 2 и Мини 2
 
 Передача штатного канала `vqe_0` на Linux-ПК для внешнего голосового ассистента.
 Это выход после обработки VQE, выбранный в конфигурации как вход Алисы.
@@ -9,9 +9,13 @@
 У этой конфигурации два микрофонных канала и один опорный канал динамика на входе 48 кГц;
 обработанный выход — моно 16 кГц. Число каналов других моделей нужно проверять отдельно.
 
-В Alisa Voice 0.3.3 обработанный микрофон также используется нативным клиентом Станции 2
-по [результатам автора адаптации][station2]. Это не передача звука на ПК:
-мост из этой инструкции по-прежнему доступен только на Лайт 2.
+В Alisa Voice 0.3.7 мост также доступен на Мини 2. По [проверке автора адаптации][mini2]
+от 4 ноября 2026 года, передача VQE и голосовой ответ работают на прошивке
+`0.369.1.46.4793643989.20261020.299`. Число входных каналов Лайт 2 на неё не переносится.
+
+Нативные клиенты [Станции 2][station2] и [Мини 3][mini3] тоже используют обработанный
+микрофон по отчётам авторов адаптаций. Передача звука с этих моделей на ПК не проверена;
+мост для них не допускается.
 
 ## Запуск готового моста { #vqe-start }
 
@@ -21,7 +25,8 @@
 1. Настройте [root и SSH](../start/ssh.md) на колонке.
 2. Установите [Alisa Voice][bridge] по [инструкции](llm.md#chatgpt-setup).
    Выберите режим «Мост». Нужны Linux-ПК с PipeWire-Pulse или совместимым PulseAudio,
-   Python 3.10+ и Chromium; на колонке — штатный Quasar, `socat` и `aplay`.
+   Python 3.10+, Chromium, Xvfb и xauth; на колонке — штатный Quasar, socat и aplay.
+   На Мини 2 socat также ищется в каталоге `/data/opt/entware/bin`.
    Компилятор для готового пакета не нужен.
 3. Если требуется только микрофон для другого приложения, пропустите вход в ChatGPT
    и тест его голосового ответа в мастере. Для захвата звука этот аккаунт не нужен.
@@ -38,7 +43,7 @@
     ```
 
 В состоянии должны быть `microphone_source: vqe` и `microphone_rate: 16000`.
-Виртуальный источник для приложений на ПК называется "alice_station_mic".
+Виртуальный источник для приложений на ПК называется «alice_station_mic».
 CLI выбирает VQE по умолчанию; переменная окружения в службе не требуется.
 Автозапуск настраивается в меню «Настройки» режима «Мост».
 
@@ -99,9 +104,11 @@ CLI выбирает VQE по умолчанию; переменная окру�
   в [«Голосовой тракт Алисы → Проверенный uplink VoiceInput»](../internals/voice.md#voiceinput-uplink).
 
 [bridge]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant
-[vqe-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/engines/bridge/station/vqe_tap.c
-[build-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/engines/bridge/scripts/build.py
-[vqe-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/engines/bridge/tests/test_vqe_tap.py
-[firmware-policy]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/docs/firmware-compatibility.md
+[vqe-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/engines/bridge/station/vqe_tap.c
+[build-source]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/engines/bridge/scripts/build.py
+[vqe-tests]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/engines/bridge/tests/test_vqe_tap.py
+[firmware-policy]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/docs/firmware-compatibility.md
 
-[station2]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.3/docs/firmware-compatibility.md#яндекс-станция-2-yandexmidi
+[station2]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/docs/firmware-compatibility.md#яндекс-станция-2-yandexmidi
+[mini2]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/docs/mini2.md
+[mini3]: https://github.com/rison1337/Alisa-ChatGPT-voice-assistant/blob/v0.3.7/docs/mini3.md
