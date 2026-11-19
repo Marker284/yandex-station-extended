@@ -50,7 +50,7 @@ otg_device=1 no_console_suspend printk_no_block ramoops.pstore_en=1 ...
 | Root и SSH | работает | [подмена DNS](../start/root.md) |
 | USB Host (OTG) | работает | [USB Host](../recipes/usb-host.md) |
 | AirPlay | не проверялось | — |
-| Spotify Connect | не проверялось | — |
+| Spotify Connect | работает через Spotify Soloist (на одном аккаунте) | [Soloist на Лайт](../recipes/station-lite-spotify-soloist.md) |
 | Плеер как Bluetooth-источник | работает | [bt-proxy](../recipes/bt-proxy.md) |
 | Свои звуки | работает | [Свои звуки](../recipes/sounds.md) |
 | Обработанный микрофон | работает | [VQE и full-duplex](#vqe) |
