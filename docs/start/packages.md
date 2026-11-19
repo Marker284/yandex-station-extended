@@ -111,7 +111,7 @@ my      https://raw.githubusercontent.com/<you>/<repo>/registry/index.json
 
 | Модель | Архитектура Entware |
 |---|---|
-| Лайт, Лайт 2, Мини 2, Мини 3, Станция 2, Миди, Станция 3 | `aarch64-k3.10` (проверено на Лайт и Станции 3) |
+| Лайт, Лайт 2, Мини 2, Мини 3, Станция 2, Миди, Станция 3 | `aarch64-k3.10` (проверено на Лайт, Станции 3 и Миди) |
 | Стрит | `armv7sf-k3.2` |
 | Макс, Станция 1-го поколения | не подходит (Android, нет root) |
 
@@ -147,6 +147,30 @@ my      https://raw.githubusercontent.com/<you>/<repo>/registry/index.json
     После этого `opkg update` и `yse install` (оба источника, `ent:` и `yap:`) проходят без
     ошибок. Проверено на Станции 3 (`factory-13`, 04.11.2026) — установка `tmux` (`ent:`) и
     `htop`/`jq` (`yap:`) прошла полностью.
+
+!!! warning "Миди (64-битный системный userspace): та же ошибка из-за `LD_LIBRARY_PATH` в старом `yse`"
+    На Миди (`cucumber`) системный userspace — тоже aarch64, поэтому та же ошибка
+    возникает ещё по одной причине: старые версии `yse` вызывают `opkg`/`curl`/`wget`
+    с `LD_LIBRARY_PATH=/opt/lib`; glibc 2.27 из Entware подменяет системную 2.30,
+    и в этом окружении падают уже **системные** бинарники — `wget` и даже `/bin/sh`:
+
+    ```text
+    /bin/sh: /opt/lib/libc.so.6: version `GLIBC_2.28' not found (required by /bin/sh)
+    ```
+
+    На 32-битных моделях (Лайт, Мини 2) этот экспорт безвреден: 32-битный
+    загрузчик пропускает 64-битные библиотеки Entware и подхватывает системные.
+    В репозитории бинарников переменная уже убрана; для старых установок лечение —
+    убрать её руками и поставить шим для `wget` (статический busybox не зависит
+    от окружения):
+
+    ```sh
+    /bin/busybox sed -i 's|LD_LIBRARY_PATH="$OPT/lib" ||g' /data/opt/bin/yse
+    printf '#!/bin/sh\nexec /bin/busybox wget "$@"\n' > /opt/bin/wget && chmod +x /opt/bin/wget
+    ```
+
+    Проверено на Миди (`.165`, 13.11.2026): `opkg update`, `yse install htop jq
+    curl` (`ent:`) и `yse install yap:btop` — без ошибок.
 
 ## Удалить { #uninstall }
 
