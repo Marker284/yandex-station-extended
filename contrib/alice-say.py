@@ -87,6 +87,11 @@ def vocalize_frame(text):
     return rpc_frame(8, integer(1, 18) + integer(3, 1) + byte_field(13, directive))
 
 
+def cancel_frame():
+    # CANCEL_DIALOG_AND_CLEAR_QUEUE=6: прервать текущий диалог и очистить очередь.
+    return rpc_frame(8, integer(1, 6))
+
+
 def ssh_command(host):
     if not host or host.startswith('-') or any(char.isspace() for char in host):
         raise ValueError('Нужен настроенный SSH-псевдоним без пробелов.')
@@ -97,7 +102,7 @@ def ssh_command(host):
             'PATH="$PATH:/opt/bin" exec socat STDIO TCP:127.0.0.1:9875,connect-timeout=2']
 
 
-async def speak(host, text, timeout):
+async def speak(host, text, timeout, interrupt=False):
     proc = await asyncio.create_subprocess_exec(
         *ssh_command(host), stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
@@ -106,6 +111,8 @@ async def speak(host, text, timeout):
         async with asyncio.timeout(timeout):
             # Keep the subscription and request on the same live IPC connection.
             subscribe = rpc_frame(20, byte_field(1, b'AliceCapability'))
+            if interrupt:
+                subscribe += cancel_frame()
             proc.stdin.write(subscribe + vocalize_frame(text))
             await proc.stdin.drain()
             while True:
@@ -153,6 +160,8 @@ def main(argv=None):
     parser.add_argument('--host', default='alice', help='Настроенный SSH-псевдоним колонки')
     parser.add_argument('--timeout', type=float, default=30, help='Ожидание, от 3 до 120 секунд')
     parser.add_argument('--dry-run', action='store_true', help='Проверить запрос без подключения')
+    parser.add_argument('--interrupt', action='store_true',
+                        help='Прервать текущий ответ колонки перед озвучкой')
     args = parser.parse_args(argv)
     if not args.text.strip() or len(args.text) > 2000:
         parser.error('Нужна непустая фраза длиной до 2000 символов.')
@@ -163,7 +172,7 @@ def main(argv=None):
         if args.dry_run:
             print(f'Запрос собран: {len(vocalize_frame(args.text))} байт; подключения не было.')
         else:
-            asyncio.run(speak(args.host, args.text, args.timeout))
+            asyncio.run(speak(args.host, args.text, args.timeout, args.interrupt))
     except TimeoutError:
         parser.exit(1, 'Нет подтверждения завершения за отведённое время.\n')
     except asyncio.IncompleteReadError:
