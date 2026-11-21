@@ -214,6 +214,7 @@ nav:
       - Подводные камни: internals/gotchas.md
       - Wi-Fi после AliceBridge: internals/station1-wifi-rollback.md
       - Сборка софта: internals/toolchain.md
+      - Шифрование U-Boot, ядра, и Device Tree на Amlogic: internals/encryption-aml.md
   - Словарь: glossary.md
   - Как дополнять вики: contributing.md
   - Участники: contributors.md
