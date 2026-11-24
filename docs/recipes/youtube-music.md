@@ -128,6 +128,12 @@ ytm-alice status
   JBL Link Portable с прошивкой 2021 года есть
   [патч ytm-alice](https://github.com/lemeshovich/jbl-link-portable-hackalice/blob/main/docs/ru/09-ytm-alice-port.md),
   на других моделях он не проверялся.
+### С приложения { #cli }
+Установка
+Готовый APK https://github.com/gfkfkf/ytm-alice-remote/releases/download/v1.0.0/ytm-alice-remote-1.0.0.apk
+Передайте файл на телефон и откройте его (разрешите установку из неизвестных источников для файлового менеджера/браузера).
+На первом экране введите адрес Станции, например 192.168.1.50:24721, либо нажмите «Найти Станцию в сети».
+«Подключиться» — откроется панель.
 
 ## Откат { #rollback }
 
