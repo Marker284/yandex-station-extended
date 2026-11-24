@@ -153,7 +153,7 @@ my      https://raw.githubusercontent.com/<you>/<repo>/registry/index.json
 ```sh
 for c in /data/opt/bin/*; do grep -q '^# yse-yap ' "$c" 2>/dev/null && rm "$c"; done   # запускалки .yap
 rm -rf /data/opt/bin/yse /data/opt/entware /data/opt/yap /data/opt/var/yse /data/opt/etc/yse
-mount -o remount,rw / && rm /opt && mkdir /opt && sync && mount -o remount,ro /
+mount -o remount,rw / && rm -r /opt && mkdir /opt && sync && mount -o remount,ro /
 ```
 
 ## Как это устроено
