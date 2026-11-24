@@ -95,7 +95,7 @@ adb devices
     Скрипт `contrib/yandex-noupdate.sh` копируется с компьютера. Если текущий каталог в
     терминале другой, `adb push` не найдёт файл и колонка выдаст ошибку
     `can't open '/data/opt/yandex-noupdate.sh'`.
-    Перед выполнением перейдите в корень клонированного репозитория.
+    Перед выполнением перейдите в корень клонированного [репозитория](https://github.com/Marker284/yandex-station-extended).
 
 ```sh
 adb push contrib/yandex-noupdate.sh /data/opt/yandex-noupdate.sh
