@@ -496,6 +496,33 @@ Gemini, ноябрь 2026. По [данным пользователя](https://
 [на странице проекта](https://github.com/lemeshovich/jbl-link-portable-hackalice/blob/main/docs/ru/14-llm-alice.md). Нужны root, SSH и автозапуск, например
 [как для JBL Link Portable](../start/root-jbl-link-portable.md).
 
+
+### Станция 1 { #llm-alice-station1 }
+
+**Проверено на:** Станция 1, Android 6.0.1 (`MOB30J`), quasar 2.369.5.46, AliceBridge,
+Gemini через OpenAI-совместимый API, ноябрь 2026. Голосовой вопрос — ответ голосом Алисы.
+
+- **Quasar Bridge** на Станции 1 не пробовали: его установщик перемонтирует `/` на запись и
+  правит `quasar.cfg`, а здесь `system` под dm-verity. **ChatGPT Voice** Станцию 1 не
+  поддерживает.
+- Схема llm-alice на Станции 1 работает, но готовый бинарник собран под Linux-колонки, поэтому
+  мост написан заново на Java (`app_process`) из уже проверенных здесь частей:
+    - фразы — из IPC `aliced` (порт из `quasar.cfg`, кадры `uint32 LE длина + protobuf`),
+      так же, как в голосовом мосте [SoundCloud](station1-soundcloud.md): события типа 210
+      (`AliceCapability`, поле 18 → 2) и типа 3, состояние в поле 1, текст фразы в поле 2;
+    - отмена ответа Алисы — конверт 210 с `AliceCapability` и методом 6
+      (`CANCEL_DIALOG_AND_CLEAR_QUEUE`), тоже как в мосте SoundCloud;
+    - ответ модели произносится через glagol сценарием `quasar.iot.repeat_phrase`
+      — см. [glagol на Станции 1](../internals/network.md#glagol-station1).
+- Из России API Gemini доступен только через VPN, но и через VPN Google отвечает
+  `User location is not supported` для многих выходов: в подписке на 47 серверов запросы
+  принимали 6–8. Помогает проверить серверы заранее и направлять `googleapis.com` только через
+  подходящие (`gemini-test.sh` в
+  [`contrib/station1-soundcloud/xray/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-soundcloud/xray)).
+- Бесплатный Gemini в часы нагрузки отвечает `503` («high demand») или молчит десятки секунд;
+  удачный ответ — 1,5–3,5 с. Мосту стоит перебирать несколько моделей с коротким тайм-аутом
+  на попытку и говорить «Секундочку», если ответа нет несколько секунд.
+
 ## Что пока не исследовано { #open }
 
 - Как отличить обычный разговор от команды умного дома внутри голосового соединения.

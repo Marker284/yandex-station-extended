@@ -74,6 +74,66 @@ sh /data/station1-soundcloud/vless.sh
 Пульт использует то же исправление REALITY: на Android 6 значение `spx=%2F`
 нормализуется в `spx=/`. Файл установщика не содержит пользовательских ключей.
 
+## Подписка вместо одного ключа: Xray только для NewPipe { #xray }
+
+**Проверено на:** Станция 1, Android 6.0.1 (`MOB30J`), quasar 2.369.5.46, AliceBridge,
+Xray-core 26.11.9 (android-arm64), подписка Remnawave на 86 серверов, ноябрь 2026.
+Голосом запущен трек, трафик NewPipe прошёл через туннель, Алиса работала напрямую.
+
+Когда нужен этот вариант:
+
+- VPN выдан **подпиской** для Happ/INCY, а не одним ключом. Такие панели (Remnawave и похожие)
+  без заголовков `x-hwid`, `x-device-os`, `x-ver-os`, `x-device-model` отдают заглушку
+  «Включите отправку HWID», а с ними — массив готовых конфигов Xray (JSON), а не ссылки VLESS.
+- v2rayNG 1.9.45 (ядро Xray 25.3) с серверами такой подписки получает `closed pipe`, хотя Happ
+  на соседнем телефоне работает. Новый v2rayNG требует Android 7.
+- VPN v2rayNG заворачивает в туннель **всю** колонку: когда сервер перестал отвечать, Алиса
+  тоже потеряла связь. Здесь в туннель идёт только NewPipe.
+
+Шаги (в терминале AliceBridge или по SSH):
+
+1. Отключите автозапуск VPN v2rayNG, голосовой мост SoundCloud при этом остаётся:
+
+    ```sh
+    sh /data/station1-soundcloud/install-soundcloud.sh vpn-autostart off
+    ```
+
+2. Положите Xray и скрипты из
+   [`contrib/station1-soundcloud/xray/`](https://github.com/Marker284/yandex-station-extended/tree/main/contrib/station1-soundcloud/xray)
+   в `/data/xray` (права `700`, бинарник — `/data/xray/xray`, см. README там же).
+3. Сохраните адрес подписки, не оставляя его в истории команд, и запустите первую настройку:
+
+    ```sh
+    umask 077; cat > /data/xray/sub.url    # вставьте адрес, Enter, затем Ctrl+D
+    sh /data/xray/run.sh setup
+    ```
+
+    В конце должно быть `test https://soundcloud.com/ 200`.
+4. Добавьте автозапуск в `/data/dropbear/start.sh`:
+
+    ```sh
+    [ -x /data/xray/run.sh ] && /sbin/busybox setsid /system/bin/sh /data/xray/run.sh boot </dev/null >>/data/xray/boot.log 2>&1 &
+    ```
+
+Как это устроено:
+
+- Xray слушает `127.0.0.1:12345` (`dokodemo-door` с `followRedirect`), а правило
+  `iptables -t nat ... -m owner --uid-owner <UID NewPipe> -j REDIRECT` направляет туда только
+  TCP NewPipe. Локальные сети исключены. Порт `127.0.0.1:10808` — SOCKS для проверок.
+- В конфиг попадают **все** серверы подписки за балансировщиком `leastPing` с проверкой
+  `burstObservatory`. Проверять нужно запросом к самому SoundCloud
+  (`https://api-v2.soundcloud.com/`), а не `gstatic.com`: часть серверов подписки пропускает
+  `gstatic`, но не CloudFront, на котором SoundCloud, и с такой проверкой балансировщик выбирал
+  сервер, через который NewPipe не мог открыть ни одной страницы.
+- `watch.sh` раз в минуту проверяет SoundCloud через туннель и обновляет подписку раз в 12 часов,
+  а если туннель не отвечает три проверки подряд — сразу, но не чаще раза в 20 минут.
+- Подписка приходит одной строкой на 2,4 МБ, а `awk` и `sed` из BusyBox 1.20 разбирают такую
+  строку за квадратичное время (за 13 минут не закончили). Разбор идёт через `fold -w 256` и
+  `extract.awk` за ~30 секунд. См. [подводные камни](../internals/gotchas.md#station1-busybox).
+
+Откат: `sh /data/xray/run.sh stop`, удалите строку из `start.sh`, включите обратно автозапуск
+VPN v2rayNG (`vpn-autostart on`).
+
 ## Голосовые команды { #voice }
 
 Примеры:
