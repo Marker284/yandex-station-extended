@@ -1,0 +1,21 @@
+#!/bin/sh
+# Autostart dropbear SSH on :2222 (delete this file to remove).
+DB=/data/opt/bin/dropbear
+DIR=/data/opt/etc/dropbear
+HK=$DIR/hk_ed25519
+LOG=$DIR/dropbear.log
+start() {
+  [ -x "$DB" ] || { echo "$(date) no $DB" >> "$LOG"; return 1; }
+  # host key lost (e.g. /data wiped) -> make a new one
+  [ -s "$HK" ] || /data/opt/bin/dropbearkey -t ed25519 -f "$HK" >> "$LOG" 2>&1 || return 1
+  pidof dropbear >/dev/null 2>&1 && return 0
+  # -B: root has an empty password, without it dropbear refuses the login.
+  # This build has no syslog: its messages go to stderr, i.e. to $LOG (no -E flag here).
+  "$DB" -r "$HK" -p 2222 -B 2>>"$LOG"
+}
+case "$1" in
+  start)   start ;;
+  stop)    killall dropbear 2>/dev/null ;;
+  restart) killall dropbear 2>/dev/null; sleep 1; start ;;
+esac
+exit 0
