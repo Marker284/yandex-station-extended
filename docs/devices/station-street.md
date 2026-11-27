@@ -47,7 +47,7 @@
 | Подсветка | работает | [Индикация](#led) |
 | Кнопки и акселерометр | читаются | [Вход](#input) |
 | YAM | не работает (32-битное ядро) | [YAM](../recipes/packagemanagers.md) |
-| Своя LLM | не проверялось | — |
+| Своя LLM | работает | [Quasar Bridge](../recipes/llm.md#quasar-bridge) |
 
 ## Получение root { #root }
 
