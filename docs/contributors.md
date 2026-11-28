@@ -38,6 +38,7 @@
 | [@zom-2018](https://github.com/zom-2018) | [Сеть](internals/network.md#unbound-config): конфиг unbound из облака, [пропадающий Wi-Fi и IGMP snooping](internals/gotchas.md#igmp) ([#55](https://github.com/Marker284/yandex-station-extended/pull/55)); [Мини 2](devices/station-mini2.md): root на сборках после 21.10.2026, выключение ADB, данные модели ([#54](https://github.com/Marker284/yandex-station-extended/pull/54)) |
 | [@dextray765](https://github.com/dextray765) | [Мини 2](devices/station-mini2.md#environment): раздел `/tee` и поведение ядра 4.9 на syscall 403 ([#68](https://github.com/Marker284/yandex-station-extended/pull/68)) |
 | [@likas](https://github.com/likas) | [Станция Миди](devices/station-midi.md#factory-6): заводская прошивка factory-6 — отличия, обновления, ADB ([#53](https://github.com/Marker284/yandex-station-extended/pull/53)) |
+| [@RoBiN19666](https://github.com/RoBiN19666) | [MidiPult](recipes/midipult.md) — веб-панель для Станции Миди: дисплей, кольцо, звук, нейросеть, VPN и сценарии ([#233](https://github.com/Marker284/yandex-station-extended/pull/233)) |
 
 ## Данные для страниц моделей
 
